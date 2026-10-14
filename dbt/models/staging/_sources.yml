@@ -20,4 +20,5 @@ models:
       - name: demographic_type
         tests:
           - accepted_values:
-              values: ['Geography', 'Sex', 'Age Group', 'Race (alone or in combination)', 'Race (primary/least common race)']
+              arguments:
+                values: ['Geography', 'Sex', 'Age Group', 'Race (alone or in combination)', 'Race (primary/least common race)']

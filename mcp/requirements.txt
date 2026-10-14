@@ -1,2 +1,2 @@
-mcp<2
+mcp==2.3.*
 psycopg2-binary==2.9.*

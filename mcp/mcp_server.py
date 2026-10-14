@@ -1,8 +1,8 @@
 import json, os, re
 import psycopg2
-from mcp.server.fastmcp import FastMCP
+from mcp.server import MCPServer
 
-mcp = FastMCP("Healthcare-STI-Epidemiology-Platform")
+mcp = MCPServer("Healthcare-STI-Epidemiology-Platform")
 DB = os.environ["MCP_DATABASE_URL"]  # rol 'mcp_reader': solo SELECT sobre marts, sin columnas OLS
 TMDL_ROOT = "data_model/STI_Surveillance_Model.SemanticModel/definition"
 

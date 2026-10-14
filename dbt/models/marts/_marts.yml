@@ -7,12 +7,12 @@ models:
     columns:
       - {name: geo_key, tests: [unique, not_null]}
       - name: geo_level
-        tests: [{accepted_values: {values: [state, county]}}]
+        tests: [{accepted_values: {arguments: {values: [state, county]}}}]
   - name: dim_mmwr_week
     columns:
       - {name: epi_week_key, tests: [unique, not_null]}
       - name: mmwr_week
-        tests: [{accepted_values: {values: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53], quote: false}}]
+        tests: [{accepted_values: {arguments: {values: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53], quote: false}}}]
   - name: dim_epi_month
     columns:
       - {name: epi_month_key, tests: [unique, not_null]}
@@ -20,20 +20,20 @@ models:
     columns:
       - {name: demographic_key, tests: [unique, not_null]}
       - name: demographic_type
-        tests: [{accepted_values: {values: ['Geography', 'Sex', 'Age Group', 'Race (alone or in combination)', 'Race (primary/least common race)']}}]
+        tests: [{accepted_values: {arguments: {values: ['Geography', 'Sex', 'Age Group', 'Race (alone or in combination)', 'Race (primary/least common race)']}}}]
   - name: fct_nndss_weekly
     columns:
       - {name: fact_id, tests: [unique, not_null]}
-      - {name: epi_week_key, tests: [not_null, {relationships: {to: ref('dim_mmwr_week'), field: epi_week_key}}]}
-      - {name: disease_key, tests: [not_null, {relationships: {to: ref('dim_disease'), field: disease_key}}]}
-      - {name: geo_key, tests: [not_null, {relationships: {to: ref('dim_geography'), field: geo_key}}]}
+      - {name: epi_week_key, tests: [not_null, {relationships: {arguments: {to: ref('dim_mmwr_week'), field: epi_week_key}}}]}
+      - {name: disease_key, tests: [not_null, {relationships: {arguments: {to: ref('dim_disease'), field: disease_key}}}]}
+      - {name: geo_key, tests: [not_null, {relationships: {arguments: {to: ref('dim_geography'), field: geo_key}}}]}
   - name: fct_oregon_monthly
     columns:
       - {name: fact_id, tests: [unique, not_null]}
-      - {name: epi_month_key, tests: [not_null, {relationships: {to: ref('dim_epi_month'), field: epi_month_key}}]}
-      - {name: disease_key, tests: [not_null, {relationships: {to: ref('dim_disease'), field: disease_key}}]}
-      - {name: geo_key, tests: [not_null, {relationships: {to: ref('dim_geography'), field: geo_key}}]}
-      - {name: demographic_key, tests: [not_null, {relationships: {to: ref('dim_demographic'), field: demographic_key}}]}
+      - {name: epi_month_key, tests: [not_null, {relationships: {arguments: {to: ref('dim_epi_month'), field: epi_month_key}}}]}
+      - {name: disease_key, tests: [not_null, {relationships: {arguments: {to: ref('dim_disease'), field: disease_key}}}]}
+      - {name: geo_key, tests: [not_null, {relationships: {arguments: {to: ref('dim_geography'), field: geo_key}}}]}
+      - {name: demographic_key, tests: [not_null, {relationships: {arguments: {to: ref('dim_demographic'), field: demographic_key}}}]}
   - name: agg_weekly_national
   - name: mart_revisions
   - name: mart_data_quality
