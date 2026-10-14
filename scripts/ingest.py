@@ -1,6 +1,12 @@
 import csv, io, os, re
 import requests, psycopg2
 from psycopg2.extras import execute_values
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+# reintenta caídas de DNS/conexión y 429/5xx con espera creciente (2, 4, 8, 16, 32 s)
+http = requests.Session()
+http.mount("https://", HTTPAdapter(max_retries=Retry(total=5, backoff_factor=2, status_forcelist=(429, 500, 502, 503, 504))))
 
 NNDSS = "https://data.cdc.gov/resource/x9gk-5huc.json"
 OREGON = "https://data.oregon.gov/resource/rk77-sqhz.json"
@@ -13,7 +19,7 @@ PAGE = 50000
 def soql(url, where):
     rows, offset = [], 0
     while True:
-        r = requests.get(url, params={"$where": where, "$order": ":id", "$limit": PAGE, "$offset": offset}, timeout=120)
+        r = http.get(url, params={"$where": where, "$order": ":id", "$limit": PAGE, "$offset": offset}, timeout=120)
         r.raise_for_status()
         page = r.json()
         rows += page
@@ -77,7 +83,7 @@ def upsert(cur, table, cols, pk, rows):
 def main():
     nndss = [norm_nndss(r) for r in soql(NNDSS, in_list("label", NNDSS_LABELS))]
     oregon = dedupe([norm_oregon(r) for r in soql(OREGON, in_list("disease_name", OREGON_DISEASES))], OREGON_PK)
-    census = [t for row in csv.DictReader(io.StringIO(requests.get(CENSUS, timeout=120).text)) for t in norm_census(row)]
+    census = [t for row in csv.DictReader(io.StringIO(http.get(CENSUS, timeout=120).text)) for t in norm_census(row)]
     assert nndss and oregon and census, "fuente vacía: abortar sin tocar la base"
     with psycopg2.connect(os.environ["DATABASE_URL"]) as conn, conn.cursor() as cur:
         upsert(cur, "raw.nndss_weekly",

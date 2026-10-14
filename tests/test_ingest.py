@@ -47,3 +47,10 @@ def test_oregon_whitespace_variants_collapse_to_one_pk():
     rows = [norm_oregon({**base, "demographic_level": "Multnomah  County"}),
             norm_oregon({**base, "demographic_level": "Multnomah County"})]
     assert len(dedupe(rows, OREGON_PK)) == 1
+
+
+def test_http_session_retries_connection_errors_and_5xx():
+    from scripts.ingest import http
+    retry = http.get_adapter("https://data.oregon.gov").max_retries
+    assert retry.total >= 5 and retry.backoff_factor > 0
+    assert {429, 500, 502, 503, 504} <= set(retry.status_forcelist)
