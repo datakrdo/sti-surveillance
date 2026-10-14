@@ -1,0 +1,17 @@
+version: 2
+exposures:
+  - name: sti_surveillance_dashboard
+    type: dashboard
+    maturity: medium
+    owner: {name: Portfolio Owner, email: jcbatman@gmail.com}
+    depends_on:
+      - ref('fct_nndss_weekly')
+      - ref('fct_oregon_monthly')
+      - ref('agg_weekly_national')
+      - ref('mart_revisions')
+      - ref('mart_data_quality')
+      - ref('dim_disease')
+      - ref('dim_geography')
+      - ref('dim_mmwr_week')
+      - ref('dim_epi_month')
+      - ref('dim_demographic')

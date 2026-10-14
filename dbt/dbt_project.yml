@@ -1,0 +1,17 @@
+name: sti
+version: '1.0'
+profile: sti
+model-paths: [models]
+seed-paths: [seeds]
+snapshot-paths: [snapshots]
+test-paths: [tests]
+models:
+  sti:
+    staging: {+materialized: view, +schema: staging}
+    marts: {+materialized: table, +schema: marts}
+on-run-end:
+  - "grant usage on schema analytics_marts to mcp_reader"
+  - "grant select on all tables in schema analytics_marts to mcp_reader"
+  - "revoke select on analytics_marts.dim_demographic, analytics_marts.fct_oregon_monthly, analytics_marts.mart_revisions from mcp_reader"
+seeds:
+  sti: {+schema: seeds}

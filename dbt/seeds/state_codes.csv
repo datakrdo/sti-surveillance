@@ -1,0 +1,59 @@
+state_name_upper,state_code,state_name
+ALABAMA,AL,Alabama
+ALASKA,AK,Alaska
+ARIZONA,AZ,Arizona
+ARKANSAS,AR,Arkansas
+CALIFORNIA,CA,California
+COLORADO,CO,Colorado
+CONNECTICUT,CT,Connecticut
+DELAWARE,DE,Delaware
+DISTRICT OF COLUMBIA,DC,District of Columbia
+FLORIDA,FL,Florida
+GEORGIA,GA,Georgia
+HAWAII,HI,Hawaii
+IDAHO,ID,Idaho
+ILLINOIS,IL,Illinois
+INDIANA,IN,Indiana
+IOWA,IA,Iowa
+KANSAS,KS,Kansas
+KENTUCKY,KY,Kentucky
+LOUISIANA,LA,Louisiana
+MAINE,ME,Maine
+MARYLAND,MD,Maryland
+MASSACHUSETTS,MA,Massachusetts
+MICHIGAN,MI,Michigan
+MINNESOTA,MN,Minnesota
+MISSISSIPPI,MS,Mississippi
+MISSOURI,MO,Missouri
+MONTANA,MT,Montana
+NEBRASKA,NE,Nebraska
+NEVADA,NV,Nevada
+NEW HAMPSHIRE,NH,New Hampshire
+NEW JERSEY,NJ,New Jersey
+NEW MEXICO,NM,New Mexico
+NEW YORK,NY,New York
+NORTH CAROLINA,NC,North Carolina
+NORTH DAKOTA,ND,North Dakota
+OHIO,OH,Ohio
+OKLAHOMA,OK,Oklahoma
+OREGON,OR,Oregon
+PENNSYLVANIA,PA,Pennsylvania
+RHODE ISLAND,RI,Rhode Island
+SOUTH CAROLINA,SC,South Carolina
+SOUTH DAKOTA,SD,South Dakota
+TENNESSEE,TN,Tennessee
+TEXAS,TX,Texas
+UTAH,UT,Utah
+VERMONT,VT,Vermont
+VIRGINIA,VA,Virginia
+WASHINGTON,WA,Washington
+WEST VIRGINIA,WV,West Virginia
+WISCONSIN,WI,Wisconsin
+WYOMING,WY,Wyoming
+PUERTO RICO,PR,Puerto Rico
+GUAM,GU,Guam
+AMERICAN SAMOA,AS,American Samoa
+COMMONWEALTH OF NORTHERN MARIANA ISLANDS,MP,Commonwealth of Northern Mariana Islands
+U.S. VIRGIN ISLANDS,VI,U.S. Virgin Islands
+NEW YORK CITY,NY,New York
+NORTHERN MARIANA ISLANDS,MP,Commonwealth of Northern Mariana Islands

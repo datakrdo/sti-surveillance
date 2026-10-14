@@ -1,0 +1,10 @@
+source,source_name,disease_key,disease_name,disease_group,pathogen_type,transmission_mode,comparable_across_sources
+nndss,Chlamydia trachomatis infection,CHL,Chlamydia,Chlamydia,Bacteriano,Sexual,true
+oregon,Chlamydia,CHL,Chlamydia,Chlamydia,Bacteriano,Sexual,true
+nndss,Gonorrhea,GON,Gonorrea,Gonorrhea,Bacteriano,Sexual,true
+oregon,Gonorrhea,GON,Gonorrea,Gonorrhea,Bacteriano,Sexual,true
+nndss,"Syphilis, Primary and secondary",SYP_PS,Sífilis primaria y secundaria,Syphilis,Bacteriano,Sexual,false
+oregon,Early syphilis,SYP_EARLY,Sífilis temprana,Syphilis,Bacteriano,Sexual,false
+nndss,"Syphilis, Congenital",SYP_CONG,Sífilis congénita,Syphilis,Bacteriano,Vertical,true
+oregon,Congenital syphilis,SYP_CONG,Sífilis congénita,Syphilis,Bacteriano,Vertical,true
+oregon,HIV,HIV,VIH,HIV,Viral,Sexual/Sanguínea/Vertical,false

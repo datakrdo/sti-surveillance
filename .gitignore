@@ -1,0 +1,9 @@
+.env
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+__pycache__/
+.venv/
+.pytest_cache/

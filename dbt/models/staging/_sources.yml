@@ -1,0 +1,23 @@
+version: 2
+sources:
+  - name: raw
+    schema: raw
+    loaded_at_field: ingested_at
+    freshness:
+      warn_after: {count: 26, period: hour}
+      error_after: {count: 50, period: hour}
+    tables:
+      - name: nndss_weekly
+      - name: oregon_monthly
+      - name: census_population
+models:
+  - name: stg_nndss_weekly
+    columns:
+      - name: state_code
+        tests: [not_null]
+  - name: stg_oregon_monthly
+    columns:
+      - name: demographic_type
+        tests:
+          - accepted_values:
+              values: ['Geography', 'Sex', 'Age Group', 'Race (alone or in combination)', 'Race (primary/least common race)']

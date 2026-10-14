@@ -1,0 +1,24 @@
+name: Automated Epidemiological Data Ingestion
+on:
+  schedule: [{ cron: '0 6 * * *' }]   # 06:00 UTC
+  workflow_dispatch:
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+      PGHOST: ${{ secrets.PGHOST }}
+      PGUSER: ${{ secrets.PGUSER }}
+      PGPASSWORD: ${{ secrets.PGPASSWORD }}
+      PGDATABASE: ${{ secrets.PGDATABASE }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11', cache: 'pip' }
+      - run: pip install -r requirements.txt
+      - run: pytest tests -q
+      - run: python -m scripts.ingest
+      - run: dbt seed --project-dir dbt --profiles-dir dbt
+      - run: dbt snapshot --project-dir dbt --profiles-dir dbt
+      - run: dbt build --project-dir dbt --profiles-dir dbt
+      - run: dbt source freshness --project-dir dbt --profiles-dir dbt
