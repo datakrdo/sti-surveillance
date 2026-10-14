@@ -1,6 +1,6 @@
-name: Automated Epidemiological Data Ingestion
+name: Weekly Epidemiological Data Ingestion
 on:
-  schedule: [{ cron: '0 6 * * *' }]   # 06:00 UTC
+  schedule: [{ cron: '0 6 * * 4' }]   # jueves 06:00 UTC, un día después de la publicación semanal de NNDSS
   workflow_dispatch:
 jobs:
   ingest:

@@ -1,5 +1,7 @@
 # STI Surveillance Platform (NNDSS + Oregon) Implementation Plan
 
+> **Nota:** este es el plan original. Lo que cambió al ejecutarlo (cron semanal, versiones fijadas, vista del MCP, `fact_id` md5, `demographic_level='All'` para Geography) está en `README.md` y en la spec.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 ## Context
@@ -24,11 +26,11 @@ Enfermedades ETS: `Chlamydia, Gonorrhea, Early syphilis, Congenital syphilis, HI
 
 ---
 
-**Goal:** Pipeline diario gratuito NNDSS+Oregon → Postgres → dbt → modelo compuesto Power BI con RLS (estado/condado), OLS (raza/edad/revisiones) y servidor MCP read-only.
+**Goal:** Pipeline semanal gratuito NNDSS+Oregon → Postgres → dbt → modelo compuesto Power BI con RLS (estado/condado), OLS (raza/edad/revisiones) y servidor MCP read-only.
 
 **Architecture:** `scripts/ingest.py` hace full-reload idempotente (upsert) de las 3 fuentes a `raw.*` (son ~100k filas: sin lógica incremental). `dbt snapshot` captura revisiones de `m1` (retraso de notificación). dbt construye dos hechos (`fct_nndss_weekly` grano semana×estado×enfermedad; `fct_oregon_monthly` grano mes×slice demográfico×enfermedad) con dimensiones compartidas `dim_disease` y `dim_geography`.
 
-**Tech Stack:** Python 3.11 (requests, psycopg2-binary, pytest), Neon Postgres (free), dbt-postgres 1.8+, Power BI Desktop (PBIP/TMDL), Tabular Editor 2, FastMCP (`mcp` package), GitHub Actions.
+**Tech Stack:** Python 3.12 (requests, psycopg2-binary, pytest), Neon Postgres (free), dbt-core 1.12.6 + dbt-postgres 1.11.0, Power BI Desktop (PBIP/TMDL), Tabular Editor 2, MCPServer (`mcp` 2.3), GitHub Actions.
 
 **Spec:** `docs/superpowers/specs/2026-10-14-sti-surveillance-design.md` (Task 0 lo crea a partir de este Context + `powerbi_consolidado.md`).
 
@@ -37,7 +39,7 @@ Enfermedades ETS: `Chlamydia, Gonorrhea, Early syphilis, Congenital syphilis, HI
 - **Nunca** `git commit`/`git push`/`git init` por el agente (CLAUDE.md del usuario): cada paso "Commit" = entregar el mensaje en un bloque de texto, sin líneas de atribución a Claude.
 - Repo GitHub privado.
 - Secretos solo en `.env` (local, gitignored) y GitHub Secrets: `DATABASE_URL`.
-- Python 3.11; dependencias: `requests psycopg2-binary dbt-postgres pytest mcp`. Nada más.
+- Python 3.12; dependencias: `requests psycopg2-binary dbt-core dbt-postgres pytest mcp` con versiones fijadas (sin fijar dbt-core pip resuelve una beta sin soporte de postgres).
 - No publicar con Publish to web.
 - Casos enmascarados de Oregon (`masked=1`) se guardan como `NULL` + `is_masked=true`; **nunca** se imputan.
 - Agregados NNDSS (`location1 IS NULL`: divisiones, "U.S. Residents", "Non-U.S. Residents") se excluyen del hecho.
@@ -54,7 +56,7 @@ Enfermedades ETS: `Chlamydia, Gonorrhea, Early syphilis, Congenital syphilis, HI
 ## File Structure
 ```
 sti-surveillance/
-├── .github/workflows/daily_ingest.yml   # cron: ingest → dbt snapshot → dbt build
+├── .github/workflows/weekly_ingest.yml  # cron semanal: ingest → dbt snapshot → dbt build
 ├── .gitignore, .env.example, requirements.txt, README.md
 ├── scripts/ingest.py                    # fetch + normalize + upsert (3 fuentes)
 ├── tests/test_ingest.py                 # tests puros de normalización
@@ -101,7 +103,8 @@ DATABASE_URL=postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require
 ```
 requests==2.32.*
 psycopg2-binary==2.9.*
-dbt-postgres==1.8.*
+dbt-core==1.12.6
+dbt-postgres==1.11.0
 pytest==8.*
 ```
 - [ ] **Step 2:** Spec = sección Context de este plan + secciones 3–8 de `powerbi_consolidado.md` reescritas con el modelo de Task 4/6/7. Self-review: sin TBD, sin contradicciones.
@@ -305,7 +308,7 @@ sti:
   - `disease_map.csv`: `source,source_name,disease_key,disease_name,disease_group,pathogen_type,transmission_mode,comparable_across_sources` con filas: NNDSS Chlamydia→`CHL`; Oregon Chlamydia→`CHL`; ambos Gonorrhea→`GON`; NNDSS `Syphilis, Primary and secondary`→`SYP_PS` (`comparable=false`); Oregon `Early syphilis`→`SYP_EARLY` (`comparable=false`, mismo `disease_group=Syphilis`); ambos congénita→`SYP_CONG`; Oregon HIV→`HIV` (Viral).
   - `state_codes.csv`: `state_name_upper,state_code,state_name` para 50 estados + DC + territorios; `NEW YORK CITY→NY`.
   - `dim_access.csv`: `user_principal_name,state_code,county_name` con usuarios ficticios del developer tenant (ej. `ana@<tenant>.onmicrosoft.com,OR,Multnomah County`; `luis@…,CA,*`; `admin@…,*,*`).
-- [ ] **Step 3:** `_sources.yml` con `freshness: {warn_after: {count: 26, period: hour}, error_after: {count: 50, period: hour}}`, `loaded_at_field: ingested_at` en las 3 tablas raw.
+- [ ] **Step 3:** `_sources.yml` con `freshness: {warn_after: {count: 8, period: day}, error_after: {count: 15, period: day}}`, `loaded_at_field: ingested_at` en las 3 tablas raw.
 - [ ] **Step 4:** `stg_nndss_weekly.sql`: `WHERE location1 IS NOT NULL`, join `state_codes` por `upper(location1)`, `year*100+week AS epi_week_key`, `m1 AS cases_week`, `m2 AS max_prev_52w`, `m3 AS cum_ytd`, `m4 AS cum_ytd_prev`; luego `GROUP BY` estado para sumar NYC dentro de NY (`sum(m1)`, flags con `max`).
   `stg_oregon_monthly.sql`: `mmwr_year*100+month AS epi_month_key`, `demographic AS demographic_type`, `CASE WHEN geo_unit='county' THEN demographic_level END AS county_name`, `'OR' AS state_code`.
   `stg_census_population.sql`: join `state_codes`, `region/division` decodificados.
@@ -357,13 +360,13 @@ group by 1,2,3,4 having count(*) > 1
 
 ### Task 5: GitHub Actions
 
-**Files:** Create `.github/workflows/daily_ingest.yml`.
+**Files:** Create `.github/workflows/weekly_ingest.yml`.
 
 - [ ] **Step 1:**
 ```yaml
-name: Automated Epidemiological Data Ingestion
+name: Weekly Epidemiological Data Ingestion
 on:
-  schedule: [{ cron: '0 6 * * *' }]   # 06:00 UTC: Oregon publica run_date del día
+  schedule: [{ cron: '0 6 * * 4' }]   # jueves 06:00 UTC, un día después de la publicación semanal de NNDSS
   workflow_dispatch:
 jobs:
   ingest:
@@ -375,9 +378,9 @@ jobs:
       PGPASSWORD: ${{ secrets.PGPASSWORD }}
       PGDATABASE: ${{ secrets.PGDATABASE }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: '3.11', cache: 'pip' }
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with: { python-version: '3.12', cache: 'pip' }
       - run: pip install -r requirements.txt
       - run: pytest tests -q
       - run: python -m scripts.ingest
@@ -387,7 +390,7 @@ jobs:
       - run: dbt source freshness --project-dir dbt --profiles-dir dbt
 ```
 - [ ] **Step 2:** Usuario carga Secrets, lanza `workflow_dispatch`; verificar job verde.
-- [ ] **Step 3:** Mensaje: `ci: nightly ingest, snapshot and dbt build`.
+- [ ] **Step 3:** Mensaje: `ci: weekly ingest, snapshot and dbt build`.
 
 ### Task 6: Modelo semántico Power BI (manual en Desktop, guardado como PBIP)
 
