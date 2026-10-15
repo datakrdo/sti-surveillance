@@ -1,0 +1,116 @@
+table fct_oregon_monthly
+	lineageTag: 55ae5879-e9bc-4d20-9553-ea0034f5b17d
+
+	column fact_id
+		dataType: string
+		isHidden
+		sourceProviderType: nvarchar(max)
+		lineageTag: 3942969d-af32-4d91-97bc-5dbaefa63945
+		summarizeBy: none
+		sourceColumn: fact_id
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column epi_month_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: efcd561e-ed74-431c-b2fa-9ea4946fc2e3
+		summarizeBy: none
+		sourceColumn: epi_month_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column disease_key
+		dataType: string
+		isHidden
+		sourceProviderType: nvarchar(max)
+		lineageTag: de0d9e11-ae13-44c8-803a-8506a55067d9
+		summarizeBy: none
+		sourceColumn: disease_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column geo_key
+		dataType: string
+		isHidden
+		sourceProviderType: nvarchar(max)
+		lineageTag: a0a4030b-f973-4219-8887-e62d0aa2f517
+		summarizeBy: none
+		sourceColumn: geo_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column demographic_key
+		dataType: string
+		isHidden
+		sourceProviderType: nvarchar(max)
+		lineageTag: 7a8c012d-50c4-4ae1-940b-94ef91b5583e
+		summarizeBy: none
+		sourceColumn: demographic_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column confirmation_status
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 527ad99b-ec90-444f-920c-2f0522bab3f4
+		summarizeBy: none
+		sourceColumn: confirmation_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column cases
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 16f1f3ca-a36e-4e83-ad8d-60e3e116a20e
+		summarizeBy: sum
+		sourceColumn: cases
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_masked
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: ea0acea9-74d3-4c3b-a0db-5d5d631c3749
+		summarizeBy: none
+		sourceColumn: is_masked
+
+		annotation SummarizationSetBy = Automatic
+
+	column population
+		dataType: double
+		formatString: 0
+		sourceProviderType: decimal
+		lineageTag: 374a8eef-2c5f-495c-9b18-0cff5ac6a174
+		summarizeBy: sum
+		sourceColumn: population
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fct_oregon_monthly = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("ep-xxxxxxxx.region.aws.neon.tech", "neondb"),
+				    analytics_marts_fct_oregon_monthly = Source{[Schema="analytics_marts",Item="fct_oregon_monthly"]}[Data]
+				in
+				    analytics_marts_fct_oregon_monthly
+
+	annotation PBI_ResultType = Table
+

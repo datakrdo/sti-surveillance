@@ -1,0 +1,48 @@
+relationship 26f0b55f-6df9-8779-7083-b67bb955f2ab
+	fromColumn: fct_nndss_weekly.week_start_date
+	toColumn: dim_date.date
+
+relationship 96ab04eb-1fbd-f4e2-49fa-000a2f31cb1a
+	fromColumn: fct_nndss_weekly.disease_key
+	toColumn: dim_disease.disease_key
+
+relationship c97559ef-01f1-d9d6-b0ca-a4f6f314e414
+	fromColumn: fct_nndss_weekly.epi_week_key
+	toColumn: dim_mmwr_week.epi_week_key
+
+relationship 4a970bff-d9b7-ac50-06ea-91200ea2f114
+	fromColumn: fct_nndss_weekly.geo_key
+	toColumn: dim_geography.geo_key
+
+relationship 2ebdec4c-0e53-5115-ee79-33b8cc50e687
+	fromColumn: fct_oregon_monthly.epi_month_key
+	toColumn: dim_epi_month.epi_month_key
+
+relationship 4c8c2eb3-58f9-40a1-e024-f5fe9f9a816d
+	fromColumn: fct_oregon_monthly.disease_key
+	toColumn: dim_disease.disease_key
+
+relationship a6569123-fe9d-d2ac-2691-dbb4458bf45a
+	fromColumn: fct_oregon_monthly.demographic_key
+	toColumn: dim_demographic.demographic_key
+
+relationship 996c0189-1b9b-ba0c-9c6d-27c317705154
+	fromColumn: fct_oregon_monthly.geo_key
+	toColumn: dim_geography.geo_key
+
+relationship 9e631235-5dfc-4d20-a46c-5c605a097bf1
+	fromColumn: agg_weekly_national.epi_week_key
+	toColumn: dim_mmwr_week.epi_week_key
+
+relationship 15252ef9-4e24-0b05-be77-747e0a5dd274
+	fromColumn: agg_weekly_national.disease_key
+	toColumn: dim_disease.disease_key
+
+relationship c3d510c6-c675-e3a2-20d6-2f4e4cc67d25
+	fromColumn: mart_revisions.geo_key
+	toColumn: dim_geography.geo_key
+
+relationship 6cab4aa1-3a84-5522-ab20-acddf3c21e6f
+	fromColumn: mart_revisions.disease_key
+	toColumn: dim_disease.disease_key
+

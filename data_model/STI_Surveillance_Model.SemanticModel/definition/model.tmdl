@@ -1,0 +1,33 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["fct_nndss_weekly","fct_oregon_monthly","dim_date","dim_demographic","dim_disease","dim_epi_month","dim_geography","dim_mmwr_week","agg_weekly_national","mart_revisions","mart_data_quality","dim_access","_Measures"]
+
+annotation PBI_ProTooling = ["DaxQueryView_Desktop","DevMode"]
+
+annotation __TEdtr = 1
+
+ref table fct_nndss_weekly
+ref table fct_oregon_monthly
+ref table dim_date
+ref table dim_demographic
+ref table dim_disease
+ref table dim_epi_month
+ref table dim_geography
+ref table dim_mmwr_week
+ref table agg_weekly_national
+ref table mart_revisions
+ref table mart_data_quality
+ref table dim_access
+ref table _Measures
+
+ref cultureInfo en-US
+

@@ -1,0 +1,79 @@
+table dim_geography
+	lineageTag: 84289f99-b7e5-40e5-a4ab-85065cf1a8dd
+
+	column geo_key
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: f099c2b4-695f-4947-835d-a9e77feb8c7d
+		summarizeBy: none
+		sourceColumn: geo_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column state_code
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 6655d162-78ba-4415-a8e5-224d74c945d4
+		summarizeBy: none
+		sourceColumn: state_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column state_name
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 3112475c-be37-4587-aa63-54f38978c630
+		dataCategory: StateOrProvince
+		summarizeBy: none
+		sourceColumn: state_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column county_name
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 6aba2ca2-cfaf-4bf7-8d7d-50bff0ff2cd1
+		dataCategory: County
+		summarizeBy: none
+		sourceColumn: county_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column geo_level
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: ff732298-42df-450a-b0fd-11bd92639d35
+		summarizeBy: none
+		sourceColumn: geo_level
+
+		annotation SummarizationSetBy = Automatic
+
+	column census_region
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: d552698e-3df6-4fbf-ba10-b8ba3bcac417
+		summarizeBy: none
+		sourceColumn: census_region
+
+		annotation SummarizationSetBy = Automatic
+
+	column census_division
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: d5032dc8-22f2-4135-bfd1-38de8220c652
+		summarizeBy: none
+		sourceColumn: census_division
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_geography = m
+		mode: dual
+		source =
+				let
+				    Source = PostgreSQL.Database("ep-xxxxxxxx.region.aws.neon.tech", "neondb"),
+				    analytics_marts_dim_geography = Source{[Schema="analytics_marts",Item="dim_geography"]}[Data]
+				in
+				    analytics_marts_dim_geography
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,80 @@
+table dim_demographic
+	lineageTag: 54020bf7-17e0-492b-b1ca-01e2d5c28189
+
+	column demographic_key
+		dataType: string
+		isHidden
+		sourceProviderType: nvarchar(max)
+		lineageTag: 8bf12297-457a-4fcf-8b5a-e9822f0a9b85
+		summarizeBy: none
+		sourceColumn: demographic_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column demographic_type
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 4cf39384-c308-433c-b5e6-84d5f8d2523b
+		summarizeBy: none
+		sourceColumn: demographic_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column demographic_level
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 053a5bcc-af66-4bf3-a7c3-f2595570c14e
+		summarizeBy: none
+		sourceColumn: demographic_level
+
+		annotation SummarizationSetBy = Automatic
+
+	column sex
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 94a98691-b648-4f0f-b1e5-e6bd57db9d42
+		summarizeBy: none
+		sourceColumn: sex
+
+		annotation SummarizationSetBy = Automatic
+
+	column age_group
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: b084dad2-cac6-461a-9e41-9113cf51433b
+		summarizeBy: none
+		sourceColumn: age_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column race_group
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: ef37eca9-311b-4a34-8541-d9dfa85ccace
+		summarizeBy: none
+		sourceColumn: race_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column race_method
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 18b1a992-6e9e-40f3-875d-839eca04527c
+		summarizeBy: none
+		sourceColumn: race_method
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_demographic = m
+		mode: dual
+		source =
+				let
+				    Source = PostgreSQL.Database("ep-xxxxxxxx.region.aws.neon.tech", "neondb"),
+				    analytics_marts_dim_demographic = Source{[Schema="analytics_marts",Item="dim_demographic"]}[Data]
+				in
+				    analytics_marts_dim_demographic
+
+	annotation PBI_ResultType = Table
+

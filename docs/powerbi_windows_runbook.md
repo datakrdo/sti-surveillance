@@ -36,11 +36,11 @@ Vigilancia de ETS en EE.UU. con datos públicos: **NNDSS** (CDC, semanal por est
 > Cada bloque termina en un **GATE** con valores esperados; no se avanza sin el anterior en ✔. Pasos: modelo (Task 6), seguridad (Task 7), informe (Task 9.2). Antes de empezar, la persona necesita por canal seguro: `PGHOST`, `PGDATABASE`, `PBI_DB_USER` (=`pbi_reader`) y `PBI_DB_PASSWORD`, más acceso a la consola de Neon (SQL Editor).
 
 ## GATE P — Entorno Windows
-- [ ] **P1.** Windows 10/11 con Power BI Desktop actualizado, [Tabular Editor 2](https://github.com/TabularEditor/TabularEditor/releases) (2.x, gratis), [DAX Studio](https://daxstudio.org) y Git. Instalar TE2 y DAX Studio **antes** de abrir Desktop para que aparezcan en *External Tools*.
-- [ ] **P2.** `git clone` del repo privado (o `git pull` si ya existe). Confirmar `git log -1` = commit del tema (paso 0.2).
-- [ ] **P3.** Neon Console → SQL Editor → pegar `sql/qa_anchors.sql` → Run. Comparar con la tabla de anclas (al final).
-- [ ] **P4.** Desktop → *File → Options and settings → Options → Current File → Data Load* → **desmarcar** "Autodetect new relationships after data is loaded".
-- [ ] **P5.** *Options → Preview features*: activar "Power BI Project (.pbip) save option" y "Store semantic model using TMDL format" **solo si aparecen**; si no aparecen, ya vienen activos. Reiniciar Desktop si cambiaste algo.
+- [x] **P1.** Windows 10/11 con Power BI Desktop actualizado, [Tabular Editor 2](https://github.com/TabularEditor/TabularEditor/releases) (2.x, gratis), [DAX Studio](https://daxstudio.org) y Git. Instalar TE2 y DAX Studio **antes** de abrir Desktop para que aparezcan en *External Tools*.
+- [x] **P2.** `git clone` del repo privado (o `git pull` si ya existe). Confirmar `git log -1` = commit del tema (paso 0.2).
+- [x] **P3.** Neon Console → SQL Editor → pegar `sql/qa_anchors.sql` → Run. Comparar con la tabla de anclas (al final).
+- [x] **P4.** Desktop → *File → Options and settings → Options → Current File → Data Load* → **desmarcar** "Autodetect new relationships after data is loaded".
+- [x] **P5.** *Options → Preview features*: activar "Power BI Project (.pbip) save option" y "Store semantic model using TMDL format" **solo si aparecen**; si no aparecen, ya vienen activos. Reiniciar Desktop si cambiaste algo.
 
 **Expected:** las 3 herramientas abren; P3 reproduce las anclas.
 
@@ -49,16 +49,16 @@ Vigilancia de ETS en EE.UU. con datos públicos: **NNDSS** (CDC, semanal por est
 ## Task 6.A — Cargar datos (dos pasadas)
 Una tabla Import no puede pasar a DirectQuery, y solo una DirectQuery puede pasar a Dual: por eso dos pasadas.
 
-- [ ] **A1. Pasada DirectQuery.** *Home → Get data → PostgreSQL database*. Server = `PGHOST` (sin `https://`, sin puerto). Database = `PGDATABASE`. **Data Connectivity mode: DirectQuery**. OK → pestaña **Database** (no Windows) → `pbi_reader` + contraseña → Connect. Navigator → `analytics_marts` → marcar **exactamente 8**: `fct_nndss_weekly`, `fct_oregon_monthly`, `dim_disease`, `dim_geography`, `dim_mmwr_week`, `dim_epi_month`, `dim_demographic`, `dim_date` → **Load**. (Si falla la conexión → Troubleshooting.)
-- [ ] **A2. Pasada Import.** *Get data → PostgreSQL database* (mismo server/base) en **Import**. Marcar `agg_weekly_national`, `mart_revisions`, `mart_data_quality` (`analytics_marts`) y `dim_access` (`analytics_seeds`) → Load. **No** marcar `mcp_oregon_county_monthly`.
-- [ ] **A3. Nombres.** *Home → Transform data* → en Queries, *Rename* cada una al nombre sin esquema (`analytics_marts fct_nndss_weekly` → `fct_nndss_weekly`). *Close & Apply*.
-- [ ] **A4. Tipos** (panel Data, seleccionar columna → *Column tools → Data type*):
-  - *Whole number*: `epi_week_key`, `epi_month_key`, `mmwr_year`, `mmwr_week`, `month`, `month_number`, `year`, `quarter`, `period_days`, `cases`, `population` (ambos hechos).
+- [x] **A1. Pasada DirectQuery.** *Home → Get data → PostgreSQL database*. Server = `PGHOST` (sin `https://`, sin puerto). Database = `PGDATABASE`. **Data Connectivity mode: DirectQuery**. OK → pestaña **Database** (no Windows) → `pbi_reader` + contraseña → Connect. Navigator → `analytics_marts` → marcar **exactamente 8**: `fct_nndss_weekly`, `fct_oregon_monthly`, `dim_disease`, `dim_geography`, `dim_mmwr_week`, `dim_epi_month`, `dim_demographic`, `dim_date` → **Load**. (Si falla la conexión → Troubleshooting.)
+- [x] **A2. Pasada Import.** *Get data → PostgreSQL database* (mismo server/base) en **Import**. Marcar `agg_weekly_national`, `mart_revisions`, `mart_data_quality` (`analytics_marts`) y `dim_access` (`analytics_seeds`) → Load. **No** marcar `mcp_oregon_county_monthly`.
+- [x] **A3. Nombres.** *Home → Transform data* → en Queries, *Rename* cada una al nombre sin esquema (`analytics_marts fct_nndss_weekly` → `fct_nndss_weekly`). *Close & Apply*.
+- [x] **A4. Tipos** (panel Data, seleccionar columna → *Column tools → Data type*):
+  - *Whole number*: `epi_week_key`, `epi_month_key`, `mmwr_year`, `mmwr_week`, `month`, `month_number`, `year`, `quarter`, `period_days`, `cases`, `population` (**solo** `fct_nndss_weekly`, que es `bigint`). **Hallazgo (2026-10-15):** `fct_oregon_monthly[population]` es `numeric` en Postgres y debe quedar como *Decimal number*; como Whole number, los filtros `population > 0` fallan en DirectQuery con "Local evaluation of Table.Join… key equality comparers is not supported".
   - *Decimal number*: `cases_week` (en `fct_nndss_weekly` **y** `agg_weekly_national`, mismo tipo en ambas o la agregación falla), `max_prev_52w`, `cum_ytd`, `cum_ytd_prev`, `first_reported_m1`, `current_m1`, `n_revisions`, `delta`, `pct_masked`, `pct_flagged`.
   - *Date* (no Date/Time): `date`, `week_start_date`, `week_end_date`, `period_start`, `period_end`.
   - *True/False*: `is_masked`, `is_flagged`, `is_reference_week`, `comparable_across_sources`.
   - *Date/Time*: `last_ingested_at`. Resto: *Text*.
-- [ ] **A5. Guardar como proyecto:** *File → Save as* → tipo **Power BI Project (*.pbip)** → `<repo>\data_model\STI_Surveillance_Model.pbip` (crear la carpeta `data_model`). El nombre es exacto: el servidor MCP lee `data_model/STI_Surveillance_Model.SemanticModel/definition`.
+- [x] **A5. Guardar como proyecto:** *File → Save as* → tipo **Power BI Project (*.pbip)** → `<repo>\data_model\STI_Surveillance_Model.pbip` (crear la carpeta `data_model`). El nombre es exacto: el servidor MCP lee `data_model/STI_Surveillance_Model.SemanticModel/definition`.
 
 **GATE 6.A** — *DAX query view* (icono de la barra izquierda) → pegar → *Run*:
 ```dax
@@ -79,14 +79,14 @@ ROW (
 )
 ```
 **Expected (A1):** 6 · 93 · 303 · 69 · 39 · 2.191 · 55.776 · 25.125 · 996 · 55.776 · 3 · 4.
-- [ ] 12 conteos = SQL · [ ] 12 nombres exactos · [ ] sin errores · [ ] el `.pbip` existe en `data_model\` · [ ] captura `docs/img/gate_6A.png`.
+- [x] 12 conteos = SQL · [x] 12 nombres exactos · [x] sin errores · [x] el `.pbip` existe en `data_model\` · [ ] captura `docs/img/gate_6A.png`.
 
 ## Task 6.B — Modos de almacenamiento
-- [ ] **B1.** *Model view* → seleccionar cada dimensión (`dim_disease`, `dim_geography`, `dim_mmwr_week`, `dim_epi_month`, `dim_demographic`, `dim_date`) → *Properties → Advanced → Storage mode = **Dual*** → aceptar aviso. (Se puede multiseleccionar con Ctrl.)
-- [ ] **B2.** No tocar el resto: hechos en DirectQuery; `agg_weekly_national`, `mart_revisions`, `mart_data_quality`, `dim_access` en Import.
+- [x] **B1.** *Model view* → seleccionar cada dimensión (`dim_disease`, `dim_geography`, `dim_mmwr_week`, `dim_epi_month`, `dim_demographic`, `dim_date`) → *Properties → Advanced → Storage mode = **Dual*** → aceptar aviso. (Se puede multiseleccionar con Ctrl.)
+- [x] **B2.** No tocar el resto: hechos en DirectQuery; `agg_weekly_national`, `mart_revisions`, `mart_data_quality`, `dim_access` en Import.
 
 **GATE 6.B:** tooltip del encabezado de cada tabla en Model view → **2 DirectQuery · 6 Dual · 4 Import**. Confirmación textual (si existe TMDL view): arrastrar una tabla a TMDL view y buscar `mode:` en `partition`.
-- [ ] 12/12 en el modo esperado · [ ] captura `docs/img/gate_6B.png`.
+- [x] 12/12 en el modo esperado · [ ] captura `docs/img/gate_6B.png`.
 
 ## Task 6.C — Relaciones (13)
 *Model view → Manage relationships → New*. Todas: **Many to one (*:1)**, **Single**, **activa**, *Assume referential integrity* **desmarcado**. Si Desktop creó alguna sola, borrarla.
@@ -110,8 +110,8 @@ ROW (
 `dim_access` y `mart_data_quality` quedan **sin** relaciones.
 
 **GATE 6.C**
-- [ ] *Manage relationships* lista exactamente 13, todas *:1, Single, activas. Ninguna marcada como *limited* (línea con corchetes/paréntesis en Model view). Si aparece una: revisar modos de 6.B. Las 9–13 (Import → Dual) son regulares porque Dual también tiene copia Import.
-- [ ] DAX query view:
+- [x] *Manage relationships* lista exactamente 13, todas *:1, Single, activas. Ninguna marcada como *limited* (línea con corchetes/paréntesis en Model view). Si aparece una: revisar modos de 6.B. Las 9–13 (Import → Dual) son regulares porque Dual también tiene copia Import.
+- [x] DAX query view:
 ```dax
 EVALUATE
 SUMMARIZECOLUMNS ( dim_disease[disease_key], "casos", SUM ( fct_nndss_weekly[cases_week] ) )
@@ -127,12 +127,12 @@ ORDER BY dim_demographic[demographic_type]
 - [ ] captura `docs/img/gate_6C.png`.
 
 ## Task 6.D — Fechas, orden y limpieza
-- [ ] **D1.** Seleccionar `dim_date` → *Table tools → Mark as date table* → columna `date`. Si la opción está deshabilitada (Dual), **anotar** "Mark as date table no disponible en Dual" para el README y seguir; no cambiar `dim_date` a Import.
-- [ ] **D2.** *Sort by column*: `dim_date[month_name]` por `month_number`; `dim_epi_month[month_label]` por `epi_month_key`.
-- [ ] **D3.** *Summarization = Don't summarize* en: todas las `*_key`, `mmwr_year`, `mmwr_week`, `month`, `month_number`, `year`, `quarter`, `period_days`.
-- [ ] **D4.** *Hide in report view*: todas las `*_key` (salvo `geo_key` de `dim_geography`), `fact_id`, `max_prev_52w`, `cum_ytd`, `cum_ytd_prev`, `first_reported_m1`, `current_m1`. **Ocultar tablas** `dim_access` y `agg_weekly_national`.
-- [ ] **D5.** *Data category*: `dim_geography[state_name]` → *State or Province*; `dim_geography[county_name]` → *County*.
-- [ ] **D6.** *Home → Enter data* → una columna `x`, sin filas → nombre `_Measures` → Load. Ocultar `x`.
+- [x] **D1.** Seleccionar `dim_date` → *Table tools → Mark as date table* → columna `date`. Si la opción está deshabilitada (Dual), **anotar** "Mark as date table no disponible en Dual" para el README y seguir; no cambiar `dim_date` a Import. **Hallazgo (2026-10-15): "Mark as date table" funcionó sobre `dim_date` en Dual.**
+- [x] **D2.** *Sort by column*: `dim_date[month_name]` por `month_number`; `dim_epi_month[month_label]` por `epi_month_key`.
+- [x] **D3.** *Summarization = Don't summarize* en: todas las `*_key`, `mmwr_year`, `mmwr_week`, `month`, `month_number`, `year`, `quarter`, `period_days`.
+- [x] **D4.** *Hide in report view*: todas las `*_key` (salvo `geo_key` de `dim_geography`), `fact_id`, `max_prev_52w`, `cum_ytd`, `cum_ytd_prev`, `first_reported_m1`, `current_m1`. **Ocultar tablas** `dim_access` y `agg_weekly_national`.
+- [x] **D5.** *Data category*: `dim_geography[state_name]` → *State or Province*; `dim_geography[county_name]` → *County*.
+- [x] **D6.** *Home → Enter data* → una columna `x`, sin filas → nombre `_Measures` → Load. Ocultar `x`.
 
 **GATE 6.D:** date table marcada (o hallazgo anotado) · un visual de tabla con `month_name` ordena Jan…Dec · captura `docs/img/gate_6D.png`.
 
@@ -197,7 +197,17 @@ VAR y = SELECTEDVALUE ( dim_mmwr_week[mmwr_year] )
 VAR hist =
     FILTER (
         ALL ( dim_mmwr_week[mmwr_year] ),
-        dim_mmwr_week[mmwr_year] >= y - 5 && dim_mmwr_week[mmwr_year] < y
+        VAR yr = dim_mmwr_week[mmwr_year]
+        RETURN
+            yr >= y - 5 && yr < y
+                && NOT ISBLANK (
+                    CALCULATE (
+                        [Cases NNDSS],
+                        REMOVEFILTERS ( dim_mmwr_week ),
+                        dim_mmwr_week[mmwr_week] = w,
+                        dim_mmwr_week[mmwr_year] = yr
+                    )
+                )
     )
 RETURN
     IF (
@@ -216,7 +226,7 @@ RETURN
         )
     )
 ```
-`Corridor P25` y `Corridor P50`: misma fórmula con `0.25` y `0.5` en la última línea.
+`Corridor P25` y `Corridor P50`: misma fórmula con `0.25` y `0.5` en la última línea. **Hallazgo (2026-10-15):** sin el `NOT ISBLANK(...)` dentro de `hist`, el año 2021 (existe en `dim_mmwr_week`, sin hechos) entraba como valor bajo y E5 daba 387 · 748 · 872 en vez de 657,75 · 810 · 885,75. Con el filtro, E5 coincide.
 ```dax
 Excess over P75 =
 VAR p75 = [Corridor P75]
@@ -306,7 +316,7 @@ EVALUATE ROW (
 
 *E8* `EVALUATE ROW ( "w53_2025", CALCULATE ( [Cases NNDSS], dim_mmwr_week[epi_week_key] = 202553 ), "w53_2026", CALCULATE ( [Cases NNDSS], dim_mmwr_week[epi_week_key] = 202653 ) )` → **> 0 · vacío**
 
-- [ ] E1–E8 correctos · [ ] ningún "casi" sin explicar · [ ] captura `docs/img/gate_6E.png`.
+- [x] E1–E8 correctos · [x] ningún "casi" sin explicar · [ ] captura `docs/img/gate_6E.png`.
 
 ## Task 6.F — Medidas Oregon, calidad, QA
 Display folder `Oregon`:
@@ -330,14 +340,14 @@ VAR t = SELECTEDVALUE ( dim_demographic[demographic_type], "Geography" )
 RETURN
     CALCULATE (
         SUMX (
-            FILTER (
-                fct_oregon_monthly,
-                NOT fct_oregon_monthly[is_masked]
-                    && NOT ISBLANK ( fct_oregon_monthly[cases] )
-                    && fct_oregon_monthly[population] > 0
-            ),
-            fct_oregon_monthly[population] * RELATED ( dim_epi_month[period_days] ) / 365.25
-        ),
+            dim_epi_month,
+            dim_epi_month[period_days]
+                * CALCULATE (
+                    SUM ( fct_oregon_monthly[population] ),
+                    fct_oregon_monthly[is_masked] = FALSE (),
+                    fct_oregon_monthly[population] > 0
+                )
+        ) / 365.25,
         KEEPFILTERS ( dim_demographic[demographic_type] = t )
     )
 ```
@@ -351,7 +361,7 @@ VAR t = SELECTEDVALUE ( dim_demographic[demographic_type], "Geography" )
 RETURN
     CALCULATE (
         DIVIDE (
-            COUNTROWS ( FILTER ( fct_oregon_monthly, fct_oregon_monthly[is_masked] ) ),
+            COUNTROWS ( FILTER ( fct_oregon_monthly, fct_oregon_monthly[is_masked] ) ) + 0,
             COUNTROWS ( fct_oregon_monthly )
         ),
         KEEPFILTERS ( dim_demographic[demographic_type] = t )
@@ -438,10 +448,10 @@ EVALUATE ROW (
 
 *F6* `EVALUATE ROW ( "rev", [Revisions (n)], "status", [Revisions Status], "ingest", [Latest Ingest (UTC)] )` → **0** · "No revisions recorded yet" · fecha de la última corrida de CI (≤ 8 días).
 
-- [ ] F1–F6 correctos · [ ] captura `docs/img/gate_6F.png`.
+- [x] F1–F6 correctos · [ ] captura `docs/img/gate_6F.png`.
 
 ## Task 6.G — Agregación
-- [ ] **G1.** Panel Data → clic derecho `agg_weekly_national` → **Manage aggregations**:
+- [x] **G1.** Panel Data → clic derecho `agg_weekly_national` → **Manage aggregations**:
 
 | Columna agg | Summarization | Detail table | Detail column |
 |---|---|---|---|
@@ -450,15 +460,15 @@ EVALUATE ROW (
 | `disease_key` | GroupBy | `fct_nndss_weekly` | `disease_key` |
 
   *Apply all* sin errores (si se queja de tipos: `cases_week` Decimal en ambas, ver A4).
-- [ ] **G2.** `agg_weekly_national` queda oculta.
+- [x] **G2.** `agg_weekly_national` queda oculta.
 
 **GATE 6.G** — página temporal `_AGG` con dos tablas:
 - Visual **A**: `dim_mmwr_week[mmwr_year]`, `dim_disease[disease_key]`, `[Cases NNDSS]` (debe acertar la agregación).
 - Visual **B**: `dim_geography[state_code]`, `[Cases NNDSS]` (debe ir a DirectQuery).
 
-- [ ] **Prueba 1 — Performance analyzer.** *Optimize → Performance analyzer → Start recording → Refresh visuals*. A: sin fila "Direct query". B: con "Direct query". Capturas `docs/img/agg_hit.png` (A) y `agg_miss.png` (B).
-- [ ] **Prueba 2 — DAX Studio.** *External Tools → DAX Studio* → activar *All Queries* y *Server Timings* → `EVALUATE SUMMARIZECOLUMNS ( dim_mmwr_week[mmwr_year], dim_disease[disease_key], "c", [Cases NNDSS] )`. Esperado: evento de *aggregate table rewrite* con match y **sin** SQL al origen. Repetir con `dim_geography[state_code]`: sin match y con SQL.
-- [ ] **Prueba 3 — decisiva (Neon SQL Editor, como dueño):**
+- [x] **Prueba 1 — Performance analyzer.** *Optimize → Performance analyzer → Start recording → Refresh visuals*. A: sin fila "Direct query". B: con "Direct query". Capturas `docs/img/agg_hit.png` (A) y `agg_miss.png` (B).
+- [x] **Prueba 2 — DAX Studio.** *External Tools → DAX Studio* → activar *All Queries* y *Server Timings* → `EVALUATE SUMMARIZECOLUMNS ( dim_mmwr_week[mmwr_year], dim_disease[disease_key], "c", [Cases NNDSS] )`. Esperado: evento de *aggregate table rewrite* con match y **sin** SQL al origen. Repetir con `dim_geography[state_code]`: sin match y con SQL.
+- [x] **Prueba 3 — decisiva (Neon SQL Editor, como dueño):**
   1. `REVOKE SELECT ON analytics_marts.fct_nndss_weekly FROM pbi_reader;`
   2. Desktop: *Refresh visuals* en `_AGG`. Esperado: **A muestra datos**, **B da error de permiso**.
   3. `GRANT SELECT ON analytics_marts.fct_nndss_weekly TO pbi_reader;`
@@ -466,9 +476,9 @@ EVALUATE ROW (
 - [ ] Borrar la página `_AGG` (o dejarla oculta).
 
 ## Task 6.H — Guardar y versionar
-- [ ] **H1.** *File → Save*. En el explorador: `data_model\STI_Surveillance_Model.pbip`, `STI_Surveillance_Model.SemanticModel\definition\` con `model.tmdl`, `relationships.tmdl`, `tables\*.tmdl` (13 archivos: 12 tablas + `_Measures`) y `STI_Surveillance_Model.Report\`.
-- [ ] **H2.** Git Bash: `git grep -nE "npg_|PASSWORD|password" -- data_model` → **vacío**. El host de Neon sí aparece en las consultas M (no es credencial; decisión registrada).
-- [ ] **H3.** `git status` no lista `.pbix`, `localSettings.json` ni `cache.abf` (el `.gitignore` que genera el PBIP los excluye).
+- [x] **H1.** *File → Save*. En el explorador: `data_model\STI_Surveillance_Model.pbip`, `STI_Surveillance_Model.SemanticModel\definition\` con `model.tmdl`, `relationships.tmdl`, `tables\*.tmdl` (13 archivos: 12 tablas + `_Measures`) y `STI_Surveillance_Model.Report\`.
+- [x] **H2.** Git Bash: `git grep -nE "npg_|PASSWORD|password" -- data_model` → **vacío**. El host de Neon sí aparece en las consultas M (no es credencial; decisión registrada).
+- [x] **H3.** `git status` no lista `.pbix`, `localSettings.json` ni `cache.abf` (el `.gitignore` que genera el PBIP los excluye).
 - [ ] **H4.** Commit + push:
 ```
 feat(pbi): composite semantic model with aggregations and epidemiological measures

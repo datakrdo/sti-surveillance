@@ -1,0 +1,152 @@
+table fct_nndss_weekly
+	lineageTag: 5f5a94ba-24e7-4e61-8777-a1d47103bf14
+
+	column fact_id
+		dataType: string
+		isHidden
+		sourceProviderType: nvarchar(max)
+		lineageTag: 1c6303e0-3a89-4bde-a2f1-bc1e4780a990
+		summarizeBy: none
+		sourceColumn: fact_id
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column epi_week_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 35ff16b8-513c-4b79-9943-13c7147561c8
+		summarizeBy: none
+		sourceColumn: epi_week_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column week_start_date
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: 86e623de-3b2e-4088-8abe-46d91245d226
+		summarizeBy: none
+		sourceColumn: week_start_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column disease_key
+		dataType: string
+		isHidden
+		sourceProviderType: nvarchar(max)
+		lineageTag: 28146baa-9865-4a58-ad2f-b9cf87ffbed6
+		summarizeBy: none
+		sourceColumn: disease_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column geo_key
+		dataType: string
+		isHidden
+		sourceProviderType: nvarchar(max)
+		lineageTag: df5353d2-20bc-477a-a975-b431d9b37f9b
+		summarizeBy: none
+		sourceColumn: geo_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column cases_week
+		dataType: double
+		sourceProviderType: decimal
+		lineageTag: bc3925b0-ad54-4ccf-b2f0-9eb3a619af06
+		summarizeBy: sum
+		sourceColumn: cases_week
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column max_prev_52w
+		dataType: double
+		isHidden
+		sourceProviderType: decimal
+		lineageTag: c967161a-5d09-4264-910c-ae47080f1251
+		summarizeBy: sum
+		sourceColumn: max_prev_52w
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column cum_ytd
+		dataType: double
+		isHidden
+		sourceProviderType: decimal
+		lineageTag: f18a4965-2657-4ba3-ac79-df25130253c3
+		summarizeBy: sum
+		sourceColumn: cum_ytd
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column cum_ytd_prev
+		dataType: double
+		isHidden
+		sourceProviderType: decimal
+		lineageTag: a3cd9c92-fcf7-433c-8642-41fb0ee6a7f5
+		summarizeBy: sum
+		sourceColumn: cum_ytd_prev
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column population
+		dataType: double
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: f65bf979-7200-4d52-9dbd-d8c78616cc38
+		summarizeBy: sum
+		sourceColumn: population
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column is_flagged
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: f46a59e9-745d-43f9-878f-a76198ff21e6
+		summarizeBy: none
+		sourceColumn: is_flagged
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fct_nndss_weekly = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("ep-xxxxxxxx.region.aws.neon.tech", "neondb"),
+				    analytics_marts_fct_nndss_weekly = Source{[Schema="analytics_marts",Item="fct_nndss_weekly"]}[Data]
+				in
+				    analytics_marts_fct_nndss_weekly
+
+	annotation PBI_ResultType = Table
+

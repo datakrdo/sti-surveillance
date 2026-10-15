@@ -1,0 +1,50 @@
+table dim_access
+	isHidden
+	lineageTag: 33cd3bf3-70ed-4df5-a3e5-4bd6f41625c2
+
+	column user_principal_name
+		dataType: string
+		isHidden
+		lineageTag: 36509c1a-f229-4f51-bd01-f31959ee3992
+		summarizeBy: none
+		sourceColumn: user_principal_name
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column state_code
+		dataType: string
+		isHidden
+		lineageTag: ceb72809-15de-44a8-8f56-dc29a8f320ef
+		summarizeBy: none
+		sourceColumn: state_code
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column county_name
+		dataType: string
+		isHidden
+		lineageTag: edd39ae6-3c2a-4078-a18a-8681953d60ca
+		summarizeBy: none
+		sourceColumn: county_name
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_access = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("ep-xxxxxxxx.region.aws.neon.tech", "neondb"),
+				    analytics_seeds_dim_access = Source{[Schema="analytics_seeds",Item="dim_access"]}[Data]
+				in
+				    analytics_seeds_dim_access
+
+	changedProperty = IsHidden
+
+	annotation PBI_ResultType = Table
+

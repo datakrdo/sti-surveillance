@@ -1,0 +1,72 @@
+table dim_disease
+	lineageTag: f1327498-eb4f-4f19-8541-d8c967ab668b
+
+	column disease_key
+		dataType: string
+		isHidden
+		sourceProviderType: nvarchar(max)
+		lineageTag: 6670e257-e7a8-4975-9898-e820c749f68b
+		summarizeBy: none
+		sourceColumn: disease_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column disease_name
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 16c6d0c2-4d91-43fd-98f7-67b156f481c7
+		summarizeBy: none
+		sourceColumn: disease_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column disease_group
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: fbf8124a-0072-4862-9eef-b71e98680a07
+		summarizeBy: none
+		sourceColumn: disease_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column pathogen_type
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 4c23e710-e10f-4afa-8367-17239e156790
+		summarizeBy: none
+		sourceColumn: pathogen_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column transmission_mode
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 1e2599b8-c0d3-4939-b4d0-65e20d4a5a52
+		summarizeBy: none
+		sourceColumn: transmission_mode
+
+		annotation SummarizationSetBy = Automatic
+
+	column comparable_across_sources
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: f8916cb1-e00c-4b54-8013-b22b67f1a492
+		summarizeBy: none
+		sourceColumn: comparable_across_sources
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_disease = m
+		mode: dual
+		source =
+				let
+				    Source = PostgreSQL.Database("ep-xxxxxxxx.region.aws.neon.tech", "neondb"),
+				    analytics_marts_dim_disease = Source{[Schema="analytics_marts",Item="dim_disease"]}[Data]
+				in
+				    analytics_marts_dim_disease
+
+	annotation PBI_ResultType = Table
+

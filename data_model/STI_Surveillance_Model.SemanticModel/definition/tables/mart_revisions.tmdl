@@ -1,0 +1,94 @@
+table mart_revisions
+	lineageTag: e077c574-ab7b-428e-8fe9-5e35da8a8ee2
+
+	column epi_week_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: a9fb4432-822c-4baf-8669-cb153161e85c
+		summarizeBy: none
+		sourceColumn: epi_week_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = User
+
+	column geo_key
+		dataType: string
+		isHidden
+		lineageTag: 67e41b46-322a-497b-a9a6-de590aba24fe
+		summarizeBy: none
+		sourceColumn: geo_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column disease_key
+		dataType: string
+		isHidden
+		lineageTag: 3316e836-a7d1-4c78-a839-8241e01a6dba
+		summarizeBy: none
+		sourceColumn: disease_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_reported_m1
+		dataType: double
+		isHidden
+		lineageTag: 9030b323-4874-4197-b3bf-0aef51a91118
+		summarizeBy: sum
+		sourceColumn: first_reported_m1
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column current_m1
+		dataType: double
+		isHidden
+		lineageTag: d45f320f-b37d-4250-9e1e-3317f7320832
+		summarizeBy: sum
+		sourceColumn: current_m1
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column n_revisions
+		dataType: double
+		lineageTag: 6329e364-6734-481a-bd67-9605295e2cf9
+		summarizeBy: sum
+		sourceColumn: n_revisions
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column delta
+		dataType: double
+		lineageTag: 1b2041eb-ba76-4469-a609-d66d70c3a55c
+		summarizeBy: sum
+		sourceColumn: delta
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition mart_revisions = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("ep-xxxxxxxx.region.aws.neon.tech", "neondb"),
+				    analytics_marts_mart_revisions = Source{[Schema="analytics_marts",Item="mart_revisions"]}[Data]
+				in
+				    analytics_marts_mart_revisions
+
+	annotation PBI_ResultType = Table
+

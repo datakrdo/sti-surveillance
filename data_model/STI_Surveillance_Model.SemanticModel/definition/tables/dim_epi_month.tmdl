@@ -1,0 +1,93 @@
+table dim_epi_month
+	lineageTag: 0bb23e9e-5a36-4219-819f-4c3041a2881a
+
+	column epi_month_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 022be065-b419-4f72-9b5a-34d754e93438
+		summarizeBy: none
+		sourceColumn: epi_month_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column mmwr_year
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 519e2c0a-cce4-4715-9681-333b4defbc3c
+		summarizeBy: none
+		sourceColumn: mmwr_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column month
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 160ea3e6-d3af-48e4-af41-7b20176660b0
+		summarizeBy: none
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	column period_start
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: 84b8443f-b5a1-4d18-979c-801b3c666de7
+		summarizeBy: none
+		sourceColumn: period_start
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column period_end
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: e167bb42-a7b2-4b75-a2cd-3074a4622177
+		summarizeBy: none
+		sourceColumn: period_end
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column period_days
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 9a5e2edb-577c-4100-ade4-3748c114db41
+		summarizeBy: none
+		sourceColumn: period_days
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_label
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 8583fc5d-8d86-42a7-bf0a-cf45d9eab559
+		summarizeBy: none
+		sourceColumn: month_label
+		sortByColumn: epi_month_key
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_epi_month = m
+		mode: dual
+		source =
+				let
+				    Source = PostgreSQL.Database("ep-xxxxxxxx.region.aws.neon.tech", "neondb"),
+				    analytics_marts_dim_epi_month = Source{[Schema="analytics_marts",Item="dim_epi_month"]}[Data]
+				in
+				    analytics_marts_dim_epi_month
+
+	annotation PBI_ResultType = Table
+

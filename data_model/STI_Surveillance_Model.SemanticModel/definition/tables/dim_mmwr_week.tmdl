@@ -1,0 +1,81 @@
+table dim_mmwr_week
+	lineageTag: 9521f54d-fd18-42d8-b36c-dc8c89654af7
+
+	column epi_week_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: bc25ad8d-924b-483a-a66c-363f1b9c50c3
+		summarizeBy: none
+		sourceColumn: epi_week_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column mmwr_year
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 7aa1f76b-de83-49d4-b3fa-a403b595f1e1
+		summarizeBy: sum
+		sourceColumn: mmwr_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column mmwr_week
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: ae4a15a1-5f34-41d3-ba02-387db030077c
+		summarizeBy: sum
+		sourceColumn: mmwr_week
+
+		annotation SummarizationSetBy = Automatic
+
+	column week_start_date
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: 5386a319-49da-4372-851b-a3d2be82c020
+		summarizeBy: none
+		sourceColumn: week_start_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column week_end_date
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: ec3128ee-c5a2-4cfe-a9f4-8298d858e467
+		summarizeBy: none
+		sourceColumn: week_end_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column is_reference_week
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: 2d1d41ab-a381-4648-8abe-893bf8e7751e
+		summarizeBy: none
+		sourceColumn: is_reference_week
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_mmwr_week = m
+		mode: dual
+		source =
+				let
+				    Source = PostgreSQL.Database("ep-xxxxxxxx.region.aws.neon.tech", "neondb"),
+				    analytics_marts_dim_mmwr_week = Source{[Schema="analytics_marts",Item="dim_mmwr_week"]}[Data]
+				in
+				    analytics_marts_dim_mmwr_week
+
+	annotation PBI_ResultType = Table
+

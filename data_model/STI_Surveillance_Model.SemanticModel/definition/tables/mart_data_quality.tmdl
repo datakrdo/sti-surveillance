@@ -1,0 +1,77 @@
+table mart_data_quality
+	lineageTag: 104ae6a3-4654-4252-b283-ea96601bf592
+
+	column source
+		dataType: string
+		lineageTag: 6e823c53-0d0b-4fc2-8cb6-718abc85794c
+		summarizeBy: none
+		sourceColumn: source
+
+		annotation SummarizationSetBy = Automatic
+
+	column last_ingested_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 6c37ce03-3b17-4345-8cb9-d169d9ce89ba
+		summarizeBy: none
+		sourceColumn: last_ingested_at
+
+		annotation SummarizationSetBy = Automatic
+
+	column max_period
+		dataType: string
+		lineageTag: 2a70a61e-3cc9-4575-a008-7f83040fbad6
+		summarizeBy: none
+		sourceColumn: max_period
+
+		annotation SummarizationSetBy = Automatic
+
+	column n_rows
+		dataType: int64
+		formatString: 0
+		lineageTag: 51cb9a4c-abbf-4584-810d-8b874c2b8b40
+		summarizeBy: sum
+		sourceColumn: n_rows
+
+		annotation SummarizationSetBy = Automatic
+
+	column pct_masked
+		dataType: double
+		lineageTag: e560055f-e198-4cf9-9c02-4444f7aa2e93
+		summarizeBy: sum
+		sourceColumn: pct_masked
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column pct_flagged
+		dataType: double
+		lineageTag: d4d484b4-c7f8-49fa-9ee4-804900cb18b4
+		summarizeBy: sum
+		sourceColumn: pct_flagged
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column n_states_reporting_last_week
+		dataType: int64
+		formatString: 0
+		lineageTag: 704afafc-fbfe-4b10-80cd-23052d989485
+		summarizeBy: sum
+		sourceColumn: n_states_reporting_last_week
+
+		annotation SummarizationSetBy = Automatic
+
+	partition mart_data_quality = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("ep-xxxxxxxx.region.aws.neon.tech", "neondb"),
+				    analytics_marts_mart_data_quality = Source{[Schema="analytics_marts",Item="mart_data_quality"]}[Data]
+				in
+				    analytics_marts_mart_data_quality
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,330 @@
+table _Measures
+	lineageTag: 5fc0fd50-a888-4f6c-99f3-9abb29c879ab
+
+	measure 'Cases NNDSS' = SUM ( fct_nndss_weekly[cases_week] )
+		formatString: #,##0
+		displayFolder: NNDSS
+		lineageTag: 36a27745-e76d-416e-8311-ac586fbc0058
+
+	measure 'Cases NNDSS (with population)' =
+			
+			CALCULATE ( [Cases NNDSS], fct_nndss_weekly[population] > 0 )
+		displayFolder: NNDSS
+		lineageTag: 473a5d24-d33d-49c7-8b6c-495d63c487f2
+
+	measure 'Person-Years NNDSS' =
+			
+			DIVIDE (
+			    SUMX (
+			        FILTER (
+			            fct_nndss_weekly,
+			            NOT ISBLANK ( fct_nndss_weekly[cases_week] )
+			                && fct_nndss_weekly[population] > 0
+			        ),
+			        fct_nndss_weekly[population]
+			    ),
+			    365.25 / 7
+			)
+		formatString: #,##0
+		displayFolder: NNDSS
+		lineageTag: 20bdcf70-3e89-4464-9c3a-0905fd637ba0
+
+	measure 'Rate per 100k NNDSS' =
+			
+			DIVIDE ( [Cases NNDSS (with population)], [Person-Years NNDSS] ) * 100000
+		formatString: 0.0
+		displayFolder: NNDSS
+		lineageTag: dd056ec6-9d3f-46b1-8e48-9e77210d575d
+
+	measure 'Cases LY (MMWR aligned)' =
+			
+			VAR weeks = VALUES ( dim_mmwr_week[mmwr_week] )
+			VAR prevYears =
+			    SELECTCOLUMNS ( VALUES ( dim_mmwr_week[mmwr_year] ), "y", dim_mmwr_week[mmwr_year] - 1 )
+			RETURN
+			    CALCULATE (
+			        [Cases NNDSS],
+			        REMOVEFILTERS ( dim_mmwr_week ),
+			        TREATAS ( weeks, dim_mmwr_week[mmwr_week] ),
+			        TREATAS ( prevYears, dim_mmwr_week[mmwr_year] )
+			    )
+		displayFolder: NNDSS
+		lineageTag: 2247e487-17d5-4c2d-8c80-f5482fa0309f
+
+	measure 'YoY % (MMWR aligned)' =
+			
+			DIVIDE ( [Cases NNDSS] - [Cases LY (MMWR aligned)], [Cases LY (MMWR aligned)] )
+		formatString: 0.0%
+		displayFolder: NNDSS
+		lineageTag: 939d67b8-1b61-4f94-a5b6-13dc4d0c853c
+
+	measure 'Cases LY (SAMEPERIODLASTYEAR)' =
+			
+			CALCULATE ( [Cases NNDSS], SAMEPERIODLASTYEAR ( dim_date[date] ) )
+		displayFolder: NNDSS
+		lineageTag: 8517e185-4455-4f4a-99a6-e2274fa53d6b
+
+	measure 'Corridor P75' =
+			
+			VAR w = SELECTEDVALUE ( dim_mmwr_week[mmwr_week] )
+			VAR y = SELECTEDVALUE ( dim_mmwr_week[mmwr_year] )
+			VAR hist =
+			    FILTER (
+			        ALL ( dim_mmwr_week[mmwr_year] ),
+			        VAR yr = dim_mmwr_week[mmwr_year]
+			        RETURN
+			            yr >= y - 5 && yr < y
+			                && NOT ISBLANK (
+			                    CALCULATE (
+			                        [Cases NNDSS],
+			                        REMOVEFILTERS ( dim_mmwr_week ),
+			                        dim_mmwr_week[mmwr_week] = w,
+			                        dim_mmwr_week[mmwr_year] = yr
+			                    )
+			                )
+			    )
+			RETURN
+			    IF (
+			        NOT ISBLANK ( w ) && NOT ISBLANK ( y ),
+			        PERCENTILEX.INC (
+			            hist,
+			            VAR yr = dim_mmwr_week[mmwr_year]
+			            RETURN
+			                CALCULATE (
+			                    [Cases NNDSS],
+			                    REMOVEFILTERS ( dim_mmwr_week ),
+			                    dim_mmwr_week[mmwr_week] = w,
+			                    dim_mmwr_week[mmwr_year] = yr
+			                ),
+			            0.75
+			        )
+			    )
+		displayFolder: NNDSS
+		lineageTag: 9f2186c2-614f-4a44-a70f-3b384988a18d
+
+	measure 'Corridor P25' =
+			
+			VAR w = SELECTEDVALUE ( dim_mmwr_week[mmwr_week] )
+			VAR y = SELECTEDVALUE ( dim_mmwr_week[mmwr_year] )
+			VAR hist =
+			    FILTER (
+			        ALL ( dim_mmwr_week[mmwr_year] ),
+			        VAR yr = dim_mmwr_week[mmwr_year]
+			        RETURN
+			            yr >= y - 5 && yr < y
+			                && NOT ISBLANK (
+			                    CALCULATE (
+			                        [Cases NNDSS],
+			                        REMOVEFILTERS ( dim_mmwr_week ),
+			                        dim_mmwr_week[mmwr_week] = w,
+			                        dim_mmwr_week[mmwr_year] = yr
+			                    )
+			                )
+			    )
+			RETURN
+			    IF (
+			        NOT ISBLANK ( w ) && NOT ISBLANK ( y ),
+			        PERCENTILEX.INC (
+			            hist,
+			            VAR yr = dim_mmwr_week[mmwr_year]
+			            RETURN
+			                CALCULATE (
+			                    [Cases NNDSS],
+			                    REMOVEFILTERS ( dim_mmwr_week ),
+			                    dim_mmwr_week[mmwr_week] = w,
+			                    dim_mmwr_week[mmwr_year] = yr
+			                ),
+			            0.25
+			        )
+			    )
+		displayFolder: NNDSS
+		lineageTag: d0a07d3c-4dd6-42dc-bff5-50e32d40e745
+
+	measure 'Corridor P50' =
+			
+			VAR w = SELECTEDVALUE ( dim_mmwr_week[mmwr_week] )
+			VAR y = SELECTEDVALUE ( dim_mmwr_week[mmwr_year] )
+			VAR hist =
+			    FILTER (
+			        ALL ( dim_mmwr_week[mmwr_year] ),
+			        VAR yr = dim_mmwr_week[mmwr_year]
+			        RETURN
+			            yr >= y - 5 && yr < y
+			                && NOT ISBLANK (
+			                    CALCULATE (
+			                        [Cases NNDSS],
+			                        REMOVEFILTERS ( dim_mmwr_week ),
+			                        dim_mmwr_week[mmwr_week] = w,
+			                        dim_mmwr_week[mmwr_year] = yr
+			                    )
+			                )
+			    )
+			RETURN
+			    IF (
+			        NOT ISBLANK ( w ) && NOT ISBLANK ( y ),
+			        PERCENTILEX.INC (
+			            hist,
+			            VAR yr = dim_mmwr_week[mmwr_year]
+			            RETURN
+			                CALCULATE (
+			                    [Cases NNDSS],
+			                    REMOVEFILTERS ( dim_mmwr_week ),
+			                    dim_mmwr_week[mmwr_week] = w,
+			                    dim_mmwr_week[mmwr_year] = yr
+			                ),
+			            0.5
+			        )
+			    )
+		displayFolder: NNDSS
+		lineageTag: e3570ca2-e8ab-4690-ab3c-5e7ca3599c8b
+
+	measure 'Excess over P75' =
+			
+			VAR p75 = [Corridor P75]
+			RETURN IF ( NOT ISBLANK ( p75 ), MAX ( 0, [Cases NNDSS] - p75 ) )
+		displayFolder: NNDSS
+		lineageTag: 1ca3ffa6-f2d8-4e13-95e5-fd6087cc4099
+
+	measure 'States in Outbreak' =
+			
+			COUNTROWS ( FILTER ( VALUES ( dim_geography[state_code] ), [Cases NNDSS] > [Corridor P75] ) )
+		displayFolder: NNDSS
+		lineageTag: 21a4f20a-6473-4213-95a5-ab507e1a17df
+
+	measure 'Reference Week' =
+			
+			CALCULATE ( MAX ( dim_mmwr_week[epi_week_key] ), dim_mmwr_week[is_reference_week] = TRUE () )
+		formatString: 0
+		displayFolder: NNDSS
+		lineageTag: c4e63387-00f5-4855-bf90-17796bb9bc24
+
+	measure 'Latest Week With Data' = MAX ( fct_nndss_weekly[epi_week_key] )
+		formatString: 0
+		displayFolder: NNDSS
+		lineageTag: ac08a4f2-3a3b-408c-8c57-205787ece504
+
+	measure 'Cases Oregon' =
+			
+			VAR t = SELECTEDVALUE ( dim_demographic[demographic_type], "Geography" )
+			RETURN
+			    CALCULATE ( SUM ( fct_oregon_monthly[cases] ), KEEPFILTERS ( dim_demographic[demographic_type] = t ) )
+		formatString: #,##0
+		displayFolder: Oregon
+		lineageTag: 60e7506b-d258-494d-9a0b-73c35060e91a
+
+	measure 'Cases Oregon (statewide)' =
+			
+			CALCULATE ( SUM ( fct_oregon_monthly[cases] ), dim_demographic[demographic_type] = "Statewide" )
+		formatString: #,##0
+		displayFolder: Oregon
+		lineageTag: eb22d817-ddeb-48e1-a1aa-544dcee68eb0
+
+	measure 'Cases Oregon (rate base)' =
+			
+			CALCULATE ( [Cases Oregon], fct_oregon_monthly[is_masked] = FALSE (), fct_oregon_monthly[population] > 0 )
+		formatString: #,##0
+		displayFolder: Oregon
+		lineageTag: 533b0f24-1201-451d-816c-6fe2b622109c
+
+	measure 'Person-Years Oregon' =
+			
+			VAR t = SELECTEDVALUE ( dim_demographic[demographic_type], "Geography" )
+			RETURN
+			    CALCULATE (
+			        SUMX (
+			            dim_epi_month,
+			            dim_epi_month[period_days]
+			                * CALCULATE (
+			                    SUM ( fct_oregon_monthly[population] ),
+			                    fct_oregon_monthly[is_masked] = FALSE (),
+			                    fct_oregon_monthly[population] > 0
+			                )
+			        ) / 365.25,
+			        KEEPFILTERS ( dim_demographic[demographic_type] = t )
+			    )
+		displayFolder: Oregon
+		lineageTag: 3326ab2c-1427-44d3-8af3-e6c12ccb18c7
+
+	measure 'Rate per 100k Oregon' =
+			
+			DIVIDE ( [Cases Oregon (rate base)], [Person-Years Oregon] ) * 100000
+		formatString: 0.0
+		displayFolder: Oregon
+		lineageTag: a9a97e39-3c77-44c8-a7a7-a21ec34953a3
+
+	measure '% Suppressed Cells' =
+			
+			VAR t = SELECTEDVALUE ( dim_demographic[demographic_type], "Geography" )
+			RETURN
+			    CALCULATE (
+			        DIVIDE (
+			            COUNTROWS ( FILTER ( fct_oregon_monthly, fct_oregon_monthly[is_masked] ) ) + 0,
+			            COUNTROWS ( fct_oregon_monthly )
+			        ),
+			        KEEPFILTERS ( dim_demographic[demographic_type] = t )
+			    )
+		formatString: 0.0%
+		displayFolder: Oregon
+		lineageTag: ae37492a-dd13-4e83-ada4-54c74f4d30fc
+
+	measure 'Share of Statewide Captured' = DIVIDE ( [Cases Oregon], [Cases Oregon (statewide)] )
+		formatString: 0.0%
+		displayFolder: Oregon
+		lineageTag: f9f75595-ba29-4172-9b79-88aeca7db880
+
+	measure 'Revisions (n)' = SUM ( mart_revisions[n_revisions] )
+		displayFolder: Quality / Revisions
+		lineageTag: 12c0ea38-25d1-4e2a-b196-e8fb1fa19b1d
+
+	measure 'Revision Delta (abs)' = SUMX ( mart_revisions, ABS ( mart_revisions[delta] ) )
+		displayFolder: Quality / Revisions
+		lineageTag: 54395365-c43c-4950-8347-5abae5f585d3
+
+	measure 'Revisions Status' =
+			
+			IF ( ISBLANK ( [Revisions (n)] ) || [Revisions (n)] = 0, "No revisions recorded yet", FORMAT ( [Revisions (n)], "#,##0" ) & " revisions" )
+		displayFolder: Quality / Revisions
+		lineageTag: 19df0d35-43c4-4411-bc59-a2779929ef1e
+
+	measure 'Latest Ingest (UTC)' = MAX ( mart_data_quality[last_ingested_at] )
+		displayFolder: Quality / Revisions
+		lineageTag: fc17d6fd-f3b5-449d-a4d5-ae75200bb97b
+
+	measure 'QA Geo Rows' = COUNTROWS ( dim_geography )
+		displayFolder: QA
+		lineageTag: 341bd321-5eb5-48cf-9402-87cca268d81d
+
+	measure 'QA Access Rows' = COUNTROWS ( dim_access )
+		displayFolder: QA
+		lineageTag: 5f948ccf-630f-4e11-8569-09e939b77164
+
+	measure 'QA Demographic Rows' = COUNTROWS ( dim_demographic )
+		displayFolder: QA
+		lineageTag: abf00b36-5b48-40ed-a43b-2cc07bb4a76d
+
+	measure 'QA Revision Rows' = COUNTROWS ( mart_revisions )
+		displayFolder: QA
+		lineageTag: 3f4f0750-9e85-4763-b9a2-706f5a398455
+
+	column x
+		dataType: string
+		isHidden
+		lineageTag: 18a9d13a-55ec-42bd-af25-75c23962f739
+		summarizeBy: none
+		sourceColumn: x
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [x = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"x", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,63 @@
+table agg_weekly_national
+	isHidden
+	lineageTag: 1c24a259-f443-4f8a-9820-376157e5099b
+
+	column epi_week_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 97298eb8-985a-4a9a-9164-0b26128a942b
+		summarizeBy: none
+		sourceColumn: epi_week_key
+
+		alternateOf
+			baseColumn: fct_nndss_weekly.epi_week_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column disease_key
+		dataType: string
+		isHidden
+		lineageTag: a87e23ed-467d-44ee-b47d-bbe8228fe42d
+		summarizeBy: none
+		sourceColumn: disease_key
+
+		alternateOf
+			baseColumn: fct_nndss_weekly.disease_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column cases_week
+		dataType: double
+		isHidden
+		lineageTag: a137e852-03d8-48d0-a58e-5f4300339be4
+		summarizeBy: sum
+		sourceColumn: cases_week
+
+		alternateOf
+			summarization: sum
+			baseColumn: fct_nndss_weekly.cases_week
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition agg_weekly_national = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("ep-xxxxxxxx.region.aws.neon.tech", "neondb"),
+				    analytics_marts_agg_weekly_national = Source{[Schema="analytics_marts",Item="agg_weekly_national"]}[Data]
+				in
+				    analytics_marts_agg_weekly_national
+
+	changedProperty = IsHidden
+
+	annotation PBI_ResultType = Table
+
