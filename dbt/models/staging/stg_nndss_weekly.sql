@@ -11,10 +11,11 @@ select
     year * 100 + week as epi_week_key,
     label as disease_source_name,
     state_code,
-    sum(m1) as cases_week,
+    -- '-' = el CDC recibió la jurisdicción sin casos => 0. Solo 'U' (no disponible) queda NULL.
+    sum(coalesce(m1, case when m1_flag = '-' then 0 end)) as cases_week,
     sum(m2) as max_prev_52w,
     sum(m3) as cum_ytd,
     sum(m4) as cum_ytd_prev,
-    bool_or(m1 is null) as is_flagged
+    bool_or(m1 is null and coalesce(m1_flag, '') <> '-') as is_flagged
 from j
 group by 1, 2, 3, 4, 5

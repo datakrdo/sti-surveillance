@@ -2,3 +2,4 @@ user_principal_name,state_code,county_name
 ana@TENANT.onmicrosoft.com,OR,Multnomah County
 luis@TENANT.onmicrosoft.com,CA,*
 admin@TENANT.onmicrosoft.com,*,*
+sofia@TENANT.onmicrosoft.com,OR,*

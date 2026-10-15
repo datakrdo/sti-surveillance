@@ -1,5 +1,5 @@
 select 'nndss' as source, max(ingested_at) as last_ingested_at, max(year * 100 + week)::text as max_period,
-       count(*) as n_rows, null::numeric as pct_masked, avg((m1 is null)::int) as pct_flagged,
+       count(*) as n_rows, null::numeric as pct_masked, avg((m1_flag = 'U')::int) as pct_flagged,
        (select count(distinct location1) from {{ source('raw', 'nndss_weekly') }} w
          where location1 is not null and (w.year * 100 + w.week) = (select max(year * 100 + week) from {{ source('raw', 'nndss_weekly') }} where m1 is not null)
            and w.m1 is not null)::int as n_states_reporting_last_week

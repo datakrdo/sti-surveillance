@@ -7,3 +7,5 @@ dbt/dbt_packages/
 __pycache__/
 .venv/
 .pytest_cache/
+*.pbix
+*.pbit

@@ -13,5 +13,8 @@ on-run-end:
   - "grant usage on schema analytics_marts to mcp_reader"
   - "grant select on all tables in schema analytics_marts to mcp_reader"
   - "revoke select on analytics_marts.dim_demographic, analytics_marts.fct_oregon_monthly, analytics_marts.mart_revisions from mcp_reader"
+  - "grant usage on schema analytics_marts, analytics_seeds to pbi_reader"
+  - "grant select on all tables in schema analytics_marts to pbi_reader"
+  - "grant select on analytics_seeds.dim_access to pbi_reader"
 seeds:
   sti: {+schema: seeds}

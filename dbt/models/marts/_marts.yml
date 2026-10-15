@@ -16,15 +16,21 @@ models:
   - name: dim_epi_month
     columns:
       - {name: epi_month_key, tests: [unique, not_null]}
+      - name: period_days
+        tests: [{accepted_values: {arguments: {values: [28, 35], quote: false}}}]
+  - name: dim_date
+    columns:
+      - {name: date, tests: [unique, not_null]}
   - name: dim_demographic
     columns:
       - {name: demographic_key, tests: [unique, not_null]}
       - name: demographic_type
-        tests: [{accepted_values: {arguments: {values: ['Geography', 'Sex', 'Age Group', 'Race (alone or in combination)', 'Race (primary/least common race)']}}}]
+        tests: [{accepted_values: {arguments: {values: ['Geography', 'Statewide', 'Sex', 'Age Group', 'Race (alone or in combination)', 'Race (primary/least common race)']}}}]
   - name: fct_nndss_weekly
     columns:
       - {name: fact_id, tests: [unique, not_null]}
       - {name: epi_week_key, tests: [not_null, {relationships: {arguments: {to: ref('dim_mmwr_week'), field: epi_week_key}}}]}
+      - {name: week_start_date, tests: [not_null, {relationships: {arguments: {to: ref('dim_date'), field: date}}}]}
       - {name: disease_key, tests: [not_null, {relationships: {arguments: {to: ref('dim_disease'), field: disease_key}}}]}
       - {name: geo_key, tests: [not_null, {relationships: {arguments: {to: ref('dim_geography'), field: geo_key}}}]}
   - name: fct_oregon_monthly

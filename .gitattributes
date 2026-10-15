@@ -1,0 +1,3 @@
+* text=auto
+*.tmdl text eol=lf
+*.pbix binary

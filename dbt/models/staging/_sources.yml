@@ -21,4 +21,4 @@ models:
         tests:
           - accepted_values:
               arguments:
-                values: ['Geography', 'Sex', 'Age Group', 'Race (alone or in combination)', 'Race (primary/least common race)']
+                values: ['Geography', 'Statewide', 'Sex', 'Age Group', 'Race (alone or in combination)', 'Race (primary/least common race)']
