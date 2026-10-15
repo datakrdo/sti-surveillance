@@ -1,0 +1,24 @@
+{
+  "name": "STI Dark Accessible",
+  "dataColors": ["#56B4E9", "#E69F00", "#009E73", "#F0E442", "#EF7B3A", "#CC79A7", "#4A9FD6", "#9AA7B4"],
+  "background": "#18232F",
+  "foreground": "#E6EDF3",
+  "tableAccent": "#56B4E9",
+  "good": "#009E73",
+  "neutral": "#E69F00",
+  "bad": "#EF7B3A",
+  "minimum": "#56B4E9",
+  "center": "#9AA7B4",
+  "maximum": "#EF7B3A",
+  "null": "#9AA7B4",
+  "hyperlink": "#7FC4F5",
+  "visitedHyperlink": "#CC79A7",
+  "textClasses": {
+    "title": { "fontFace": "Segoe UI Semibold", "fontSize": 14, "color": "#E6EDF3" },
+    "label": { "fontFace": "Segoe UI", "fontSize": 11, "color": "#A9B7C6" },
+    "callout": { "fontFace": "Segoe UI Semibold", "fontSize": 32, "color": "#E6EDF3" }
+  },
+  "visualStyles": {
+    "page": { "*": { "background": [{ "color": { "solid": { "color": "#0F1720" } }, "transparency": 0 }] } }
+  }
+}
