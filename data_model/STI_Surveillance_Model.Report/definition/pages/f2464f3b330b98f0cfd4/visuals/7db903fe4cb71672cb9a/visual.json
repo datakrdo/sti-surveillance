@@ -1,0 +1,52 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "7db903fe4cb71672cb9a",
+  "position": {
+    "x": 1206.3546798029556,
+    "y": 284.6305418719212,
+    "z": 10,
+    "height": 280,
+    "width": 227,
+    "tabOrder": 10
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_demographic"
+                    }
+                  },
+                  "Property": "sex"
+                }
+              },
+              "queryRef": "dim_demographic.sex",
+              "nativeQueryRef": "sex"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Cases Oregon"
+                }
+              },
+              "queryRef": "_Measures.Cases Oregon",
+              "nativeQueryRef": "Cases Oregon"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

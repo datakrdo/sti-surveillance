@@ -12,7 +12,7 @@ Vigilancia de ETS en EE.UU. con datos públicos: **NNDSS** (CDC, semanal por est
 - **Falta todo lo de Power BI**: `data_model/` no existe, `docs/img/` está vacío. Este runbook es ese trabajo.
 
 ## Decisiones de diseño que no se discuten (ya validadas contra los datos)
-- **Modelo compuesto:** 2 hechos en DirectQuery (`fct_nndss_weekly`, `fct_oregon_monthly`), 6 dimensiones en Dual, y en Import `agg_weekly_national` (agregación), `mart_revisions`, `mart_data_quality`, `dim_access`.
+- **Modelo compuesto:** 2 hechos en DirectQuery (`fct_nndss_weekly`, `fct_oregon_monthly`), 5 dimensiones en Dual (todas menos `dim_geography`) y en Import `dim_geography` (decisión 2026-10-17: RLS sobre Dual no puede referenciar `dim_access`, ver 7.A), `agg_weekly_national` (agregación), `mart_revisions`, `mart_data_quality`, `dim_access`.
 - **Cero vs no disponible:** en NNDSS `-` = 0 casos; solo `U` es NULL (213 filas reales: Maryland y Ohio).
 - **Oregon sin doble conteo:** el total estatal vive en el corte `Statewide`; `Geography` solo tiene condados. `Cases Oregon` fuerza un único `demographic_type` (por defecto `Geography`); sumar cortes distintos da 500.312 (incorrecto).
 - **Tasas** anualizadas con **persona-años** (NNDSS: Σpoblación semanal / (365,25/7); Oregon: población × `period_days` / 365,25). Nunca dividir por una sola población anual.
@@ -85,7 +85,7 @@ ROW (
 - [x] **B1.** *Model view* → seleccionar cada dimensión (`dim_disease`, `dim_geography`, `dim_mmwr_week`, `dim_epi_month`, `dim_demographic`, `dim_date`) → *Properties → Advanced → Storage mode = **Dual*** → aceptar aviso. (Se puede multiseleccionar con Ctrl.)
 - [x] **B2.** No tocar el resto: hechos en DirectQuery; `agg_weekly_national`, `mart_revisions`, `mart_data_quality`, `dim_access` en Import.
 
-**GATE 6.B:** tooltip del encabezado de cada tabla en Model view → **2 DirectQuery · 6 Dual · 4 Import**. Confirmación textual (si existe TMDL view): arrastrar una tabla a TMDL view y buscar `mode:` en `partition`.
+**GATE 6.B:** tooltip del encabezado de cada tabla en Model view → **2 DirectQuery · 6 Dual · 4 Import** (modelo original; el vigente, tras 7.A, es **2 DirectQuery · 5 Dual · 5 Import**, con `dim_geography` en Import). Confirmación textual (si existe TMDL view): arrastrar una tabla a TMDL view y buscar `mode:` en `partition`.
 - [x] 12/12 en el modo esperado · [x] captura `docs/img/gate_6B.png`.
 
 ## Task 6.C — Relaciones (13)
@@ -521,9 +521,9 @@ COUNTROWS (
 **GATE 7.A:** 3 roles, sin errores de sintaxis · *Save* · captura `docs/img/gate_7A.png`. Si *View as* de 7.C da un error de DirectQuery/RLS con dimensiones Dual → contingencia: `dim_geography` a Import (no tiene vuelta: hacerlo en una copia del `.pbip` primero), repetir GATES 6.C–6.G, anotar. **Hallazgo (2026-10-15):** el editor de roles rechazó el filtro RLS sobre `dim_geography` (Dual) con "A calculated column or RLS expression on a DirectQuery table cannot reference tables from a different data source", porque `dim_access` es Import. Se aplicó esta contingencia (2026-10-17) en una copia: con `dim_geography` en Import el editor acepta los 3 roles; GATES 6.C, 6.E, 6.F y 6.G (pruebas 1 y 2) se repitieron con los mismos valores. Diferencia: la consulta por `state_code` pasa de JOIN a `WHERE geo_key IN (…~5.664 claves…)` (~2,3 s), firma de relación *limited* (Desktop no la dibuja).
 
 ### 7.B — Página `_QA`
-- [ ] Segmentadores `dim_disease[disease_key]` y `dim_mmwr_week[mmwr_year]`.
-- [ ] Tarjetas: `QA Geo Rows`, `QA Access Rows`, `QA Demographic Rows`, `QA Revision Rows`, `Cases NNDSS`, `Cases Oregon`, `Cases Oregon (statewide)`.
-- [ ] Tabla 1: `dim_geography[geo_key]` + `Cases NNDSS`. Tabla 2: `dim_demographic[sex]` + `Cases Oregon`.
+- [x] Segmentadores `dim_disease[disease_key]` y `dim_mmwr_week[mmwr_year]`.
+- [x] Tarjetas: `QA Geo Rows`, `QA Access Rows`, `QA Demographic Rows`, `QA Revision Rows`, `Cases NNDSS`, `Cases Oregon`, `Cases Oregon (statewide)`.
+- [x] Tabla 1: `dim_geography[geo_key]` + `Cases NNDSS`. Tabla 2: `dim_demographic[sex]` + `Cases Oregon`. Observado (2026-10-17): con `SYP_EARLY` la tabla 1 queda vacía (sin hechos NNDSS, esperado); en la tabla 2 la fila `sex` vacía y el total repiten el corte `Geography` por el `SELECTEDVALUE` de `Cases Oregon` (sin doble conteo); `Female`/`Male` solo aparecen filtrando `demographic_type = Sex`.
 - [ ] Ocultar la página (clic derecho en la pestaña → *Hide page*) antes de publicar.
 
 ### GATE 7.C — Matriz RLS
@@ -543,22 +543,22 @@ COUNTROWS (
 | 10 | Admin | cualquiera | 93 | 4 | 217.373 | 82.066 | 80.587 |
 
 Fila 6: el condado limitado oculta la fila estatal `OR` (su `county_name` es vacío), y con ella todos los cortes demográficos. Filas 5/9: `COUNTROWS` sobre tabla vacía muestra *(Blank)*; ambos cuentan como 0.
-- [ ] 10 filas coinciden · [ ] `nadie` no ve ningún dato · [ ] tabla 1 nunca muestra estados ajenos · [ ] capturas `docs/img/rls_01.png` … `rls_10.png`.
+- [x] 10 filas coinciden · [x] `nadie` no ve ningún dato · [x] tabla 1 nunca muestra estados ajenos · [ ] capturas `docs/img/rls_01.png` … `rls_10.png`.
 
 ### 7.D — OLS con Tabular Editor 2
-- [ ] **D1.** *External Tools → Tabular Editor*. *Roles* → clic derecho → *Create New Role* → `Restricted_Epidemiologist`, *Model Permission* = Read.
-- [ ] **D2.** Seleccionar `dim_demographic[race_group]` → propiedades → *Object Level Security* → `Restricted_Epidemiologist` = **None**. Igual con `age_group`, **`demographic_level`** (repite los valores; sin ella el OLS no oculta nada) y la **tabla** `mart_revisions`.
-- [ ] **D3.** Rol `Restricted_State_Analyst`: Read + mismos filtros RLS de `State_Analyst` (en `dim_geography` y `dim_access`, propiedad *Row Level Security* de cada tabla) + las mismas 4 restricciones OLS. (RLS y OLS de un usuario deben estar en un mismo rol.)
-- [ ] **D4.** `Ctrl+S` en TE2 → volver a Desktop → *File → Save*.
-- [ ] **D5.** `git diff -- data_model` → en los `.tmdl` de roles aparece `metadataPermission: none` para las 3 columnas y la tabla, y el filtro en `Restricted_State_Analyst`. Si no, el OLS no se guardó: repetir D4.
+- [x] **D1.** *External Tools → Tabular Editor*. *Roles* → clic derecho → *Create New Role* → `Restricted_Epidemiologist`, *Model Permission* = Read.
+- [x] **D2.** Seleccionar `dim_demographic[race_group]` → propiedades → *Object Level Security* → `Restricted_Epidemiologist` = **None**. Igual con `age_group`, **`demographic_level`** (repite los valores; sin ella el OLS no oculta nada) y la **tabla** `mart_revisions`.
+- [x] **D3.** Rol `Restricted_State_Analyst`: Read + mismos filtros RLS de `State_Analyst` (en `dim_geography` y `dim_access`, propiedad *Row Level Security* de cada tabla) + las mismas 4 restricciones OLS. (RLS y OLS de un usuario deben estar en un mismo rol.)
+- [x] **D4.** `Ctrl+S` en TE2 → volver a Desktop → *File → Save*.
+- [x] **D5.** `git diff -- data_model` → en los `.tmdl` de roles aparece `metadataPermission: none` para las 3 columnas y la tabla, y el filtro en `Restricted_State_Analyst`. Si no, el OLS no se guardó: repetir D4.
 
 **GATE 7.D** (*View as → Restricted_Epidemiologist*, Other user `ana@TENANT.onmicrosoft.com`; en `_QA` agregar visuales temporales):
-- [ ] `race_group` + `Cases Oregon` → **error** de campo inaccesible. Igual `age_group`, `demographic_level` y tarjeta `QA Revision Rows`.
-- [ ] `sex` + `Cases Oregon` (CHL) → **funciona**: 52.038 / 29.695.
-- [ ] `QA Demographic Rows` = **39**.
-- [ ] `Restricted_State_Analyst` + `ana@…` → `QA Geo Rows` = 38 **y** los 4 visuales restringidos fallan.
-- [ ] Combinación: *View as* con `State_Analyst` **y** `Restricted_Epidemiologist` a la vez → anotar textual lo que pasa (va a Limitaciones del README).
-- [ ] **Si Desktop muestra datos donde debía fallar:** no aprobar; anotar "Desktop View as no aplica OLS" y 7.E pasa a ser la prueba obligatoria.
+- [x] `race_group` + `Cases Oregon` → **error** de campo inaccesible. Igual `age_group`, `demographic_level` y tarjeta `QA Revision Rows`.
+- [x] `sex` + `Cases Oregon` (CHL) → **funciona**: 52.038 / 29.695.
+- [x] `QA Demographic Rows` = **39**.
+- [x] `Restricted_State_Analyst` + `ana@…` → `QA Geo Rows` = 38 **y** los 4 visuales restringidos fallan.
+- [x] Combinación: *View as* con `State_Analyst` **y** `Restricted_Epidemiologist` a la vez → anotar textual lo que pasa (va a Limitaciones del README). **Resultado (2026-10-17, Desktop):** con `State_Analyst` + `Restricted_Epidemiologist` + `ana@…`, `QA Geo Rows` = 93 (el RLS se une: el rol sin filtro anula al de 38) y `QA Revision Rows` falla con "This field was deleted from the model and can't be used in this visual" (el OLS se mantiene). Limitación: no asignar a un mismo usuario un rol con RLS y otro solo con OLS; usar `Restricted_State_Analyst`.
+- [x] **Si Desktop muestra datos donde debía fallar:** no aprobar; anotar "Desktop View as no aplica OLS" y 7.E pasa a ser la prueba obligatoria.
 - [ ] Capturas `docs/img/ols_*.png`. Commit:
 ```
 feat(security): dynamic RLS (state/county) and OLS roles with tested matrix

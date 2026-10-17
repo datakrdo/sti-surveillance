@@ -1,0 +1,52 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "fb753d57e37ea5c057cb",
+  "position": {
+    "x": 855.22167487684726,
+    "y": 284.6305418719212,
+    "z": 9,
+    "height": 304.58128078817731,
+    "width": 351.13300492610836,
+    "tabOrder": 9
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_geography"
+                    }
+                  },
+                  "Property": "geo_key"
+                }
+              },
+              "queryRef": "dim_geography.geo_key",
+              "nativeQueryRef": "geo_key"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Cases NNDSS"
+                }
+              },
+              "queryRef": "_Measures.Cases NNDSS",
+              "nativeQueryRef": "Cases NNDSS"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

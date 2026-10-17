@@ -32,6 +32,8 @@ ref table _Measures
 ref role State_Analyst
 ref role County_Analyst
 ref role Admin
+ref role Restricted_Epidemiologist
+ref role Restricted_State_Analyst
 
 ref cultureInfo en-US
 

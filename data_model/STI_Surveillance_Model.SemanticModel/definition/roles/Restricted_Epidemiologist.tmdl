@@ -1,0 +1,14 @@
+role Restricted_Epidemiologist
+	modelPermission: read
+
+	tablePermission dim_demographic
+
+		columnPermission race_group = none
+
+		columnPermission age_group = none
+
+		columnPermission demographic_level = none
+
+	tablePermission mart_revisions
+		metadataPermission: none
+

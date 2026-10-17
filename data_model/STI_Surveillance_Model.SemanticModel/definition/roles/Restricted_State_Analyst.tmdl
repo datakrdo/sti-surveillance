@@ -1,0 +1,27 @@
+role Restricted_State_Analyst
+	modelPermission: read
+
+	tablePermission dim_access = dim_access[user_principal_name] = USERPRINCIPALNAME ()
+
+	tablePermission dim_geography =
+			COUNTROWS (
+			    FILTER (
+			        dim_access,
+			        dim_access[user_principal_name] = USERPRINCIPALNAME ()
+			            && ( dim_access[state_code] = "*" || dim_access[state_code] = dim_geography[state_code] )
+			    )
+			) > 0
+
+	tablePermission dim_demographic
+
+		columnPermission race_group = none
+
+		columnPermission age_group = none
+
+		columnPermission demographic_level = none
+
+	tablePermission mart_revisions
+		metadataPermission: none
+
+	annotation PBI_Id = 1a070c39d8be483691705bcb9527e538
+
