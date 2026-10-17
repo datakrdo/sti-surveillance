@@ -1,4 +1,14 @@
 
+// ==== F1 -> Age 81.886 · Geography 80.587 · Race alone 92.237 · Race primary 81.803 · Sex 81.733 · Statewide 82.066
+EVALUATE
+SUMMARIZECOLUMNS ( dim_demographic[demographic_type], "chl", CALCULATE ( [Cases Oregon], dim_disease[disease_key] = "CHL" ) )
+ORDER BY dim_demographic[demographic_type]
+
+// ==== F2 -> Female 52.038 · Male 29.695 · Nonbinary/Unknown vacios
+EVALUATE
+SUMMARIZECOLUMNS ( dim_demographic[demographic_level], FILTER ( ALL ( dim_demographic[demographic_type] ), dim_demographic[demographic_type] = "Sex" ),
+    "chl", CALCULATE ( [Cases Oregon], dim_disease[disease_key] = "CHL" ) )
+
 // ==== F3 -> 294 · 3.376 · 23.787 · 414,658
 EVALUATE ROW (
     "m01", CALCULATE ( [Cases Oregon], dim_geography[geo_key] = "OR|Multnomah County", dim_disease[disease_key] = "CHL", dim_epi_month[epi_month_key] = 202601 ),
@@ -6,7 +16,6 @@ EVALUATE ROW (
     "all", CALCULATE ( [Cases Oregon], dim_geography[geo_key] = "OR|Multnomah County", dim_disease[disease_key] = "CHL" ),
     "rate2025", CALCULATE ( [Rate per 100k Oregon], dim_geography[geo_key] = "OR|Multnomah County", dim_disease[disease_key] = "CHL", dim_epi_month[mmwr_year] = 2025 )
 )
-
 
 // ==== F4 -> Age 0,688 · Geography 0,792 · Race alone 0,583 · Race primary 0,659 · Sex 0,607 · Statewide 0,000
 EVALUATE SUMMARIZECOLUMNS ( dim_demographic[demographic_type], "supp", [% Suppressed Cells] ) ORDER BY dim_demographic[demographic_type]

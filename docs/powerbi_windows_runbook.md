@@ -79,14 +79,14 @@ ROW (
 )
 ```
 **Expected (A1):** 6 · 93 · 303 · 69 · 39 · 2.191 · 55.776 · 25.125 · 996 · 55.776 · 3 · 4.
-- [x] 12 conteos = SQL · [x] 12 nombres exactos · [x] sin errores · [x] el `.pbip` existe en `data_model\` · [ ] captura `docs/img/gate_6A.png`.
+- [x] 12 conteos = SQL · [x] 12 nombres exactos · [x] sin errores · [x] el `.pbip` existe en `data_model\` · [x] captura `docs/img/gate_6A.png`.
 
 ## Task 6.B — Modos de almacenamiento
 - [x] **B1.** *Model view* → seleccionar cada dimensión (`dim_disease`, `dim_geography`, `dim_mmwr_week`, `dim_epi_month`, `dim_demographic`, `dim_date`) → *Properties → Advanced → Storage mode = **Dual*** → aceptar aviso. (Se puede multiseleccionar con Ctrl.)
 - [x] **B2.** No tocar el resto: hechos en DirectQuery; `agg_weekly_national`, `mart_revisions`, `mart_data_quality`, `dim_access` en Import.
 
 **GATE 6.B:** tooltip del encabezado de cada tabla en Model view → **2 DirectQuery · 6 Dual · 4 Import**. Confirmación textual (si existe TMDL view): arrastrar una tabla a TMDL view y buscar `mode:` en `partition`.
-- [x] 12/12 en el modo esperado · [ ] captura `docs/img/gate_6B.png`.
+- [x] 12/12 en el modo esperado · [x] captura `docs/img/gate_6B.png`.
 
 ## Task 6.C — Relaciones (13)
 *Model view → Manage relationships → New*. Todas: **Many to one (*:1)**, **Single**, **activa**, *Assume referential integrity* **desmarcado**. Si Desktop creó alguna sola, borrarla.
@@ -479,7 +479,7 @@ EVALUATE ROW (
 - [x] **H1.** *File → Save*. En el explorador: `data_model\STI_Surveillance_Model.pbip`, `STI_Surveillance_Model.SemanticModel\definition\` con `model.tmdl`, `relationships.tmdl`, `tables\*.tmdl` (13 archivos: 12 tablas + `_Measures`) y `STI_Surveillance_Model.Report\`.
 - [x] **H2.** Git Bash: `git grep -nE "npg_|PASSWORD|password" -- data_model` → **vacío**. El host de Neon sí aparece en las consultas M (no es credencial; decisión registrada).
 - [x] **H3.** `git status` no lista `.pbix`, `localSettings.json` ni `cache.abf` (el `.gitignore` que genera el PBIP los excluye).
-- [ ] **H4.** Commit + push:
+- [x] **H4.** Commit + push:
 ```
 feat(pbi): composite semantic model with aggregations and epidemiological measures
 ```
@@ -494,7 +494,7 @@ feat(pbi): composite semantic model with aggregations and epidemiological measur
 
 ### 7.A — Roles RLS (Desktop)
 *Modeling → Manage roles → New* (si se abre el editor nuevo, pasar a *Switch to DAX editor*).
-- [ ] **`State_Analyst`**, tabla `dim_geography`:
+- [x] **`State_Analyst`**, tabla `dim_geography`:
 ```dax
 COUNTROWS (
     FILTER (
@@ -504,7 +504,7 @@ COUNTROWS (
     )
 ) > 0
 ```
-- [ ] **`County_Analyst`**, tabla `dim_geography`:
+- [x] **`County_Analyst`**, tabla `dim_geography`:
 ```dax
 COUNTROWS (
     FILTER (
@@ -515,10 +515,10 @@ COUNTROWS (
     )
 ) > 0
 ```
-- [ ] En **ambos**, tabla `dim_access`: `dim_access[user_principal_name] = USERPRINCIPALNAME ()`
-- [ ] **`Admin`**: sin filtros.
+- [x] En **ambos**, tabla `dim_access`: `dim_access[user_principal_name] = USERPRINCIPALNAME ()`
+- [x] **`Admin`**: sin filtros.
 
-**GATE 7.A:** 3 roles, sin errores de sintaxis · *Save* · captura `docs/img/gate_7A.png`. Si *View as* de 7.C da un error de DirectQuery/RLS con dimensiones Dual → contingencia: `dim_geography` a Import (no tiene vuelta: hacerlo en una copia del `.pbip` primero), repetir GATES 6.C–6.G, anotar.
+**GATE 7.A:** 3 roles, sin errores de sintaxis · *Save* · captura `docs/img/gate_7A.png`. Si *View as* de 7.C da un error de DirectQuery/RLS con dimensiones Dual → contingencia: `dim_geography` a Import (no tiene vuelta: hacerlo en una copia del `.pbip` primero), repetir GATES 6.C–6.G, anotar. **Hallazgo (2026-10-15):** el editor de roles rechazó el filtro RLS sobre `dim_geography` (Dual) con "A calculated column or RLS expression on a DirectQuery table cannot reference tables from a different data source", porque `dim_access` es Import. Se aplicó esta contingencia (2026-10-17) en una copia: con `dim_geography` en Import el editor acepta los 3 roles; GATES 6.C, 6.E, 6.F y 6.G (pruebas 1 y 2) se repitieron con los mismos valores. Diferencia: la consulta por `state_code` pasa de JOIN a `WHERE geo_key IN (…~5.664 claves…)` (~2,3 s), firma de relación *limited* (Desktop no la dibuja).
 
 ### 7.B — Página `_QA`
 - [ ] Segmentadores `dim_disease[disease_key]` y `dim_mmwr_week[mmwr_year]`.

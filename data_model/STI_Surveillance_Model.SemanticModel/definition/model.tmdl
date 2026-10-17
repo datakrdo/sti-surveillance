@@ -29,5 +29,9 @@ ref table mart_data_quality
 ref table dim_access
 ref table _Measures
 
+ref role State_Analyst
+ref role County_Analyst
+ref role Admin
+
 ref cultureInfo en-US
 

@@ -1,0 +1,16 @@
+role State_Analyst
+	modelPermission: read
+
+	tablePermission dim_access = dim_access[user_principal_name] = USERPRINCIPALNAME ()
+
+	tablePermission dim_geography =
+			COUNTROWS (
+			    FILTER (
+			        dim_access,
+			        dim_access[user_principal_name] = USERPRINCIPALNAME ()
+			            && ( dim_access[state_code] = "*" || dim_access[state_code] = dim_geography[state_code] )
+			    )
+			) > 0
+
+	annotation PBI_Id = 7f9a8379969c4e938c45af2b92e2ae76
+

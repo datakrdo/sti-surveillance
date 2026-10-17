@@ -67,7 +67,7 @@ table dim_geography
 		annotation SummarizationSetBy = Automatic
 
 	partition dim_geography = m
-		mode: dual
+		mode: import
 		source =
 				let
 				    Source = PostgreSQL.Database("ep-xxxxxxxx.region.aws.neon.tech", "neondb"),

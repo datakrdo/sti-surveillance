@@ -1,0 +1,17 @@
+role County_Analyst
+	modelPermission: read
+
+	tablePermission dim_access = dim_access[user_principal_name] = USERPRINCIPALNAME ()
+
+	tablePermission dim_geography =
+			COUNTROWS (
+			    FILTER (
+			        dim_access,
+			        dim_access[user_principal_name] = USERPRINCIPALNAME ()
+			            && ( dim_access[state_code] = "*" || dim_access[state_code] = dim_geography[state_code] )
+			            && ( dim_access[county_name] = "*" || dim_access[county_name] = dim_geography[county_name] )
+			    )
+			) > 0
+
+	annotation PBI_Id = 90de285d4d4341549d68c09d3898f3fd
+
