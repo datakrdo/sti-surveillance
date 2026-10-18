@@ -22,6 +22,8 @@ export const STRINGS = {
     notIncluded: "Los datos del Oregon Health Authority (condados y demografía), Ranking y Calidad existen en el informe real de Power BI, pero no están en esta demo.",
     week: "semana", cases: "casos", states: "estados", noState: "Todos los estados",
     filtersLabel: "Filtros", langLabel: "Idioma", metaDescription: "Demo estática del informe de Power BI de vigilancia de ITS (NNDSS) con preguntas de ejemplo y MCP remoto.",
+    mapLegendTitle: "Cómo leer el mapa", mapLegendLow: "Tasa más baja", mapLegendHigh: "Tasa más alta", mapLegendNoData: "Sin dato para ese estado",
+    mapLegendNote: "El color indica la tasa de casos por cada 100 mil habitantes: cuanto más amarillo, más casos por habitante. Es una comparación entre estados de la misma selección (la escala va de 0 al estado con la tasa más alta), no un nivel de gravedad clínica.",
     tourOn: "Modo recorrido", mapTable: "Tabla de la tasa por estado", loading: "Cargando datos…", loadError: "No se pudieron cargar los datos.",
   },
   en: {
@@ -47,6 +49,8 @@ export const STRINGS = {
     notIncluded: "Oregon Health Authority data (counties and demographics), Ranking and Quality exist in the real Power BI report but are not in this demo.",
     week: "week", cases: "cases", states: "states", noState: "All states",
     filtersLabel: "Filters", langLabel: "Language", metaDescription: "Static demo of the STI surveillance Power BI report (NNDSS) with example questions and a remote MCP.",
+    mapLegendTitle: "How to read the map", mapLegendLow: "Lowest rate", mapLegendHigh: "Highest rate", mapLegendNoData: "No data for this state",
+    mapLegendNote: "Color shows the rate of cases per 100,000 people: the more yellow, the more cases per resident. It compares states within the same selection (the scale runs from 0 to the state with the highest rate); it is not a measure of clinical severity.",
     tourOn: "Tour mode", mapTable: "Table of the rate by state", loading: "Loading data…", loadError: "Could not load the data.",
   },
 };

@@ -8,67 +8,9 @@ Un pipeline semanal para clamidia, gonorrea, sífilis y VIH en Estados Unidos. C
 
 Fuentes: [CDC NNDSS Weekly](https://data.cdc.gov/resource/x9gk-5huc), [Oregon Monthly Reportable Disease](https://data.oregon.gov/resource/rk77-sqhz) y [Census PEP 2025](https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/state/totals/NST-EST2025-ALLDATA.csv). Todas gratuitas y sin API key.
 
-## Leer antes de usar los números ⚠️
+**[Demo en vivo →](https://datakrdo.github.io/sti-surveillance/)** · [Español](https://datakrdo.github.io/sti-surveillance/?lang=es) · [English](https://datakrdo.github.io/sti-surveillance/?lang=en) · [MCP remoto](#demo-en-vivo-)
 
-- **Oregon publica un solo corte por fila** (condado, o sexo, o edad, o raza), nunca un cruce. Sumar todos los cortes cuenta cada caso unas 5 veces: la clamidia suma 500.312 con todos los cortes y 80.587 solo con condados.
-- **El 70,7 % de las filas de Oregon están enmascaradas** (menos de 6 casos). `cases` queda en `NULL`, nunca en cero, así que las sumas por condado subestiman el total estatal.
-- **Los conteos de NNDSS son provisionales** y se revisan después de publicarse; el snapshot registra cada cambio.
-- **El VIH existe solo en Oregon.** NNDSS no lo publica, así que aquí no hay serie nacional de VIH.
-- **Sífilis primaria y secundaria (NNDSS) y sífilis temprana (Oregon) son definiciones distintas** y no son comparables.
-
-## Herramientas 🛠️
-
-- Python 3.12, requests, psycopg2, pytest
-- Neon Postgres, dbt-core 1.12 + dbt-postgres 1.11
-- GitHub Actions (semanal), MCP Python SDK 2.3
-- Power BI (PBIP/TMDL), Tabular Editor 2, DAX Studio
-- Sitio estático (JS puro, SVG), GitHub Pages, Cloudflare Workers, Node 22
-
-## Habilidades 🧠
-
-- Ingesta desde APIs abiertas a un warehouse: SoQL paginado, upsert idempotente por claves naturales y una guarda contra fuentes vacías que aborta antes de tocar la base
-- Modelado dimensional con dbt: tests `unique`/`relationships`, tests singulares que atrapan doble conteo, un snapshot que registra revisiones y una exposure para el linaje
-- Control de divulgación estadística: supresión de celdas pequeñas conservada como `NULL` más una marca
-- Acceso seguro de una IA a una base de datos: rol de solo lectura, permisos reaplicados por un hook de dbt, una vista de un solo corte y un regex solo como segunda línea
-- Depuración de CI: rastreé un run fallido hasta una dependencia sin fijar que resolvió a una beta
-
-## Decisiones de diseño 🧭
-
-- **Dos fuentes, no una.** Ninguna API gratuita trae ITS recientes con demografía: NNDSS es nacional y semanal pero sin demografía ni VIH; Oregon tiene ambos. Se descartaron otros portales por antigüedad (California termina en 2021, Illinois en 2016, el VIH de NYC es anual hasta 2022) o por no tener API (AtlasPlus).
-- **Carga completa con upsert, no incremental.** Cada corrida trae unas 95.000 filas en cerca de un minuto y hace upsert por clave, así que repetirla es idempotente. La lógica incremental sumaría complejidad sin beneficio a este tamaño. Solo `snap_nndss_weekly` guarda historia entre corridas.
-- **Semanal, no diario.** NNDSS publica cada semana, Oregon declara frecuencia mensual y Census es anual. El workflow corre los jueves 06:00 UTC; la frescura de dbt avisa a los 8 días y da error a los 15.
-- **Las celdas enmascaradas quedan en `NULL`.** Nunca se imputan, y las tasas deben usar solo celdas visibles.
-- **El MCP ve un solo corte.** `mcp_oregon_county_monthly` tiene solo condados y el corte `Geography`, así que cualquier `SUM` es aditivo. El rol no tiene acceso al hecho multicorte ni a `dim_demographic`.
-- **New York City se suma a NY** para coincidir con Census; `max_prev_52w` de NY es una suma y solo informativo.
-- **Modelo compuesto en Power BI.** Hechos en DirectQuery, cinco dimensiones en Dual y una agregación Import pequeña (`agg_weekly_national`). `dim_geography` es Import y no Dual: el editor de roles rechaza la seguridad por fila sobre una tabla Dual que referencia `dim_access`, que es Import.
-- **Tasas en persona-años.** La población es anual y los períodos de Oregon duran 28 o 35 días, así que las tasas dividen por población × tiempo sumados (anualizadas), nunca por una sola población.
-- **Cero no es dato faltante.** En NNDSS un `-` significa sin casos reportados y se carga como 0; solo `U` queda `NULL` (213 filas, Maryland y Ohio). El total estatal de Oregon es un corte propio, `Statewide`, para que la suma de condados no duplique.
-- **Un solo rol por usuario.** La seguridad por fila y por objeto viven juntas en `Restricted_State_Analyst`; `demographic_level` también está restringida porque repite los valores de `age_group` y `race_group`.
-- **Rol `pbi_reader` de solo lectura** para Power BI; los permisos los reaplica el mismo hook de dbt que los del MCP.
-- **Versiones fijadas.** Sin fijar `dbt-core`, pip eligió una beta de `dbt` sin soporte de postgres y el primer run de CI falló.
-
-## Cómo funciona 🏗️
-
-```
-CDC NNDSS (Socrata) ─┐
-Oregon (Socrata)     ─┼─► scripts/ingest.py ─► Neon raw.* ─► dbt ─► analytics_marts.* ─► Power BI
-Census PEP (CSV)     ─┘     (GitHub Actions, semanal)         │                    └─► servidor MCP (solo lectura)
-                                                              └─ snapshot de NNDSS m1 → mart_revisions
-```
-
-`analytics_marts` contiene `dim_disease`, `dim_geography`, `dim_mmwr_week`, `dim_epi_month`, `dim_demographic`, los hechos `fct_nndss_weekly` y `fct_oregon_monthly`, `agg_weekly_national`, `mart_revisions`, `mart_data_quality` y la vista del MCP. Los ids de hechos son claves `md5` en texto.
-
-El servidor MCP (`mcp/mcp_server.py`) expone una tool de SQL y el TMDL como resource. La protección tiene tres capas: el rol Postgres `mcp_reader` (solo lectura, timeout de 10 s, permisos solo sobre `analytics_marts`), sin acceso al hecho multicorte, a `dim_demographic` ni a `mart_revisions`, y un regex sobre DML y nombres restringidos.
-
-## Fuentes de datos 📎
-
-| Fuente | Endpoint | Grano | Filas cargadas |
-|---|---|---|---|
-| CDC NNDSS Weekly | `data.cdc.gov/resource/x9gk-5huc` | semana × estado × enfermedad | 69.720 |
-| Oregon Monthly Reportable Disease | `data.oregon.gov/resource/rk77-sqhz` | mes × (condado, sexo, edad o raza) × enfermedad | 25.125 |
-| Census PEP 2025 | `NST-EST2025-ALLDATA.csv` | estado × año | 396 |
-
-Cadencia vista el 2026-10-14: NNDSS semanal, Oregon declara mensual (se regeneró ese día junto con su dataset semanal), Census anual. Solo se observó una fecha de publicación por fuente, así que el día de la semana de NNDSS no está confirmado.
+[![Vista previa animada de la demo: Resumen, Mapa y Corredor](docs/img/cover_es.gif)](https://datakrdo.github.io/sti-surveillance/?lang=es)
 
 ## Resultados 📊
 
@@ -93,19 +35,96 @@ Una versión pública y gratuita, sin base de datos ni claves en línea:
 - **Cómo se actualiza:** el workflow semanal exporta `site/data/*.json` desde Neon y vuelve a publicar Pages; el Worker lee ese JSON, así que no hay que redesplegarlo. Las pruebas comparan las cifras del sitio con las anclas SQL antes de publicar.
 - **Fuentes y avisos:** CDC NNDSS (datos provisionales) y U.S. Census Bureau. Proyecto independiente, sin afiliación con estas entidades.
 
-## Limitaciones ⚠️
+### Cómo usarla, paso a paso
 
-- No hay cruces demográficos (sexo × edad × raza); Oregon no los publica.
-- Las series de ITS de NNDSS empiezan en 2022, así que un corredor endémico tendría solo los años disponibles.
-- La población de 2026 usa la estimación Census de 2025.
-- `dim_access.csv` trae usuarios ficticios con el dominio `TENANT`; hay que reemplazarlo antes de probar la seguridad a nivel de fila.
-- `Asymptomatic_Ratio` del plan original se eliminó: ninguna fuente lo tiene.
-- La seguridad por fila y por objeto se probó solo en Power BI Desktop (*View as*). La prueba en el servicio (copia del modelo con Import, workspace privado) no se hizo: no hay tenant de Microsoft 365.
-- Asignar a un usuario un rol con filtros de fila y otro que solo restringe objetos une los filtros de fila: `State_Analyst` + `Restricted_Epidemiologist` mostró 93 geografías en vez de 38, y la restricción de objetos se mantuvo.
-- `SAMEPERIODLASTYEAR` sobre una sola semana devuelve vacío porque los datos son semanales; el informe usa la comparación alineada por MMWR.
-- El corredor endémico usa los años con datos (desde 2022) y la última semana de gonorrea de CA (2026-W40) parece un reporte parcial (hipótesis).
-- `Person-Years Oregon` itera por meses para funcionar bien en DirectQuery y ya no descarta las 34 filas visibles con `cases` vacío, así que puede diferir levemente en otros cortes.
-- El error `[OLS-HIPAA]` del MCP sale de un filtro de texto en `mcp_server.py` (busca `race_group`, `age_group`, `race_method`, `mart_revisions`), así que es una guarda de demostración, no un permiso. La barrera real es el rol `mcp_reader`: no tiene `SELECT` sobre `dim_demographic`, `fct_oregon_monthly` ni `mart_revisions` (verificado: `permission denied`), es de solo lectura y tiene un timeout de 10 s.
+**A. En tu navegador (sin cuenta)**
+
+1. Abre <https://datakrdo.github.io/sti-surveillance/>. Cambia el idioma con **ES / EN**, arriba a la derecha.
+2. Elige una **enfermedad** y un **año** en los filtros. Cada enfermedad tiene su propio color (mira la leyenda a la derecha de los filtros).
+3. Pestaña **Resumen**: cuatro tarjetas (casos, tasa por 100.000 habitantes, cambio frente al mismo periodo del año anterior y cuántos estados están por encima de su rango habitual) y una línea con los casos semanales del año elegido frente al año anterior.
+4. Pestaña **Mapa**: cada estado se colorea según su tasa de casos por 100.000 habitantes. La barra bajo el mapa explica la escala: **azul grisáceo = tasa más baja, amarillo = tasa más alta, gris oscuro = sin dato**. Compara estados entre sí; no mide gravedad clínica. A su lado están los 10 estados con más casos.
+5. Pestaña **Corredor**: elige un **estado**. La banda gris es el rango habitual de los años anteriores en cada semana y la línea discontinua es su mediana. Si la línea de color (el año que elegiste) sube por encima de la banda, esa semana hubo más casos de lo habitual.
+6. **Pregúntale a los datos** (panel derecho): pulsa cualquier pregunta de ejemplo para ver su respuesta. Se calculan en tu navegador con los mismos datos que usa el MCP.
+7. Opcional: añade `?tour=1` a la dirección y la página recorre sola las tres vistas (se detiene cuando haces clic).
+
+**B. Haz tus propias preguntas con Claude (texto libre)**
+
+Necesitas una cuenta de Claude (cualquier plan; el gratuito permite un conector personalizado) en claude.ai o Claude Desktop. Los nombres de los menús pueden variar un poco entre versiones.
+
+1. Copia la dirección del servidor: `https://sti-surveillance-mcp.jcbatman.workers.dev/mcp`
+2. En Claude abre **Customize → Connectors** y elige **Add custom connector** (añadir conector personalizado). En los planes Team y Enterprise lo añade un propietario de la organización en **Organization settings → Connectors**.
+3. Ponle un nombre (por ejemplo "STI Surveillance"), pega la dirección y guarda. El servidor es público y de solo lectura, así que deja vacías las opciones de inicio de sesión o avanzadas.
+4. Abre un chat nuevo, comprueba que el conector esté activado y pregunta en lenguaje natural. Si Claude pide permiso para usar una herramienta, permítelo. Prueba:
+   - "Con el conector STI Surveillance, ¿cuántos casos de gonorrea se notificaron en California en 2024?"
+   - "¿Cuál fue la tasa nacional de clamidia por 100.000 habitantes en 2025?"
+   - "¿La gonorrea en Texas sube o baja respecto al mismo periodo del año anterior?"
+   - "¿California está por encima de su rango habitual de gonorrea en la semana 38 de 2026?"
+   - "¿Qué cinco estados tienen más casos de sífilis primaria y secundaria en 2025?"
+   - "¿Qué cubren estos datos y cuáles son sus límites?"
+5. Cualquier otro cliente que admita servidores MCP remotos funciona con la misma dirección.
+
+Lo que **no** puede hacer, a propósito: ejecutar SQL libre, modificar nada ni mostrar los datos de condados y demografía del Oregon Health Authority. Las cifras semanales son provisionales y los datos se actualizan cada semana. Si una respuesta parece rara, pide a Claude que liste las enfermedades, los estados y las semanas disponibles (`list_dimensions`).
+
+## Cómo funciona 🏗️
+
+```
+CDC NNDSS (Socrata) ─┐
+Oregon (Socrata)     ─┼─► scripts/ingest.py ─► Neon raw.* ─► dbt ─► analytics_marts.* ─► Power BI
+Census PEP (CSV)     ─┘     (GitHub Actions, semanal)         │                    └─► servidor MCP (solo lectura)
+                                                              └─ snapshot de NNDSS m1 → mart_revisions
+```
+
+`analytics_marts` contiene `dim_disease`, `dim_geography`, `dim_mmwr_week`, `dim_epi_month`, `dim_demographic`, los hechos `fct_nndss_weekly` y `fct_oregon_monthly`, `agg_weekly_national`, `mart_revisions`, `mart_data_quality` y la vista del MCP. Los ids de hechos son claves `md5` en texto.
+
+El servidor MCP (`mcp/mcp_server.py`) expone una tool de SQL y el TMDL como resource. La protección tiene tres capas: el rol Postgres `mcp_reader` (solo lectura, timeout de 10 s, permisos solo sobre `analytics_marts`), sin acceso al hecho multicorte, a `dim_demographic` ni a `mart_revisions`, y un regex sobre DML y nombres restringidos.
+
+## Fuentes de datos 📎
+
+| Fuente | Endpoint | Grano | Filas cargadas |
+|---|---|---|---|
+| CDC NNDSS Weekly | `data.cdc.gov/resource/x9gk-5huc` | semana × estado × enfermedad | 69.720 |
+| Oregon Monthly Reportable Disease | `data.oregon.gov/resource/rk77-sqhz` | mes × (condado, sexo, edad o raza) × enfermedad | 25.125 |
+| Census PEP 2025 | `NST-EST2025-ALLDATA.csv` | estado × año | 396 |
+
+Cadencia vista el 2026-10-14: NNDSS semanal, Oregon declara mensual (se regeneró ese día junto con su dataset semanal), Census anual. Solo se observó una fecha de publicación por fuente, así que el día de la semana de NNDSS no está confirmado.
+
+## Decisiones de diseño 🧭
+
+- **Dos fuentes, no una.** Ninguna API gratuita trae ITS recientes con demografía: NNDSS es nacional y semanal pero sin demografía ni VIH; Oregon tiene ambos. Se descartaron otros portales por antigüedad (California termina en 2021, Illinois en 2016, el VIH de NYC es anual hasta 2022) o por no tener API (AtlasPlus).
+- **Carga completa con upsert, no incremental.** Cada corrida trae unas 95.000 filas en cerca de un minuto y hace upsert por clave, así que repetirla es idempotente. La lógica incremental sumaría complejidad sin beneficio a este tamaño. Solo `snap_nndss_weekly` guarda historia entre corridas.
+- **Semanal, no diario.** NNDSS publica cada semana, Oregon declara frecuencia mensual y Census es anual. El workflow corre los jueves 06:00 UTC; la frescura de dbt avisa a los 8 días y da error a los 15.
+- **Las celdas enmascaradas quedan en `NULL`.** Nunca se imputan, y las tasas deben usar solo celdas visibles.
+- **El MCP ve un solo corte.** `mcp_oregon_county_monthly` tiene solo condados y el corte `Geography`, así que cualquier `SUM` es aditivo. El rol no tiene acceso al hecho multicorte ni a `dim_demographic`.
+- **New York City se suma a NY** para coincidir con Census; `max_prev_52w` de NY es una suma y solo informativo.
+- **Modelo compuesto en Power BI.** Hechos en DirectQuery, cinco dimensiones en Dual y una agregación Import pequeña (`agg_weekly_national`). `dim_geography` es Import y no Dual: el editor de roles rechaza la seguridad por fila sobre una tabla Dual que referencia `dim_access`, que es Import.
+- **Tasas en persona-años.** La población es anual y los períodos de Oregon duran 28 o 35 días, así que las tasas dividen por población × tiempo sumados (anualizadas), nunca por una sola población.
+- **Cero no es dato faltante.** En NNDSS un `-` significa sin casos reportados y se carga como 0; solo `U` queda `NULL` (213 filas, Maryland y Ohio). El total estatal de Oregon es un corte propio, `Statewide`, para que la suma de condados no duplique.
+- **Un solo rol por usuario.** La seguridad por fila y por objeto viven juntas en `Restricted_State_Analyst`; `demographic_level` también está restringida porque repite los valores de `age_group` y `race_group`.
+- **Rol `pbi_reader` de solo lectura** para Power BI; los permisos los reaplica el mismo hook de dbt que los del MCP.
+- **Versiones fijadas.** Sin fijar `dbt-core`, pip eligió una beta de `dbt` sin soporte de postgres y el primer run de CI falló.
+
+## Herramientas 🛠️
+
+- Python 3.12, requests, psycopg2, pytest
+- Neon Postgres, dbt-core 1.12 + dbt-postgres 1.11
+- GitHub Actions (semanal), MCP Python SDK 2.3
+- Power BI (PBIP/TMDL), Tabular Editor 2, DAX Studio
+- Sitio estático (JS puro, SVG), GitHub Pages, Cloudflare Workers, Node 22
+- Cloudflare Workers (SDK `agents`, zod, Wrangler), runner de tests de Node 22
+
+## Habilidades 🧠
+
+- Ingesta desde APIs abiertas a un warehouse: SoQL paginado, upsert idempotente por claves naturales y una guarda contra fuentes vacías que aborta antes de tocar la base
+- Modelado dimensional con dbt: tests `unique`/`relationships`, tests singulares que atrapan doble conteo, un snapshot que registra revisiones y una exposure para el linaje
+- Control de divulgación estadística: supresión de celdas pequeñas conservada como `NULL` más una marca
+- Acceso seguro de una IA a una base de datos: rol de solo lectura, permisos reaplicados por un hook de dbt, una vista de un solo corte y un regex solo como segunda línea
+- Depuración de CI: rastreé un run fallido hasta una dependencia sin fijar que resolvió a una beta
+- Modelado compuesto en Power BI (DirectQuery, Dual y una agregación Import) con el acierto de la agregación probado de tres formas, y DAX epidemiológico: tasas en persona-años, comparación interanual alineada por semana MMWR y corredores endémicos
+- Seguridad a nivel de fila y de objeto en TMDL, probada rol por rol, incluida la combinación de roles que se solapan
+- Diseño de informe accesible generado desde código: grilla de 8 px, segmentadores sincronizados, color fijo por enfermedad, tests de contraste WCAG y de layout
+- Sitios de datos estáticos: un módulo de cálculo compartido por la página y la API, verificado contra anclas SQL en el CI
+- Una API pública, gratuita y segura para una IA: un MCP remoto de solo lectura en Cloudflare Workers con parámetros validados, sin SQL libre y sin secretos
+- CI/CD con GitHub Actions de mínimo privilegio: exportación semanal, verificación de anclas y despliegue en Pages
 
 ## Estructura
 
@@ -155,8 +174,8 @@ El CI necesita los secrets del repo `NEON_DATABASE_URL`, `PGHOST`, `PGUSER`, `PG
 ## Tests
 
 ```bash
-.venv/bin/pytest -q                       # 38 tests: ingesta, contraste del tema, layout del informe, exportador, sin host real de la base
-node --test "site/js/*.test.mjs"          # 15 tests: cálculos contra las anclas SQL, sitio
+.venv/bin/pytest -q                       # 45 tests: ingesta, contraste del tema, layout del informe, exportador, sin host real de la base
+node --test "site/js/*.test.mjs"          # 17 tests: cálculos contra las anclas SQL, sitio
 (cd worker && npm test)                   # 11 tests: herramientas del MCP remoto
 cd dbt && ../.venv/bin/dbt build --profiles-dir .
 ```
@@ -176,7 +195,6 @@ cd dbt && ../.venv/bin/dbt build --profiles-dir .
 - [x] Sitio estático bilingüe y MCP remoto (código y tests)
 - [ ] Desplegar Pages y el Worker, y probar el MCP público desde Claude
 - [ ] Abrir ambos `.pbip` en Desktop tras el rediseño del informe
-- [ ] Capturas en `docs/img/` (parcial)
 
 ## Fuera de alcance (a propósito)
 
@@ -184,6 +202,30 @@ cd dbt && ../.venv/bin/dbt build --profiles-dir .
 - Carga incremental y un orquestador: la carga completa tarda cerca de un minuto.
 - Publicar el informe con *Publish to web* de Power BI: expone los datos y no soporta seguridad a nivel de fila.
 - Imputar las celdas enmascaradas.
+
+## Limitaciones ⚠️
+
+**Antes de usar los números**
+
+- **Oregon publica un solo corte por fila** (condado, o sexo, o edad, o raza), nunca un cruce. Sumar todos los cortes cuenta cada caso unas 5 veces: la clamidia suma 500.312 con todos los cortes y 80.587 solo con condados.
+- **El 70,7 % de las filas de Oregon están enmascaradas** (menos de 6 casos). `cases` queda en `NULL`, nunca en cero, así que las sumas por condado subestiman el total estatal.
+- **Los conteos de NNDSS son provisionales** y se revisan después de publicarse; el snapshot registra cada cambio.
+- **El VIH existe solo en Oregon.** NNDSS no lo publica, así que aquí no hay serie nacional de VIH.
+- **Sífilis primaria y secundaria (NNDSS) y sífilis temprana (Oregon) son definiciones distintas** y no son comparables.
+
+**Otras limitaciones**
+
+- No hay cruces demográficos (sexo × edad × raza); Oregon no los publica.
+- Las series de ITS de NNDSS empiezan en 2022, así que un corredor endémico tendría solo los años disponibles.
+- La población de 2026 usa la estimación Census de 2025.
+- `dim_access.csv` trae usuarios ficticios con el dominio `TENANT`; hay que reemplazarlo antes de probar la seguridad a nivel de fila.
+- `Asymptomatic_Ratio` del plan original se eliminó: ninguna fuente lo tiene.
+- La seguridad por fila y por objeto se probó solo en Power BI Desktop (*View as*). La prueba en el servicio (copia del modelo con Import, workspace privado) no se hizo: no hay tenant de Microsoft 365.
+- Asignar a un usuario un rol con filtros de fila y otro que solo restringe objetos une los filtros de fila: `State_Analyst` + `Restricted_Epidemiologist` mostró 93 geografías en vez de 38, y la restricción de objetos se mantuvo.
+- `SAMEPERIODLASTYEAR` sobre una sola semana devuelve vacío porque los datos son semanales; el informe usa la comparación alineada por MMWR.
+- El corredor endémico usa los años con datos (desde 2022) y la última semana de gonorrea de CA (2026-W40) parece un reporte parcial (hipótesis).
+- `Person-Years Oregon` itera por meses para funcionar bien en DirectQuery y ya no descarta las 34 filas visibles con `cases` vacío, así que puede diferir levemente en otros cortes.
+- El error `[OLS-HIPAA]` del MCP sale de un filtro de texto en `mcp_server.py` (busca `race_group`, `age_group`, `race_method`, `mart_revisions`), así que es una guarda de demostración, no un permiso. La barrera real es el rol `mcp_reader`: no tiene `SELECT` sobre `dim_demographic`, `fct_oregon_monthly` ni `mart_revisions` (verificado: `permission denied`), es de solo lectura y tiene un timeout de 10 s.
 
 ## Licencia
 

@@ -93,6 +93,7 @@ Los valores que dependen de datos nuevos (`fct_*`, semana de referencia, estados
 
 - **Metas:** sitio estático en GitHub Pages con 3 vistas (Resumen, Mapa, Corredor), ES/EN, filtros de enfermedad/año/estado, 5 preguntas de ejemplo calculadas en el navegador, bloque "Conecta tu propio Claude", modo recorrido `?tour=1`; MCP remoto de solo lectura en Cloudflare Workers; repo listo para hacerse público.
 - **No metas:** no embeber Power BI (exige licencia y no admite DirectQuery/RLS); no chat libre dentro de la página (requeriría un LLM de pago); no consultas en vivo a Postgres; no el dataset del Oregon Health Authority (condados y demografía) ni las revisiones en lo público; las filas del estado de Oregon de NNDSS sí se publican; no logos de terceros.
+- **Portada:** `scripts/make_cover_gif.sh` regenera `docs/img/cover_en.gif` y `cover_es.gif` (Resumen → Mapa → Corredor) con capturas reales del sitio; `tests/test_readme_assets.py` impide imágenes rotas en los README.
 - **Anti-metas:** filtrar credenciales o datos restringidos; cualquier cargo o tarjeta; SQL libre o escritura en el MCP público; que las cifras difieran de las anclas.
 - **Datos:** solo NNDSS (CHL, GON, SYP_PS, SYP_CONG) por estado y semana. VIH no está porque solo existe en Oregon.
 - **Flujo:** `scripts/export_public.py` → `site/data/nndss.json` (1,8 MB) y `anchors.json`. `site/js/metrics.js` concentra los cálculos y lo usan el sitio y el Worker, así coinciden. `pages.yml` exporta, corre `node --test` (compara con las anclas SQL) y publica; `weekly_ingest.yml` lo invoca cada semana. El Worker lee el JSON desde Pages (caché 10 min): no hace falta redesplegarlo ni un token de Cloudflare en GitHub.
@@ -104,11 +105,11 @@ Los valores que dependen de datos nuevos (`fct_*`, semana de referencia, estados
 1. `git rm --cached dbt/.user.yml`; commits y push.
 2. Repo público; Settings → Pages → Source: **GitHub Actions**; lanzar `pages.yml` a mano.
 3. `cd worker && npx wrangler login && npx wrangler deploy`; poner la URL del Worker en `site/js/config.js` y en los README; commit y push.
-4. Probar el MCP público desde Claude (conector personalizado) y capturar `mcp_public`.
+4. Probar el MCP público desde Claude (conector personalizado).
 
 ## 8. Pendientes y riesgos
 
-- **Windows (Desktop):** abrir ambos `.pbip` sin errores; relación 13; los 7 botones de navegación; segmentadores sincronizados; barras con el color de la enfermedad; tarjetas sin cambios (A3, A4, A9, A10); revisión manual de accesibilidad (teclado, daltonismo, 11 pt, texto alternativo); capturas `page_1…7`, `rls_*`, `ols_*`, `mcp_*`, `dbt_lineage`. Si Desktop rechaza el botón de navegación generado: insertar uno a mano y el generador lo clona.
+- **Windows (Desktop):** abrir ambos `.pbip` sin errores; relación 13; los 7 botones de navegación; segmentadores sincronizados; barras con el color de la enfermedad; tarjetas sin cambios (A3, A4, A9, A10); revisión manual de accesibilidad (teclado, daltonismo, 11 pt, texto alternativo); capturas `page_1…7` del informe, que se usarán en una sección «Informe en Power BI» de los README para que se vea cómo luce (no para documentar el proceso). Si Desktop rechaza el botón de navegación generado: insertar uno a mano y el generador lo clona.
 - **Servicio de Power BI (7.E):** cuando haya tenant, cambiar el dominio de `dbt/seeds/dim_access.csv` y `dbt seed`.
 - **Limitaciones conocidas:** la paleta de colores no pasa el validador (banda de luminosidad y ΔE 14,9 entre CC79A7 y EF7B3A); se compensa con etiquetas porque la enfermedad se elige de una en una. La línea del informe no se puede colorear por medida. Neon suspende el cómputo a los 5 minutos: la primera consulta tras una pausa tarda unos segundos.
 - **Mejoras posibles:** el exportador usa el rol del pipeline; un rol de solo lectura (`pbi_reader`) reduciría privilegios. Migrar a `uv`/`pyproject.toml`.
@@ -123,8 +124,8 @@ Los valores que dependen de datos nuevos (`fct_*`, semana de referencia, estados
 ## 10. Verificación
 
 ```bash
-.venv/bin/pytest -q                                   # 38 tests (ingesta, tema, layout, exportador)
-node --test "site/js/*.test.mjs"                      # 15 (cálculos contra anclas SQL + sitio)
+.venv/bin/pytest -q                                   # 45 tests (ingesta, tema, layout, exportador, README)
+node --test "site/js/*.test.mjs"                      # 17 (cálculos contra anclas SQL + sitio)
 (cd worker && npm test)                               # 11 (herramientas del MCP remoto)
 cd dbt && ../.venv/bin/dbt build --profiles-dir .     # 70/70
 ```

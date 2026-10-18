@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { STRINGS, t } from "./i18n.js";
 import { QUESTIONS } from "./questions.js";
-import { lineChartSVG, tileMapSVG, TILES, esc, xMaxOf } from "./charts.js";
+import { lineChartSVG, tileMapSVG, TILES, esc, xMaxOf, mapLegendHTML, RAMP } from "./charts.js";
 import { index } from "./metrics.js";
 
 const weeks = [];
@@ -72,4 +72,21 @@ test("la semana 53 amplía el eje y queda dentro del área del gráfico", () => 
   const svg = lineChartSVG({ title: "x", xMax: xMaxOf([[{ x: 53 }]]), w: 800, lines: [{ label: "a", color: "#fff", points: [{ x: 52, y: 1 }, { x: 53, y: 2 }] }] });
   const xs = [...svg.matchAll(/[ML](\d+\.?\d*),/g)].map((m) => Number(m[1]));
   assert.ok(Math.max(...xs) <= 800 - 16 + 0.1, String(Math.max(...xs)));
+});
+
+test("leyenda del mapa: rampa, extremos reales y 'sin dato'", () => {
+  const html = mapLegendHTML({ min: 0, max: 61.7, lang: "es", fmt: (n) => n.toFixed(1), t: (k) => STRINGS.es[k] });
+  assert.match(html, new RegExp(RAMP[0]));
+  assert.match(html, new RegExp(RAMP[1]));
+  assert.match(html, /0\.0/); assert.match(html, /61\.7/);
+  assert.match(html, /#2A3A4A/);                       // muestra de "sin dato"
+  assert.match(html, new RegExp(STRINGS.es.mapLegendLow)); assert.match(html, new RegExp(STRINGS.es.mapLegendHigh));
+  assert.doesNotMatch(html, BAD);
+  // sin ningún valor no hay escala que mostrar, pero tampoco error
+  assert.doesNotMatch(mapLegendHTML({ min: null, max: null, lang: "en", fmt: String, t: (k) => STRINGS.en[k] }), BAD);
+});
+
+test("el mapa usa los extremos de la rampa documentada (#4F7CA3 -> #F0E442)", () => {
+  assert.deepEqual(RAMP, ["#4F7CA3", "#F0E442"]);
+  assert.match(tileMapSVG({ CA: 10, OR: 20 }, { title: "m", label: String }), /#F0E442/i);
 });

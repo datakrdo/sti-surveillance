@@ -49,7 +49,7 @@ Vigilancia de ETS en EE.UU. con datos públicos: **NNDSS** (CDC, semanal por est
 14. Tarjetas `Reference Week` / `Latest Week With Data`: formato `0000"-W"00` aplicado desde Tabular Editor 2 (el menú de Desktop no ofrece *Custom*) y *Display units* = None.
 15. Filled map: el relleno por tasa se configura en *Fill colors → fx* (no hay *Color saturation*), con `nullColoringStrategy = noColor` para que los territorios sin población queden sin dato y no en 0.
 
-**Pendiente en Windows:** gate 9.2 manual; capturas `rls_01`…`rls_10`, `ols_*`, `page_1`…`page_7`; borrar el `.pbit` sobrante de `data_model\`; decidir si se borra o se deja oculta `_AGG`; 7.E cuando haya tenant.
+**Pendiente en Windows:** gate 9.2 manual; capturas `page_1`…`page_7` (solo para mostrar cómo se ve el informe en los README); borrar el `.pbit` sobrante de `data_model\`; decidir si se borra o se deja oculta `_AGG`; 7.E cuando haya tenant.
 
 **Para la sesión en Linux:** (1) verificar que el recurso MCP lee el TMDL (incluye `roles\`); (2) probar el MCP en Claude Code; (3) escribir README/spec con los hallazgos de arriba; (4) revisar `git diff` de `_Measures.tmdl`, `Restricted_Epidemiologist.tmdl` y `Query 1.dax`, que cambiaron por guardados de Desktop.
 

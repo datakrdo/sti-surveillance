@@ -1,6 +1,6 @@
 import { STRINGS, t } from "./i18n.js";
 import { index, casesTotal, ratePer100k, yoy, weeklySeries, corridor, statesInOutbreak, topStates, ratesByState } from "./metrics.js";
-import { lineChartSVG, tileMapSVG, esc, xMaxOf } from "./charts.js";
+import { lineChartSVG, tileMapSVG, esc, xMaxOf, mapLegendHTML } from "./charts.js";
 import { QUESTIONS } from "./questions.js";
 import { MCP_URL, REPO_URL } from "./config.js";
 
@@ -70,7 +70,9 @@ function mapView() {
     label: (c, v) => `${stateName(c)}: ${v == null ? "—" : num(v, 1)}` });
   const top = topStates(ix, { ...f, n: 10 });
   const all = Object.entries(rates).filter(([, v]) => v != null).sort((a, b) => b[1] - a[1]);
-  return `<div class="split"><section class="chart"><h2>${L("rateByState")}</h2>${svg}</section>
+  const vals = Object.values(rates).filter((v) => v != null);
+  const legend = mapLegendHTML({ min: vals.length ? 0 : null, max: vals.length ? Math.max(...vals) : null, fmt: (n) => num(n, 1), t: L });
+  return `<div class="split"><section class="chart"><h2>${L("rateByState")}</h2>${svg}${legend}</section>
     <section><h2>${L("top10")}</h2>${table([L("state"), L("cases")], top.map((r) => [stateName(r.state), num(r.cases)]))}</section></div>
     <details><summary>${L("mapTable")}</summary>${table([L("state"), L("cardRate")], all.map(([c, v]) => [stateName(c), num(v, 1)]))}</details>`;
 }

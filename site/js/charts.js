@@ -52,7 +52,21 @@ export const TILES = {
 };
 
 const lerp = (a, b, t) => Math.round(a + (b - a) * t).toString(16).padStart(2, "0");
-const ramp = (t) => `#${[1, 3, 5].map((i) => lerp(parseInt("4F7CA3".slice(i - 1, i + 1), 16), parseInt("F0E442".slice(i - 1, i + 1), 16), t)).join("")}`;
+// Rampa secuencial de un solo sentido: azul grisáceo = tasa baja, amarillo = tasa alta (la tasa es magnitud, no identidad).
+export const RAMP = ["#4F7CA3", "#F0E442"];
+const ramp = (t) => `#${[1, 3, 5].map((i) => lerp(parseInt(RAMP[0].slice(i, i + 2), 16), parseInt(RAMP[1].slice(i, i + 2), 16), t)).join("")}`;
+
+// Leyenda del mapa: barra con la misma rampa, extremos con valores reales y muestra de "sin dato".
+export function mapLegendHTML({ min, max, fmt, t }) {
+  if (min == null || max == null) return "";
+  return `<div class="map-legend" role="group" aria-label="${esc(t("mapLegendTitle"))}">
+    <p class="map-legend-title">${esc(t("mapLegendTitle"))}</p>
+    <div class="map-legend-bar"><span>${esc(t("mapLegendLow"))}<br><b>${esc(fmt(min))}</b></span>
+      <i aria-hidden="true" style="background:linear-gradient(90deg,${RAMP[0]},${RAMP[1]})"></i>
+      <span>${esc(t("mapLegendHigh"))}<br><b>${esc(fmt(max))}</b></span></div>
+    <p class="map-legend-nodata"><i aria-hidden="true" style="background:#2A3A4A"></i>${esc(t("mapLegendNoData"))}</p>
+    <p class="note">${esc(t("mapLegendNote"))}</p></div>`;
+}
 
 // values: {CODE: number|null}; label(code, value) -> texto accesible
 export function tileMapSVG(values, { title, label }) {
