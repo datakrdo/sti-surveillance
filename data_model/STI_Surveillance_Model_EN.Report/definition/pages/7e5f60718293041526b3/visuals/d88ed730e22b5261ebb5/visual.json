@@ -1,0 +1,211 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "d88ed730e22b5261ebb5",
+  "position": {
+    "x": 0,
+    "y": 270,
+    "z": 2,
+    "height": 400,
+    "width": 1870,
+    "tabOrder": 2
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_data_quality"
+                    }
+                  },
+                  "Property": "source"
+                }
+              },
+              "queryRef": "mart_data_quality.source",
+              "nativeQueryRef": "source"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_data_quality"
+                    }
+                  },
+                  "Property": "last_ingested_at"
+                }
+              },
+              "queryRef": "mart_data_quality.last_ingested_at",
+              "nativeQueryRef": "last_ingested_at"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_data_quality"
+                    }
+                  },
+                  "Property": "max_period"
+                }
+              },
+              "queryRef": "mart_data_quality.max_period",
+              "nativeQueryRef": "max_period"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_data_quality"
+                    }
+                  },
+                  "Property": "n_rows"
+                }
+              },
+              "queryRef": "mart_data_quality.n_rows",
+              "nativeQueryRef": "n_rows"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_data_quality"
+                    }
+                  },
+                  "Property": "pct_masked"
+                }
+              },
+              "queryRef": "mart_data_quality.pct_masked",
+              "nativeQueryRef": "pct_masked"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_data_quality"
+                    }
+                  },
+                  "Property": "pct_flagged"
+                }
+              },
+              "queryRef": "mart_data_quality.pct_flagged",
+              "nativeQueryRef": "pct_flagged"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_data_quality"
+                    }
+                  },
+                  "Property": "n_states_reporting_last_week"
+                }
+              },
+              "queryRef": "mart_data_quality.n_states_reporting_last_week",
+              "nativeQueryRef": "n_states_reporting_last_week"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "columnHeaders": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "values": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Data quality by source'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Data quality table by source: latest ingest, maximum period, rows, percent masked and flagged, and states reporting in the latest week.'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -12,3 +12,5 @@ role Restricted_Epidemiologist
 	tablePermission mart_revisions
 		metadataPermission: none
 
+	annotation PBI_Id = 5da2358a0f3e498ea7b52af33b5c1ce9
+

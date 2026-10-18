@@ -9,6 +9,15 @@
         "page": "2.3.1"
       },
       "type": "SharedResources"
+    },
+    "customTheme": {
+      "name": "STI_Dark_Accessible8698696877637903.json",
+      "reportVersionAtImport": {
+        "visual": "2.14.0",
+        "report": "3.4.0",
+        "page": "2.3.1"
+      },
+      "type": "RegisteredResources"
     }
   },
   "objects": {
@@ -31,7 +40,7 @@
           "expanded": {
             "expr": {
               "Literal": {
-                "Value": "false"
+                "Value": "true"
               }
             }
           }
@@ -48,6 +57,17 @@
           "name": "Fluent2-CY26SU09",
           "path": "BaseThemes/Fluent2-CY26SU09.json",
           "type": "BaseTheme"
+        }
+      ]
+    },
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "STI_Dark_Accessible8698696877637903.json",
+          "path": "STI_Dark_Accessible8698696877637903.json",
+          "type": "CustomTheme"
         }
       ]
     }

@@ -194,12 +194,12 @@ table _Measures
 	measure 'Reference Week' =
 			
 			CALCULATE ( MAX ( dim_mmwr_week[epi_week_key] ), dim_mmwr_week[is_reference_week] = TRUE () )
-		formatString: 0
+		formatString: 0000"-W"00
 		displayFolder: NNDSS
 		lineageTag: c4e63387-00f5-4855-bf90-17796bb9bc24
 
 	measure 'Latest Week With Data' = MAX ( fct_nndss_weekly[epi_week_key] )
-		formatString: 0
+		formatString: 0000"-W"00
 		displayFolder: NNDSS
 		lineageTag: ac08a4f2-3a3b-408c-8c57-205787ece504
 

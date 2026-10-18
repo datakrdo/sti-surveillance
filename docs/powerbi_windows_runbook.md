@@ -564,7 +564,7 @@ Fila 6: el condado limitado oculta la fila estatal `OR` (su `county_name` es vac
 feat(security): dynamic RLS (state/county) and OLS roles with tested matrix
 ```
 
-### 7.E — Prueba en el servicio (copia Import)
+### 7.E — Prueba en el servicio (copia Import) — **PENDIENTE (sin tenant, 2026-10-17)**
 DirectQuery a Postgres en el servicio requiere gateway: no se instala; se prueba con una copia.
 - [ ] **E1.** Desde el `.pbip`: *File → Save as* → `.pbix` **fuera del repo** (ej. `C:\pbi_tmp\STI_ServiceTest.pbix`).
 - [ ] **E2.** En la copia: los 2 hechos y las 6 dimensiones a **Import** → *Refresh*.

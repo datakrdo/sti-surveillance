@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "STI_Surveillance_Model_EN"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "63e72b69-f973-471e-a85b-333f441b23b2"
+  }
+}
