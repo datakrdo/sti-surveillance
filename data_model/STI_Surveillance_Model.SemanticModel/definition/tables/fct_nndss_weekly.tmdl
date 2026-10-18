@@ -143,7 +143,7 @@ table fct_nndss_weekly
 		mode: directQuery
 		source =
 				let
-				    Source = PostgreSQL.Database("ep-xxxxxxxx.region.aws.neon.tech", "neondb"),
+				    Source = PostgreSQL.Database(PgHost, "neondb"),
 				    analytics_marts_fct_nndss_weekly = Source{[Schema="analytics_marts",Item="fct_nndss_weekly"]}[Data]
 				in
 				    analytics_marts_fct_nndss_weekly

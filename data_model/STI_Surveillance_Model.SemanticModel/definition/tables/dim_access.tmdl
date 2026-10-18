@@ -39,7 +39,7 @@ table dim_access
 		mode: import
 		source =
 				let
-				    Source = PostgreSQL.Database("ep-xxxxxxxx.region.aws.neon.tech", "neondb"),
+				    Source = PostgreSQL.Database(PgHost, "neondb"),
 				    analytics_seeds_dim_access = Source{[Schema="analytics_seeds",Item="dim_access"]}[Data]
 				in
 				    analytics_seeds_dim_access

@@ -9,7 +9,7 @@ model Model
 
 annotation __PBI_TimeIntelligenceEnabled = 0
 
-annotation PBI_QueryOrder = ["fct_nndss_weekly","fct_oregon_monthly","dim_date","dim_demographic","dim_disease","dim_epi_month","dim_geography","dim_mmwr_week","agg_weekly_national","mart_revisions","mart_data_quality","dim_access","_Measures"]
+annotation PBI_QueryOrder = ["fct_nndss_weekly","fct_oregon_monthly","dim_date","dim_demographic","dim_disease","dim_epi_month","dim_geography","dim_mmwr_week","agg_weekly_national","mart_revisions","mart_data_quality","dim_access","_Measures","PgHost"]
 
 annotation PBI_ProTooling = ["DaxQueryView_Desktop","DevMode"]
 
@@ -28,6 +28,7 @@ ref table mart_revisions
 ref table mart_data_quality
 ref table dim_access
 ref table _Measures
+ref expression PgHost
 
 ref role State_Analyst
 ref role County_Analyst

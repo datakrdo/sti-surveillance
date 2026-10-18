@@ -4,7 +4,7 @@
 
 **Can a free-tier stack keep sexually transmitted infection (STI) surveillance data current, honest about its gaps, and safe to hand to an AI assistant?**
 
-A weekly pipeline for chlamydia, gonorrhea, syphilis and HIV in the United States. It combines two open sources: CDC's national weekly notifications (NNDSS) and Oregon's reportable-disease data, which adds county, sex, age and race. Data lands in Postgres (Neon), dbt models it into a star schema, and a read-only MCP server lets an AI query it without being able to change it or read restricted columns. A Power BI model with row- and object-level security is designed but not built yet (see [Phases](#phases-)).
+A weekly pipeline for chlamydia, gonorrhea, syphilis and HIV in the United States. It combines two open sources: CDC's national weekly notifications (NNDSS) and Oregon's reportable-disease data, which adds county, sex, age and race. Data lands in Postgres (Neon), dbt models it into a star schema, and a read-only MCP server lets an AI query it without being able to change it or read restricted columns. A composite Power BI model with row- and object-level security and a 7-page bilingual report sit on top, and a free static demo plus a remote read-only MCP make it explorable (see [Live demo](#live-demo-)).
 
 Sources: [CDC NNDSS Weekly](https://data.cdc.gov/resource/x9gk-5huc), [Oregon Monthly Reportable Disease](https://data.oregon.gov/resource/rk77-sqhz) and [Census PEP 2025](https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/state/totals/NST-EST2025-ALLDATA.csv). All free, no API key.
 
@@ -21,7 +21,8 @@ Sources: [CDC NNDSS Weekly](https://data.cdc.gov/resource/x9gk-5huc), [Oregon Mo
 - Python 3.12, requests, psycopg2, pytest
 - Neon Postgres, dbt-core 1.12 + dbt-postgres 1.11
 - GitHub Actions (weekly), MCP Python SDK 2.3
-- Power BI (PBIP/TMDL) and Tabular Editor 2 — planned
+- Power BI (PBIP/TMDL), Tabular Editor 2, DAX Studio
+- Static site (vanilla JS, SVG), GitHub Pages, Cloudflare Workers, Node 22
 
 ## Skills 🧠
 
@@ -39,13 +40,18 @@ Sources: [CDC NNDSS Weekly](https://data.cdc.gov/resource/x9gk-5huc), [Oregon Mo
 - **Masked cells stay `NULL`.** They are never imputed, and rates must use visible cells only.
 - **The MCP sees one cut.** `mcp_oregon_county_monthly` holds counties and the `Geography` cut only, so any `SUM` is additive. The role has no access to the multi-cut fact or to `dim_demographic`.
 - **New York City is folded into NY** to match Census; `max_prev_52w` for NY is a sum and informative only.
+- **Composite Power BI model.** Facts in DirectQuery, five dimensions in Dual, a small Import aggregation (`agg_weekly_national`). `dim_geography` is Import, not Dual: the role editor rejects row-level security on a Dual table that references the Import `dim_access`.
+- **Rates in person-years.** Population is annual and Oregon periods last 28 or 35 days, so rates divide by summed population × time (annualised), never by a single population.
+- **Zero is not missing.** In NNDSS a `-` means no cases reported and loads as 0; only `U` stays `NULL` (213 rows, Maryland and Ohio). Oregon's statewide total is its own `Statewide` cut, so county sums do not double count.
+- **One role per user.** Row- and object-level security live together in `Restricted_State_Analyst`; `demographic_level` is restricted too because it repeats the values of `age_group` and `race_group`.
+- **Read-only `pbi_reader` role** for Power BI; grants are reapplied by the same dbt hook as the MCP's.
 - **Pinned versions.** Without a `dbt-core` pin, pip picked a beta `dbt` with no postgres support and the first CI run failed.
 
 ## How it works 🏗️
 
 ```
 CDC NNDSS (Socrata) ─┐
-Oregon (Socrata)     ─┼─► scripts/ingest.py ─► Neon raw.* ─► dbt ─► analytics_marts.* ─► Power BI (planned)
+Oregon (Socrata)     ─┼─► scripts/ingest.py ─► Neon raw.* ─► dbt ─► analytics_marts.* ─► Power BI
 Census PEP (CSV)     ─┘     (GitHub Actions, weekly)          │                    └─► MCP server (read-only)
                                                               └─ snapshot of NNDSS m1 → mart_revisions
 ```
@@ -66,12 +72,26 @@ Cadence seen on 2026-10-14: NNDSS weekly, Oregon declared monthly (it regenerate
 
 ## Results 📊
 
-- `dbt build`: 57 of 58 nodes pass; the remaining one is the snapshot, a no-op. No deprecation warnings.
+- `dbt build`: 70 of 70 nodes pass.
 - Cross-checks against the APIs: California gonorrhea in week 2024-W52 = 499 cases and Multnomah chlamydia in 2026-M01 = 294, both matching the source.
 - The MCP view gives the same totals as an independent query for all five diseases.
 - Ingestion is idempotent: two consecutive runs leave identical row counts.
 - The weekly workflow runs green end to end (pytest, ingest, seed, snapshot, build, freshness) in about 1 min 17 s.
+- Power BI model checked against SQL anchors: 12 table counts, NNDSS and Oregon totals, annualised rates (CA chlamydia 2024 = 259.434 per 100k), year-over-year in two forms (MMWR-aligned and `SAMEPERIODLASTYEAR`, which differ by exactly the 2,833 cases of week 2025-W1), the endemic corridor and the Oregon cuts (chlamydia 80,587 by county, 82,066 statewide).
+- Aggregation hit confirmed three ways: Performance Analyzer, DAX Studio (`RewriteAttempted` with a match and a scan of `agg_weekly_national`, no SQL) and revoking `SELECT` on the fact from `pbi_reader`: the aggregated visual kept working and the other failed.
+- Row-level security: the 10-case matrix in *View as* matches, and an unknown user sees nothing. Object-level security blocks `race_group`, `age_group`, `demographic_level` and `mart_revisions` in *View as* while `sex` keeps working.
+- Report: 7 pages in Spanish and English over one semantic model, with the accessible dark theme (contrast tests in `tests/test_theme_contrast.py`).
 - MCP guardrails verified from Python: a valid query returns JSON, DML and restricted columns are blocked, and the database refuses writes and the `raw` schema on its own.
+
+## Live demo 🌐
+
+A free public version with no online database or keys:
+
+- **Static site** (GitHub Pages, `site/`): a 3-view replica of the report (Overview, Map, Corridor) in Spanish and English, with 5 example questions computed in the browser. `?tour=1` rotates the views automatically.
+- **Read-only remote MCP** (Cloudflare Workers, `worker/`): 6 tools with validated parameters and no free SQL. It reads the same aggregated JSON as the site. Connect it as a custom connector in Claude (available on every plan; the free plan allows one) or in any client that supports remote MCP: `https://sti-surveillance-mcp.<subdomain>.workers.dev/mcp`.
+- **What it contains:** NNDSS only (chlamydia, gonorrhea, primary/secondary and congenital syphilis) by state and week, with the model's definitions. The Oregon Health Authority dataset (counties, demographics) and revisions are not published (Oregon's state-level NNDSS rows are); they stay in the Power BI report and in the local lab MCP (`mcp/`, `mcp_reader` role).
+- **How it stays fresh:** the weekly workflow exports `site/data/*.json` from Neon and republishes Pages; the Worker reads that JSON, so it never needs a redeploy. Tests compare the site's figures with the SQL anchors before publishing.
+- **Sources and notices:** CDC NNDSS (provisional data) and U.S. Census Bureau. Independent project, not affiliated with these entities.
 
 ## Limitations ⚠️
 
@@ -80,13 +100,19 @@ Cadence seen on 2026-10-14: NNDSS weekly, Oregon declared monthly (it regenerate
 - 2026 population uses the 2025 Census estimate.
 - `dim_access.csv` has fictional users on a `TENANT` domain; replace it before testing row-level security.
 - `Asymptomatic_Ratio` from the original plan was dropped: no source has it.
-- Row- and object-level security cannot be split across two roles for one user; a user needing both gets a single combined role.
+- Row- and object-level security were tested in Power BI Desktop (*View as*) only. The service test (copy of the model with Import, private workspace) was not run: there is no Microsoft 365 tenant.
+- Assigning a user one role with row filters and another that only restricts objects makes the row filters union: `State_Analyst` + `Restricted_Epidemiologist` showed 93 geographies instead of 38, while the object restriction held.
+- `SAMEPERIODLASTYEAR` on a single week returns blank because the data is weekly, so the report uses the MMWR-aligned comparison.
+- The endemic corridor uses the years with data (2022 onwards) and the last week of CA gonorrhea (2026-W40) looks like a partial report (hypothesis).
+- `Person-Years Oregon` iterates months to stay DirectQuery-friendly and no longer drops the 34 visible rows with an empty `cases`, so it can differ slightly on other cuts.
+- The MCP `[OLS-HIPAA]` error comes from a text filter in `mcp_server.py` (it looks for `race_group`, `age_group`, `race_method`, `mart_revisions`), so it is a demo guard, not a permission. The real barrier is the `mcp_reader` role: it has no `SELECT` on `dim_demographic`, `fct_oregon_monthly` or `mart_revisions` (checked: `permission denied`), and it is read-only with a 10 s timeout.
 
 ## Structure
 
 ```
 sti-surveillance/
-├── .github/workflows/weekly_ingest.yml   # pytest → ingest → dbt seed/snapshot/build → freshness
+├── .github/workflows/weekly_ingest.yml   # pytest → ingest → dbt seed/snapshot/build → freshness → Pages
+├── .github/workflows/pages.yml           # export public aggregates, check anchors, deploy site/
 ├── scripts/ingest.py                     # fetch, normalise, upsert
 ├── sql/                                  # raw schema, mcp_reader role
 ├── dbt/
@@ -95,8 +121,15 @@ sti-surveillance/
 │   ├── snapshots/snap_nndss_weekly.sql
 │   └── tests/                            # singular grain tests
 ├── mcp/mcp_server.py
-├── tests/test_ingest.py
-└── docs/superpowers/                     # design spec and implementation plan
+├── data_model/                           # Power BI project (PBIP/TMDL), reports ES and EN
+├── theme/dark_accessible.json            # accessible dark theme
+├── scripts/export_public.py              # public aggregates for the demo
+├── site/                                 # static bilingual dashboard (GitHub Pages)
+├── worker/                               # remote read-only MCP (Cloudflare Workers)
+├── tests/                                # ingest, theme contrast, report layout, exporter, no real DB host
+└── docs/
+    ├── PROJECT.md                        # design, decisions, anchors, demo, pending work
+    └── powerbi_windows_runbook.md        # manual Power BI Desktop steps
 ```
 
 ## Quick start 🚀
@@ -115,12 +148,16 @@ cd dbt && ../.venv/bin/dbt seed --profiles-dir . && ../.venv/bin/dbt snapshot --
 
 MCP role, once: `psql "$DATABASE_URL" -v pw="'<password>'" -f sql/mcp_reader_role.sql`, then store its URL in `.env` as `MCP_DATABASE_URL`. The grants are applied by the dbt `on-run-end` hook at every build.
 
+Public demo, locally: `python -m scripts.export_public` (writes `site/data/`), then `python3 -m http.server -d site 8000`. The remote MCP: `cd worker && npm install && npx wrangler dev`.
+
 CI needs the repo secrets `NEON_DATABASE_URL`, `PGHOST`, `PGUSER`, `PGPASSWORD` and `PGDATABASE`.
 
 ## Tests
 
 ```bash
-.venv/bin/pytest tests -q      # 6 tests on the normalisers and the dedupe
+.venv/bin/pytest -q                       # 38 tests: ingest, theme contrast, report layout, exporter, no real DB host
+node --test "site/js/*.test.mjs"          # 15 tests: metrics against the SQL anchors, site
+(cd worker && npm test)                   # 11 tests: remote MCP tools
 cd dbt && ../.venv/bin/dbt build --profiles-dir .
 ```
 
@@ -131,11 +168,15 @@ cd dbt && ../.venv/bin/dbt build --profiles-dir .
 - [x] dbt staging, star schema, snapshot, tests and exposure
 - [x] Weekly GitHub Actions workflow
 - [x] Read-only MCP server with a single-cut view
-- [ ] MCP tested from Claude Desktop (valid query, DML block, restricted-column block)
-- [ ] Power BI semantic model: relations, DAX measures, aggregations
-- [ ] Row-level security by county and object-level security on race, age and revisions, tested with *View as*
-- [ ] Accessible dark theme and the 7-page report
-- [ ] Screenshots in `docs/img/`
+- [x] MCP tested from Claude Code (valid query, DML block, restricted-column block, schema resource)
+- [x] Power BI semantic model: relations, DAX measures, aggregations
+- [x] Row-level security by county and object-level security on race, age and revisions, tested with *View as*
+- [ ] Same security tests in the Power BI service (needs a tenant)
+- [x] Accessible dark theme and the 7-page report (manual accessibility pass pending)
+- [x] Static bilingual site and remote MCP (code and tests)
+- [ ] Deploy Pages and the Worker, then test the public MCP from Claude
+- [ ] Open both `.pbip` in Desktop after the report redesign
+- [ ] Screenshots in `docs/img/` (partial)
 
 ## Out of scope (deliberately)
 

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STI Surveillance</title>
+<meta name="description" content="Demo estática del informe de Power BI de vigilancia de ITS (NNDSS) con preguntas de ejemplo y MCP remoto.">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="logo" aria-hidden="true">STI</span>
+    <div><h1 id="title"></h1><p id="subtitle"></p></div></div>
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+  <div class="lang" role="group" id="lang-group" aria-label="Language">
+    <button type="button" data-lang="es">ES</button><button type="button" data-lang="en">EN</button>
+  </div>
+</header>
+
+<section class="filters" id="filters" aria-label="Filtros">
+  <label><span id="lbl-disease"></span><select id="f-disease"></select></label>
+  <label><span id="lbl-year"></span><select id="f-year"></select></label>
+  <label id="wrap-state" hidden><span id="lbl-state"></span><select id="f-state"></select></label>
+  <ul class="legend" id="legend" aria-hidden="true"></ul>
+</section>
+
+<div class="layout">
+  <main id="view" role="tabpanel" aria-label="Dashboard"><p id="status" aria-live="polite"></p></main>
+  <aside class="panel" aria-labelledby="q-title">
+    <h2 id="q-title"></h2>
+    <p id="q-lead" class="muted"></p>
+    <ul class="qlist" id="qlist"></ul>
+    <div class="answer" id="answer" aria-live="polite"></div>
+    <div class="connect" id="connect"></div>
+  </aside>
+</div>
+
+<footer class="foot" id="foot"></footer>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

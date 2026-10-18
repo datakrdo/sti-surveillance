@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "a13d7ae31184cfbd24b5",
   "position": {
-    "x": 0,
-    "y": 92,
-    "z": 0,
-    "height": 200,
-    "width": 280,
-    "tabOrder": 0
+    "x": 32,
+    "y": 80,
+    "z": 10,
+    "height": 64,
+    "width": 640,
+    "tabOrder": 9
   },
   "visual": {
     "visualType": "slicer",
@@ -91,6 +91,13 @@
                   }
                 ]
               }
+            },
+            "orientation": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
             }
           }
         }
@@ -151,6 +158,11 @@
           }
         }
       ]
+    },
+    "syncGroup": {
+      "groupName": "sync_disease",
+      "fieldChanges": true,
+      "filterChanges": true
     }
   },
   "filterConfig": {

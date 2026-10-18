@@ -52,7 +52,7 @@ table agg_weekly_national
 		mode: import
 		source =
 				let
-				    Source = PostgreSQL.Database("ep-xxxxxxxx.region.aws.neon.tech", "neondb"),
+				    Source = PostgreSQL.Database(PgHost, "neondb"),
 				    analytics_marts_agg_weekly_national = Source{[Schema="analytics_marts",Item="agg_weekly_national"]}[Data]
 				in
 				    analytics_marts_agg_weekly_national

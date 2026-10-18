@@ -1,4 +1,6 @@
 name: Weekly Epidemiological Data Ingestion
+permissions:
+  contents: read
 on:
   schedule: [{ cron: '0 6 * * 4' }]   # jueves 06:00 UTC, un día después de la publicación semanal de NNDSS
   workflow_dispatch:
@@ -22,3 +24,12 @@ jobs:
       - run: dbt snapshot --project-dir dbt --profiles-dir dbt
       - run: dbt build --project-dir dbt --profiles-dir dbt
       - run: dbt source freshness --project-dir dbt --profiles-dir dbt
+  pages:
+    needs: ingest
+    uses: ./.github/workflows/pages.yml
+    secrets:
+      NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write

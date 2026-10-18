@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "2cd3681d0af809254b8e",
   "position": {
-    "x": 310,
-    "y": 92,
-    "z": 2,
-    "height": 150,
-    "width": 380,
-    "tabOrder": 2
+    "x": 32,
+    "y": 152,
+    "z": 13,
+    "height": 128,
+    "width": 296,
+    "tabOrder": 12
   },
   "visual": {
     "visualType": "cardVisual",
@@ -80,6 +80,68 @@
               "expr": {
                 "Literal": {
                   "Value": "'Tarjeta: porcentaje de celdas de Oregon suprimidas por tener menos de 6 casos.'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#18232F'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#2A3A4A'"
+                    }
+                  }
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
                 }
               }
             }

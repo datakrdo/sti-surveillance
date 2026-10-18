@@ -107,7 +107,7 @@ table fct_oregon_monthly
 		mode: directQuery
 		source =
 				let
-				    Source = PostgreSQL.Database("ep-xxxxxxxx.region.aws.neon.tech", "neondb"),
+				    Source = PostgreSQL.Database(PgHost, "neondb"),
 				    analytics_marts_fct_oregon_monthly = Source{[Schema="analytics_marts",Item="fct_oregon_monthly"]}[Data]
 				in
 				    analytics_marts_fct_oregon_monthly

@@ -9,3 +9,10 @@ __pycache__/
 .pytest_cache/
 *.pbix
 *.pbit
+site/data/
+.superpowers/
+graphify-out/
+.serena/
+dbt/.user.yml
+worker/node_modules/
+worker/.wrangler/

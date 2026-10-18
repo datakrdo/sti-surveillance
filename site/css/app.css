@@ -1,0 +1,61 @@
+:root{--bg:#0F1720;--card:#18232F;--line:#2A3A4A;--ink:#E6EDF3;--mute:#9AA7B4;--accent:#56B4E9;--r:8px}
+*{box-sizing:border-box}
+html{color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+[hidden]{display:none!important}
+h1,h2,h3,p{margin:0}
+.muted{color:var(--mute)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button,select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:8px 12px;cursor:pointer;min-height:40px}
+button:hover{border-color:var(--accent)}
+
+.top{display:flex;flex-wrap:wrap;gap:16px;align-items:center;padding:16px 32px;border-bottom:1px solid var(--line)}
+.brand{display:flex;gap:12px;align-items:center;margin-right:auto}
+.logo{display:grid;place-items:center;width:56px;height:40px;border-radius:var(--r);background:var(--accent);color:var(--bg);font-weight:800;letter-spacing:.04em}
+h1{font-size:1.25rem}
+#subtitle{color:var(--mute);font-size:.875rem}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:700}
+.lang{display:flex;gap:4px}
+.lang button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:700}
+
+.filters{display:flex;flex-wrap:wrap;gap:16px;align-items:end;padding:16px 32px}
+.filters label{display:flex;flex-direction:column;gap:4px;font-size:.875rem;color:var(--mute)}
+.legend{display:flex;gap:16px;list-style:none;margin:0 0 0 auto;padding:0;flex-wrap:wrap;font-size:.875rem}
+.legend li{display:flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px}
+
+.layout{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:16px;padding:0 32px 16px}
+@media (max-width:1000px){.layout{grid-template-columns:1fr}.top,.filters{padding:16px}.layout{padding:0 16px 16px}}
+main,.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:16px}
+@media (max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:12px}
+.kpi small{display:block;color:var(--mute);font-size:.875rem}
+.kpi strong{display:block;font-size:1.6rem;margin-top:4px}
+.kpi em{font-style:normal;color:var(--mute);font-size:.875rem}
+.chart h2,.panel h2,main h2{font-size:1.1rem;margin-bottom:8px}
+.chart svg{width:100%;height:auto;display:block}
+.note{color:var(--mute);font-size:.875rem;margin-top:8px}
+.key{display:flex;gap:16px;flex-wrap:wrap;font-size:.875rem;margin-top:8px}
+.key i{display:inline-block;width:18px;height:0;border-top:3px solid;vertical-align:middle;margin-right:6px}
+
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{padding:6px 8px;text-align:left;border-bottom:1px solid var(--line)}
+td:last-child,th:last-child{text-align:right}
+.split{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:16px}
+@media (max-width:700px){.split{grid-template-columns:1fr}}
+details{margin-top:12px}
+
+.qlist{list-style:none;margin:12px 0;padding:0;display:grid;gap:8px}
+.qlist button{width:100%;text-align:left}
+.qlist button[aria-pressed="true"]{border-color:var(--accent)}
+.answer{min-height:48px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:12px;margin-bottom:16px}
+.connect{border-top:1px solid var(--line);padding-top:16px}
+.connect h3{margin-bottom:8px}
+code{display:block;word-break:break-all;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:8px;margin:8px 0}
+
+.foot{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;padding:16px 32px 32px;border-top:1px solid var(--line);color:var(--mute);font-size:.875rem}
+.badge{border:1px solid var(--line);border-radius:999px;padding:4px 12px;color:var(--ink);background:var(--card)}
+.foot a{color:var(--accent)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

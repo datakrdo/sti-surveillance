@@ -49,7 +49,7 @@ Vigilancia de ETS en EE.UU. con datos públicos: **NNDSS** (CDC, semanal por est
 14. Tarjetas `Reference Week` / `Latest Week With Data`: formato `0000"-W"00` aplicado desde Tabular Editor 2 (el menú de Desktop no ofrece *Custom*) y *Display units* = None.
 15. Filled map: el relleno por tasa se configura en *Fill colors → fx* (no hay *Color saturation*), con `nullColoringStrategy = noColor` para que los territorios sin población queden sin dato y no en 0.
 
-**Pendiente en Windows:** gate 9.2 manual; capturas `gate_6C`, `gate_6E`, `gate_6F`, `agg_miss`, `rls_01`…`rls_10`, `ols_*`, `page_1`…`page_7`; borrar el `.pbit` sobrante de `data_model\`; decidir si se borra o se deja oculta `_AGG`; 7.E cuando haya tenant.
+**Pendiente en Windows:** gate 9.2 manual; capturas `rls_01`…`rls_10`, `ols_*`, `page_1`…`page_7`; borrar el `.pbit` sobrante de `data_model\`; decidir si se borra o se deja oculta `_AGG`; 7.E cuando haya tenant.
 
 **Para la sesión en Linux:** (1) verificar que el recurso MCP lee el TMDL (incluye `roles\`); (2) probar el MCP en Claude Code; (3) escribir README/spec con los hallazgos de arriba; (4) revisar `git diff` de `_Measures.tmdl`, `Restricted_Epidemiologist.tmdl` y `Query 1.dax`, que cambiaron por guardados de Desktop.
 
@@ -65,6 +65,7 @@ Vigilancia de ETS en EE.UU. con datos públicos: **NNDSS** (CDC, semanal por est
 - [x] **P3.** Neon Console → SQL Editor → pegar `sql/qa_anchors.sql` → Run. Comparar con la tabla de anclas (al final).
 - [x] **P4.** Desktop → *File → Options and settings → Options → Current File → Data Load* → **desmarcar** "Autodetect new relationships after data is loaded".
 - [x] **P5.** *Options → Preview features*: activar "Power BI Project (.pbip) save option" y "Store semantic model using TMDL format" **solo si aparecen**; si no aparecen, ya vienen activos. Reiniciar Desktop si cambiaste algo.
+- [ ] **P6. Parámetro `PgHost` (el host de Neon ya no está en el repo).** Al abrir el `.pbip` por primera vez: *Inicio → Transformar datos → Editar parámetros* → `PgHost` = el valor de `PGHOST` de tu `.env` (solo el host, sin contraseña) → Aceptar → *Cerrar y aplicar*. Las credenciales guardadas siguen valiendo porque el origen (host + `neondb`) es el mismo. **No commitees ese valor:** Desktop lo escribe en `definition/expressions.tmdl`; antes de `git add` ejecutá una sola vez `git update-index --skip-worktree data_model/STI_Surveillance_Model.SemanticModel/definition/expressions.tmdl`. `tests/test_no_real_host.py` falla si el host real llega al repo.
 
 **Expected:** las 3 herramientas abren; P3 reproduce las anclas.
 
@@ -103,14 +104,14 @@ ROW (
 )
 ```
 **Expected (A1):** 6 · 93 · 303 · 69 · 39 · 2.191 · 55.776 · 25.125 · 996 · 55.776 · 3 · 4.
-- [x] 12 conteos = SQL · [x] 12 nombres exactos · [x] sin errores · [x] el `.pbip` existe en `data_model\` · [x] captura `docs/img/gate_6A.png`.
+- [x] 12 conteos = SQL · [x] 12 nombres exactos · [x] sin errores · [x] el `.pbip` existe en `data_model\`.
 
 ## Task 6.B — Modos de almacenamiento
 - [x] **B1.** *Model view* → seleccionar cada dimensión (`dim_disease`, `dim_geography`, `dim_mmwr_week`, `dim_epi_month`, `dim_demographic`, `dim_date`) → *Properties → Advanced → Storage mode = **Dual*** → aceptar aviso. (Se puede multiseleccionar con Ctrl.)
 - [x] **B2.** No tocar el resto: hechos en DirectQuery; `agg_weekly_national`, `mart_revisions`, `mart_data_quality`, `dim_access` en Import.
 
 **GATE 6.B:** tooltip del encabezado de cada tabla en Model view → **2 DirectQuery · 6 Dual · 4 Import** (modelo original; el vigente, tras 7.A, es **2 DirectQuery · 5 Dual · 5 Import**, con `dim_geography` en Import). Confirmación textual (si existe TMDL view): arrastrar una tabla a TMDL view y buscar `mode:` en `partition`.
-- [x] 12/12 en el modo esperado · [x] captura `docs/img/gate_6B.png`.
+- [x] 12/12 en el modo esperado.
 
 ## Task 6.C — Relaciones (13)
 *Model view → Manage relationships → New*. Todas: **Many to one (*:1)**, **Single**, **activa**, *Assume referential integrity* **desmarcado**. Si Desktop creó alguna sola, borrarla.
@@ -148,7 +149,6 @@ SUMMARIZECOLUMNS ( dim_demographic[demographic_type], "n", COUNTROWS ( fct_orego
 ORDER BY dim_demographic[demographic_type]
 ```
   **Expected:** 6 tipos (`Age Group`, `Geography`, `Race (alone or in combination)`, `Race (primary/least common race)`, `Sex`, `Statewide`), suma de `n` = 25.125.
-- [ ] captura `docs/img/gate_6C.png`.
 
 ## Task 6.D — Fechas, orden y limpieza
 - [x] **D1.** Seleccionar `dim_date` → *Table tools → Mark as date table* → columna `date`. Si la opción está deshabilitada (Dual), **anotar** "Mark as date table no disponible en Dual" para el README y seguir; no cambiar `dim_date` a Import. **Hallazgo (2026-10-15): "Mark as date table" funcionó sobre `dim_date` en Dual.**
@@ -158,7 +158,7 @@ ORDER BY dim_demographic[demographic_type]
 - [x] **D5.** *Data category*: `dim_geography[state_name]` → *State or Province*; `dim_geography[county_name]` → *County*.
 - [x] **D6.** *Home → Enter data* → una columna `x`, sin filas → nombre `_Measures` → Load. Ocultar `x`.
 
-**GATE 6.D:** date table marcada (o hallazgo anotado) · un visual de tabla con `month_name` ordena Jan…Dec · captura `docs/img/gate_6D.png`.
+**GATE 6.D:** date table marcada (o hallazgo anotado) · un visual de tabla con `month_name` ordena Jan…Dec.
 
 ## Task 6.E — Medidas NNDSS
 En `_Measures` → *Table tools → New measure*. Crear **en este orden**. *Measure tools → Display folder* = `NNDSS`.
@@ -340,7 +340,7 @@ EVALUATE ROW (
 
 *E8* `EVALUATE ROW ( "w53_2025", CALCULATE ( [Cases NNDSS], dim_mmwr_week[epi_week_key] = 202553 ), "w53_2026", CALCULATE ( [Cases NNDSS], dim_mmwr_week[epi_week_key] = 202653 ) )` → **> 0 · vacío**
 
-- [x] E1–E8 correctos · [x] ningún "casi" sin explicar · [ ] captura `docs/img/gate_6E.png`.
+- [x] E1–E8 correctos · [x] ningún "casi" sin explicar.
 
 ## Task 6.F — Medidas Oregon, calidad, QA
 Display folder `Oregon`:
@@ -472,7 +472,7 @@ EVALUATE ROW (
 
 *F6* `EVALUATE ROW ( "rev", [Revisions (n)], "status", [Revisions Status], "ingest", [Latest Ingest (UTC)] )` → **0** · "No revisions recorded yet" · fecha de la última corrida de CI (≤ 8 días).
 
-- [x] F1–F6 correctos · [ ] captura `docs/img/gate_6F.png`.
+- [x] F1–F6 correctos.
 
 ## Task 6.G — Agregación
 - [x] **G1.** Panel Data → clic derecho `agg_weekly_national` → **Manage aggregations**:
@@ -490,7 +490,7 @@ EVALUATE ROW (
 - Visual **A**: `dim_mmwr_week[mmwr_year]`, `dim_disease[disease_key]`, `[Cases NNDSS]` (debe acertar la agregación).
 - Visual **B**: `dim_geography[state_code]`, `[Cases NNDSS]` (debe ir a DirectQuery).
 
-- [x] **Prueba 1 — Performance analyzer.** *Optimize → Performance analyzer → Start recording → Refresh visuals*. A: sin fila "Direct query". B: con "Direct query". Capturas `docs/img/agg_hit.png` (A) y `agg_miss.png` (B).
+- [x] **Prueba 1 — Performance analyzer.** *Optimize → Performance analyzer → Start recording → Refresh visuals*. A: sin fila "Direct query". B: con "Direct query".
 - [x] **Prueba 2 — DAX Studio.** *External Tools → DAX Studio* → activar *All Queries* y *Server Timings* → `EVALUATE SUMMARIZECOLUMNS ( dim_mmwr_week[mmwr_year], dim_disease[disease_key], "c", [Cases NNDSS] )`. Esperado: evento de *aggregate table rewrite* con match y **sin** SQL al origen. Repetir con `dim_geography[state_code]`: sin match y con SQL.
 - [x] **Prueba 3 — decisiva (Neon SQL Editor, como dueño):**
   1. `REVOKE SELECT ON analytics_marts.fct_nndss_weekly FROM pbi_reader;`
@@ -501,7 +501,7 @@ EVALUATE ROW (
 
 ## Task 6.H — Guardar y versionar
 - [x] **H1.** *File → Save*. En el explorador: `data_model\STI_Surveillance_Model.pbip`, `STI_Surveillance_Model.SemanticModel\definition\` con `model.tmdl`, `relationships.tmdl`, `tables\*.tmdl` (13 archivos: 12 tablas + `_Measures`) y `STI_Surveillance_Model.Report\`.
-- [x] **H2.** Git Bash: `git grep -nE "npg_|PASSWORD|password" -- data_model` → **vacío**. El host de Neon sí aparece en las consultas M (no es credencial; decisión registrada).
+- [x] **H2.** Git Bash: `git grep -nE "np[g]_|PASSWORD|password" -- data_model` → **vacío**. El host de Neon sí aparece en las consultas M (no es credencial; decisión registrada).
 - [x] **H3.** `git status` no lista `.pbix`, `localSettings.json` ni `cache.abf` (el `.gitignore` que genera el PBIP los excluye).
 - [x] **H4.** Commit + push:
 ```
@@ -542,7 +542,7 @@ COUNTROWS (
 - [x] En **ambos**, tabla `dim_access`: `dim_access[user_principal_name] = USERPRINCIPALNAME ()`
 - [x] **`Admin`**: sin filtros.
 
-**GATE 7.A:** 3 roles, sin errores de sintaxis · *Save* · captura `docs/img/gate_7A.png`. Si *View as* de 7.C da un error de DirectQuery/RLS con dimensiones Dual → contingencia: `dim_geography` a Import (no tiene vuelta: hacerlo en una copia del `.pbip` primero), repetir GATES 6.C–6.G, anotar. **Hallazgo (2026-10-15):** el editor de roles rechazó el filtro RLS sobre `dim_geography` (Dual) con "A calculated column or RLS expression on a DirectQuery table cannot reference tables from a different data source", porque `dim_access` es Import. Se aplicó esta contingencia (2026-10-17) en una copia: con `dim_geography` en Import el editor acepta los 3 roles; GATES 6.C, 6.E, 6.F y 6.G (pruebas 1 y 2) se repitieron con los mismos valores. Diferencia: la consulta por `state_code` pasa de JOIN a `WHERE geo_key IN (…~5.664 claves…)` (~2,3 s), firma de relación *limited* (Desktop no la dibuja).
+**GATE 7.A:** 3 roles, sin errores de sintaxis · *Save*. Si *View as* de 7.C da un error de DirectQuery/RLS con dimensiones Dual → contingencia: `dim_geography` a Import (no tiene vuelta: hacerlo en una copia del `.pbip` primero), repetir GATES 6.C–6.G, anotar. **Hallazgo (2026-10-15):** el editor de roles rechazó el filtro RLS sobre `dim_geography` (Dual) con "A calculated column or RLS expression on a DirectQuery table cannot reference tables from a different data source", porque `dim_access` es Import. Se aplicó esta contingencia (2026-10-17) en una copia: con `dim_geography` en Import el editor acepta los 3 roles; GATES 6.C, 6.E, 6.F y 6.G (pruebas 1 y 2) se repitieron con los mismos valores. Diferencia: la consulta por `state_code` pasa de JOIN a `WHERE geo_key IN (…~5.664 claves…)` (~2,3 s), firma de relación *limited* (Desktop no la dibuja).
 
 ### 7.B — Página `_QA`
 - [x] Segmentadores `dim_disease[disease_key]` y `dim_mmwr_week[mmwr_year]`.
@@ -666,3 +666,15 @@ feat(report): 7-page accessible report
 | A12 | Cobertura condados/estatal | HIV 376/1.291 (29,1 %) · CHL 80.587/82.066 (98,2 %) |
 | A13 | NNDSS GON 2025: OR · CA · nacional | 4.073 · 31.479 · 217.373 |
 | A14 | Oregon CHL por edad | 20–29 41.900 · 10–19 16.587 · 30–39 15.456 · 40–49 5.457 · 50–59 1.991 · 60–69 485 · <5 10 |
+
+## Rediseño del informe (2026-10-18) — validar en Desktop
+El layout de ambos informes (ES y EN) lo genera `scripts/build_report_layout.py` (grilla de 8 px, navegación superior, filtros sincronizados, leyenda de colores, pie con fuentes) y lo comprueba `tests/test_report_layout.py`. Para cambiar el diseño se edita el script y se vuelve a correr; no editar posiciones a mano.
+
+Pasos para validar (cerrar Desktop antes de `git pull`):
+- [ ] Abrir `STI_Surveillance_Model.pbip` y `STI_Surveillance_Model_EN.pbip`: sin errores de carga. Si Desktop rechaza algún botón de navegación o el formato de color, anotar el mensaje exacto.
+- [ ] Los 7 botones de la cabecera navegan a su página (Ctrl+clic en Desktop) y el de la página actual está resaltado.
+- [ ] Cambiar Enfermedad y Año en una página: se sincroniza en las demás (Oregon tiene su propio grupo de año).
+- [ ] Las barras toman el color de la enfermedad elegida (medida `Disease Color`); la línea de Resumen/Corredor queda en color neutro porque Power BI no admite color por medida en series de línea.
+- [ ] Las cifras de las tarjetas no cambiaron (A3, A4, A9, A10). Tomar `page_1…7`.
+
+Paleta de enfermedades (validador del skill `dataviz`, modo oscuro): contraste y separación para daltónicos OK; falla el piso de visión normal entre `#CC79A7` y `#EF7B3A` (ΔE 14,9 frente a 15) y la banda de luminosidad. Se mantienen los colores del plan original porque la selección es única (nunca van juntos en un gráfico) y cada uno lleva etiqueta.

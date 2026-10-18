@@ -1,0 +1,9 @@
+/// Host de Neon (solo el host, sin contraseña). El valor real NO se versiona: ponelo en Desktop con
+/// Inicio > Transformar datos > Editar parámetros (es el PGHOST de tu .env) y no lo commitees.
+expression PgHost = "ep-xxxxxxxx.region.aws.neon.tech" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: a1a2d3bc-d543-4580-b106-667fd216f6da
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+

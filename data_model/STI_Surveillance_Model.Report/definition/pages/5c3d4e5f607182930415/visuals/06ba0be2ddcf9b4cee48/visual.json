@@ -1,0 +1,155 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "06ba0be2ddcf9b4cee48",
+  "position": {
+    "x": 1184,
+    "y": 80,
+    "z": 12,
+    "width": 704,
+    "height": 64,
+    "tabOrder": 11
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Color fijo por enfermedad",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#A9B7C6"
+                    }
+                  }
+                ],
+                "horizontalTextAlignment": "left"
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "■ ",
+                    "textStyle": {
+                      "fontSize": "14pt",
+                      "color": "#56B4E9"
+                    }
+                  },
+                  {
+                    "value": "CHL    ",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#E6EDF3"
+                    }
+                  },
+                  {
+                    "value": "■ ",
+                    "textStyle": {
+                      "fontSize": "14pt",
+                      "color": "#E69F00"
+                    }
+                  },
+                  {
+                    "value": "GON    ",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#E6EDF3"
+                    }
+                  },
+                  {
+                    "value": "■ ",
+                    "textStyle": {
+                      "fontSize": "14pt",
+                      "color": "#009E73"
+                    }
+                  },
+                  {
+                    "value": "SYP_PS    ",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#E6EDF3"
+                    }
+                  },
+                  {
+                    "value": "■ ",
+                    "textStyle": {
+                      "fontSize": "14pt",
+                      "color": "#F0E442"
+                    }
+                  },
+                  {
+                    "value": "SYP_EARLY    ",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#E6EDF3"
+                    }
+                  },
+                  {
+                    "value": "■ ",
+                    "textStyle": {
+                      "fontSize": "14pt",
+                      "color": "#EF7B3A"
+                    }
+                  },
+                  {
+                    "value": "SYP_CONG    ",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#E6EDF3"
+                    }
+                  },
+                  {
+                    "value": "■ ",
+                    "textStyle": {
+                      "fontSize": "14pt",
+                      "color": "#CC79A7"
+                    }
+                  },
+                  {
+                    "value": "HIV    ",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#E6EDF3"
+                    }
+                  }
+                ],
+                "horizontalTextAlignment": "left"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Leyenda de colores fijos por enfermedad.'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

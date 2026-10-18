@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "9374effcf4d9230a653c",
   "position": {
-    "x": 308.57142857142856,
-    "y": 254.03940886699507,
-    "z": 8,
-    "height": 150,
-    "width": 279,
-    "tabOrder": 7
+    "x": 1592,
+    "y": 152,
+    "z": 18,
+    "height": 128,
+    "width": 296,
+    "tabOrder": 17
   },
   "visual": {
     "visualType": "cardVisual",
@@ -98,6 +98,68 @@
               "expr": {
                 "Literal": {
                   "Value": "'Tarjeta: última semana MMWR con datos notificados, en formato año-semana.'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#18232F'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#2A3A4A'"
+                    }
+                  }
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
                 }
               }
             }

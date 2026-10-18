@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "d51dd24f8133e5f58f05",
   "position": {
-    "x": 896.4532019704433,
-    "y": 67.83251231527093,
-    "z": 5,
-    "height": 150,
-    "width": 279,
-    "tabOrder": 4
+    "x": 656,
+    "y": 152,
+    "z": 15,
+    "height": 128,
+    "width": 296,
+    "tabOrder": 14
   },
   "visual": {
     "visualType": "cardVisual",
@@ -80,6 +80,68 @@
               "expr": {
                 "Literal": {
                   "Value": "'Card: percent change in cases versus the same period of the previous year, with MMWR-aligned weeks.'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#18232F'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#2A3A4A'"
+                    }
+                  }
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
                 }
               }
             }

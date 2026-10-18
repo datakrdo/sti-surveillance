@@ -70,7 +70,7 @@ table dim_date
 		mode: dual
 		source =
 				let
-				    Source = PostgreSQL.Database("ep-xxxxxxxx.region.aws.neon.tech", "neondb"),
+				    Source = PostgreSQL.Database(PgHost, "neondb"),
 				    analytics_marts_dim_date = Source{[Schema="analytics_marts",Item="dim_date"]}[Data]
 				in
 				    analytics_marts_dim_date

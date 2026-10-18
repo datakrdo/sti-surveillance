@@ -1,0 +1,7 @@
+name = "sti-surveillance-mcp"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+# Solo datos públicos agregados, publicados por GitHub Pages. Sin secretos ni base de datos.
+[vars]
+DATA_URL = "https://datakrdo.github.io/sti-surveillance/data/nndss.json"

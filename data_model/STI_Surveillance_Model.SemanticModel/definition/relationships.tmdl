@@ -46,3 +46,7 @@ relationship 6cab4aa1-3a84-5522-ab20-acddf3c21e6f
 	fromColumn: mart_revisions.disease_key
 	toColumn: dim_disease.disease_key
 
+relationship 4def896e-bc83-4c36-8505-13cc7d7c5ded
+	fromColumn: mart_revisions.epi_week_key
+	toColumn: dim_mmwr_week.epi_week_key
+
