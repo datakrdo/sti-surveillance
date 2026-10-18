@@ -29,6 +29,30 @@ Vigilancia de ETS en EE.UU. con datos públicos: **NNDSS** (CDC, semanal por est
 ## Qué traer de vuelta a Linux (para la sesión que cierra el proyecto)
 (1) hallazgo de 6.D1 (date table en Dual); (2) resultado de la combinación de roles en 7.D; (3) si *View as* aplicó OLS en Desktop; (4) valores que no coincidieron y qué devolvió el SQL; (5) `git push` hecho. Con eso se hace: verificar que el recurso MCP lee el TMDL, probar el MCP en Claude Code y escribir README/spec con resultados reales.
 
+### Actualización 2026-10-18 (cierre de la sesión en Windows)
+**Estado:** Task 6 y 7.A–7.D completas y subidas. 9.2 generada y revisada a mano por el usuario (7 páginas, ES y EN); falta el gate 9.2 (teclado, daltonismo, 11 pt, alt text) y las capturas. **7.E pendiente: no hay tenant.**
+
+**Decisiones y hallazgos para README/Limitaciones**
+1. `dim_geography` quedó en **Import** (no Dual): el editor de roles rechaza RLS sobre una tabla Dual que referencia `dim_access` (Import). Modelo vigente: 2 DirectQuery · 5 Dual · 5 Import. Con eso, GATES 6.C–6.G dieron los mismos valores. Costo: la consulta por `state_code` pasa de `JOIN` a `WHERE geo_key IN (…~5.664 claves…)` (~2,3 s); es la firma de una relación *limited* (Desktop no la dibuja, sin paréntesis).
+2. Roles: `State_Analyst`, `County_Analyst`, `Admin`, `Restricted_Epidemiologist` (OLS) y `Restricted_State_Analyst` (RLS + OLS). Matriz 7.C: 10/10 filas coinciden.
+3. **Combinar roles:** `State_Analyst` + `Restricted_Epidemiologist` → `QA Geo Rows` = 93 (el RLS se une: el rol sin filtro anula al de 38) y el OLS se mantiene ("This field was deleted from the model…"). No asignar a un usuario un rol con RLS y otro solo con OLS; usar `Restricted_State_Analyst`.
+4. **Desktop *View as* sí aplicó el OLS** (los 4 objetos restringidos fallaron como se esperaba).
+5. Al duplicar un rol en Tabular Editor 2 se hereda la anotación `PBI_Id`, que debe ser un GUID único; si no, no guarda ("PBI_Id annotation… in conflict"). Se arregló borrando la anotación; Desktop escribió un `annotation PBI_Id` vacío (bloque de triple comilla) y hubo que poner un GUID de 32 hex a mano.
+6. "Mark as date table" **sí funciona** sobre `dim_date` en Dual.
+7. Corredor P25/P50/P75: filtra años sin hechos (`NOT ISBLANK` en `hist`; 2021 existe en `dim_mmwr_week` sin datos). Con 2022–2024: GON semana 20 de 2025 → 4157/4663/4507 → P25 4332 · P50 4507 · P75 4585 (comprobado a mano).
+8. CA GON 2026: semanas 202638 = 59 y 202640 = 1 casos (reporte parcial/tardío del CDC; hipótesis); `Reference Week` 202638 no es confiable para CA.
+9. `fct_oregon_monthly[population]` es `numeric` en Postgres: debe ir como **Decimal** en el modelo (Whole number rompe los filtros `population > 0` en DirectQuery).
+10. `Person-Years Oregon` se reescribió iterando `dim_epi_month` (evita `RELATED`/`NOT`/`ISBLANK` dentro de `FILTER` en DirectQuery). Limitación: ya no excluye del denominador las 34 filas no suprimidas con `cases` vacío; puede diferir levemente en otros cortes.
+11. En DirectQuery no cambiar tipos con Power Query (error "can't be used for DirectQuery"): se cambian en el panel Data.
+12. Agregación (6.G): Prueba 2 en DAX Studio confirma `RewriteAttempted` con match y `Scan` sobre `agg_weekly_national`, sin SQL; con `dim_geography` falla el rewrite y va a Postgres.
+13. Informe: dos versiones sobre un solo modelo semántico: `STI_Surveillance_Model.pbip` (ES) y `STI_Surveillance_Model_EN.pbip` (EN, generado traduciendo títulos, alt text, notas y nombres de página). Las medidas conservan nombres en inglés en ambas. Los visuales se editaron como JSON PBIR con Desktop cerrado.
+14. Tarjetas `Reference Week` / `Latest Week With Data`: formato `0000"-W"00` aplicado desde Tabular Editor 2 (el menú de Desktop no ofrece *Custom*) y *Display units* = None.
+15. Filled map: el relleno por tasa se configura en *Fill colors → fx* (no hay *Color saturation*), con `nullColoringStrategy = noColor` para que los territorios sin población queden sin dato y no en 0.
+
+**Pendiente en Windows:** gate 9.2 manual; capturas `gate_6C`, `gate_6E`, `gate_6F`, `agg_miss`, `rls_01`…`rls_10`, `ols_*`, `page_1`…`page_7`; borrar el `.pbit` sobrante de `data_model\`; decidir si se borra o se deja oculta `_AGG`; 7.E cuando haya tenant.
+
+**Para la sesión en Linux:** (1) verificar que el recurso MCP lee el TMDL (incluye `roles\`); (2) probar el MCP en Claude Code; (3) escribir README/spec con los hallazgos de arriba; (4) revisar `git diff` de `_Measures.tmdl`, `Restricted_Epidemiologist.tmdl` y `Query 1.dax`, que cambiaron por guardados de Desktop.
+
 ---
 
 # Runbook
