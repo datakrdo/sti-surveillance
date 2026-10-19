@@ -4,10 +4,10 @@
   "position": {
     "x": 520,
     "y": 16,
-    "z": 4,
-    "width": 176,
+    "z": 3000,
     "height": 40,
-    "tabOrder": 3
+    "width": 176,
+    "tabOrder": 3000
   },
   "visual": {
     "visualType": "actionButton",
@@ -37,11 +37,15 @@
                   "Value": "true"
                 }
               }
-            },
+            }
+          }
+        },
+        {
+          "properties": {
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Mapa'"
+                  "Value": "'Map'"
                 }
               }
             },
@@ -92,7 +96,11 @@
                   "Value": "true"
                 }
               }
-            },
+            }
+          }
+        },
+        {
+          "properties": {
             "fillColor": {
               "solid": {
                 "color": {
@@ -126,7 +134,11 @@
                   "Value": "true"
                 }
               }
-            },
+            }
+          }
+        },
+        {
+          "properties": {
             "lineColor": {
               "solid": {
                 "color": {
@@ -161,7 +173,6 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "general": [
         {
@@ -169,7 +180,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Botón de navegación a la página Mapa.'"
+                  "Value": "'Navigation button to the Map page.'"
                 }
               }
             }
@@ -203,6 +214,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

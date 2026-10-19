@@ -39,7 +39,7 @@ CDC · Oregon · Census → scripts/ingest.py → Neon raw.* → dbt → analyti
 - **Modelo Power BI:** 2 hechos en DirectQuery, 5 dimensiones Dual, `dim_geography` en Import (el editor rechaza RLS sobre una tabla Dual que referencia la Import `dim_access`), agregación `agg_weekly_national` en Import, 13 relaciones. Medidas en `_Measures` por carpetas (NNDSS 15, Oregon 7, Quality 4, QA 4).
 - **Seguridad:** roles RLS (`State_Analyst`, `County_Analyst`, `Admin`) y OLS (`Restricted_Epidemiologist`, `Restricted_State_Analyst`) sobre `race_group`, `age_group`, `demographic_level` y `mart_revisions`. Un usuario = un rol: combinar uno con filtros y otro solo con OLS une los filtros de fila (93 vs 38 geografías), por eso RLS+OLS van juntas en `Restricted_State_Analyst`.
 - **Roles de base:** `mcp_reader` y `pbi_reader` solo lectura, con permisos reaplicados por el hook `on-run-end` de dbt (`mcp_reader` sin `SELECT` en `dim_demographic`, `fct_oregon_monthly` ni `mart_revisions`).
-- **Informe:** lienzo 1920×1080, grilla de 8 px, navegación superior, segmentadores sincronizados, color fijo por enfermedad (medida `Disease Color`); generado por `scripts/build_report_layout.py` para ES y EN. Tema `theme/dark_accessible.json` con tests de contraste.
+- **Informe:** lienzo 1920×1080, grilla de 8 px, navegación superior, segmentadores sincronizados, tema oscuro accesible (también para los segmentadores); generado por `scripts/build_report_layout.py` para ES y EN. Tema `theme/dark_accessible.json` con tests de contraste.
 
 ## 4. Decisiones de diseño (y por qué)
 

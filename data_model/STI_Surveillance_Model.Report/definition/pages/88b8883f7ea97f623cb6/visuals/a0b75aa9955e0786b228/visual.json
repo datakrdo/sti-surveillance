@@ -4,10 +4,10 @@
   "position": {
     "x": 32,
     "y": 1032,
-    "z": 15,
-    "width": 160,
+    "z": 13000,
     "height": 32,
-    "tabOrder": 14
+    "width": 160,
+    "tabOrder": 13000
   },
   "visual": {
     "visualType": "textbox",
@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Fuentes de datos",
+                    "value": "Data sources",
                     "textStyle": {
                       "fontSize": "11pt",
                       "color": "#A9B7C6"
@@ -33,7 +33,6 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "general": [
         {
@@ -41,7 +40,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Etiqueta de las fuentes de datos.'"
+                  "Value": "'Label for the data sources.'"
                 }
               }
             }
@@ -61,6 +60,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

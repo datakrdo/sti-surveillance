@@ -19,6 +19,13 @@
     "callout": { "fontFace": "Segoe UI Semibold", "fontSize": 32, "color": "#E6EDF3" }
   },
   "visualStyles": {
-    "page": { "*": { "background": [{ "color": { "solid": { "color": "#0F1720" } }, "transparency": 0 }] } }
+    "page": { "*": { "background": [{ "color": { "solid": { "color": "#0F1720" } }, "transparency": 0 }] } },
+    "slicer": { "*": {
+      "items": [{ "fontColor": { "solid": { "color": "#E6EDF3" } }, "background": { "solid": { "color": "#18232F" } }, "outline": "Frame", "outlineColor": { "solid": { "color": "#2A3A4A" } }, "textSize": 12 }],
+      "header": [{ "fontColor": { "solid": { "color": "#A9B7C6" } }, "textSize": 11, "show": true }],
+      "slicerHeader": [{ "fontColor": { "solid": { "color": "#A9B7C6" } }, "textSize": 11 }],
+      "selection": [{ "strictSingleSelect": true }],
+      "dropdown": [{ "fontColor": { "solid": { "color": "#E6EDF3" } }, "background": { "solid": { "color": "#18232F" } } }],
+      "background": [{ "show": false }] } }
   }
 }

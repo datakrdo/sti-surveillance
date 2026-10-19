@@ -3,12 +3,10 @@ import json, pathlib, itertools
 import pytest
 
 ROOT = pathlib.Path(__file__).parent.parent / "data_model"
-REPORTS = {"es": "STI_Surveillance_Model.Report", "en": "STI_Surveillance_Model_EN.Report"}
+REPORTS = {"es": "STI_Surveillance_Model_ES.Report", "en": "STI_Surveillance_Model.Report"}
 W, H = 1920, 1080
 NAV = 7
 CARD = (296, 128)
-DISEASE_COLORS = {"CHL": "#56B4E9", "GON": "#E69F00", "SYP_PS": "#009E73",
-                  "SYP_EARLY": "#F0E442", "SYP_CONG": "#EF7B3A", "HIV": "#CC79A7"}
 
 
 def load(lang):
@@ -19,6 +17,10 @@ def load(lang):
         vis = [json.loads(f.read_text()) for f in sorted((d / pid / "visuals").glob("*/visual.json"))]
         pages.append((pid, vis))
     return pages
+
+
+def is_nav(v):
+    return v["visual"]["visualType"] == "actionButton" and         v["visual"]["visualContainerObjects"]["visualLink"][0]["properties"]["type"]["expr"]["Literal"]["Value"] == "'PageNavigation'"
 
 
 def lit(obj, *path):
@@ -64,8 +66,7 @@ def test_navigation_identical_on_every_page(pages):
     seen = None
     page_ids = [pid for pid, _ in pages]
     for i, (pid, vis) in enumerate(pages):
-        nav = sorted((v for v in vis if v["visual"]["visualType"] == "actionButton"),
-                     key=lambda v: v["position"]["x"])
+        nav = sorted((v for v in vis if is_nav(v)), key=lambda v: v["position"]["x"])
         assert len(nav) == NAV, pid
         geo = [(v["position"]["x"], v["position"]["y"], v["position"]["width"], v["position"]["height"]) for v in nav]
         targets = [lit(v["visual"]["visualContainerObjects"]["visualLink"][0]["properties"]["navigationSection"])
@@ -99,24 +100,44 @@ def test_same_slicer_same_size(pages):
         assert len(by_field[ref]) == 1, (ref, by_field[ref])
 
 
-def test_bars_use_disease_color_measure(pages):
-    n = 0
+def test_disease_color_only_on_disease_slicer(pages):
     for pid, vis in pages:
         for v in vis:
-            if v["visual"]["visualType"] == "barChart":
-                fill = v["visual"]["objects"]["dataPoint"][0]["properties"]["fill"]
-                assert fill["solid"]["color"]["expr"]["Measure"]["Property"] == "Disease Color", (pid, v["name"])
-                n += 1
-    assert n >= 6
+            uses = "Disease Color" in json.dumps(v)
+            is_disease_slicer = v["visual"]["visualType"] == "slicer" and                 "dim_disease.disease_key" in json.dumps(v["visual"]["query"])
+            assert uses == is_disease_slicer, (pid, v["name"])
 
 
-def test_legend_lists_all_diseases(pages):
+def test_gridlines(pages):
     for pid, vis in pages:
-        if pid == pages[-1][0]:
-            continue
-        text = json.dumps([v for v in vis if v["visual"]["visualType"] == "textbox"])
-        for code, color in DISEASE_COLORS.items():
-            assert code in text and color in text, (pid, code)
+        for v in vis:
+            vt = v["visual"]["visualType"]
+            ax = v["visual"].get("objects", {}).get("valueAxis", [{}])[0].get("properties", {})
+            if vt in ("barChart", "columnChart", "hundredPercentStackedBarChart"):
+                assert lit(ax["gridlineShow"]) == "false", (pid, v["name"])
+            if vt == "lineChart":
+                assert lit(ax["gridlineStyle"]) == "'dashed'", (pid, v["name"])
+
+
+def test_filter_band_aligned(pages):
+    for pid, vis in pages:
+        sl = sorted((v for v in vis if v["visual"]["visualType"] == "slicer"), key=lambda v: v["position"]["x"])
+        assert all(v["position"]["y"] == 80 for v in sl), pid
+        for a, b in zip(sl, sl[1:]):
+            assert a["position"]["x"] + a["position"]["width"] < b["position"]["x"], pid
+
+
+def test_nav_buttons_show_label(pages):
+    labels = None
+    for pid, vis in pages:
+        nav = sorted((v for v in vis if is_nav(v)), key=lambda v: v["position"]["x"])
+        cur = []
+        for v in nav:
+            text = v["visual"]["objects"]["text"]
+            assert lit(text[0]["properties"]["show"]) == "true", (pid, v["name"])
+            cur.append(lit(text[1]["properties"]["text"]))
+        labels = labels or cur
+        assert cur == labels and len(set(cur)) == NAV, pid
 
 
 def test_font_sizes_at_least_11pt(pages):
@@ -143,8 +164,9 @@ def test_es_and_en_share_geometry():
     es, en = load("es"), load("en")
     for (pa, va), (pb, vb) in zip(es, en):
         assert pa == pb
-        ga = {v["name"]: v["position"] for v in va}
-        gb = {v["name"]: v["position"] for v in vb}
+        box = lambda v: {k: v["position"][k] for k in ("x", "y", "width", "height")}   # z/tabOrder los reescribe Desktop
+        ga = {v["name"]: box(v) for v in va}
+        gb = {v["name"]: box(v) for v in vb}
         assert ga == gb, pa
 
 
@@ -153,3 +175,102 @@ def test_every_visual_has_alt_text(pages):
         for v in vis:
             alt = v["visual"].get("visualContainerObjects", {}).get("general", [{}])[0].get("properties", {}).get("altText")
             assert alt, (pid, v["name"])
+
+
+def test_filter_band_fits_and_content_below(pages):
+    for pid, vis in pages:
+        for v in vis:
+            p, vt = v["position"], v["visual"]["visualType"]
+            if vt == "slicer":
+                assert p["height"] >= 96 and p["y"] + p["height"] <= 192, (pid, v["name"])
+            elif vt in ("cardVisual", "lineChart", "barChart", "filledMap", "tableEx"):
+                assert p["y"] >= 192, (pid, v["name"], p["y"])
+
+
+def test_card_values_centered(pages):
+    for pid, vis in pages:
+        for v in vis:
+            if v["visual"]["visualType"] != "cardVisual":
+                continue
+            entries = [e for e in v["visual"]["objects"]["value"] if e.get("selector") == {"id": "default"}]
+            assert entries and lit(entries[0]["properties"]["horizontalAlignment"]) == "'center'", (pid, v["name"])
+
+
+def test_sources_hidden_link(pages):
+    for pid, vis in pages:
+        links = [v for v in vis if v["visual"]["visualType"] == "actionButton" and not is_nav(v)]
+        assert len(links) == 3, pid
+        for v in links:
+            lk = v["visual"]["visualContainerObjects"]["visualLink"][0]["properties"]
+            assert lit(lk["type"]) == "'WebUrl'" and lit(lk["webUrl"]).startswith("'https://"), (pid, v["name"])
+        for v in vis:
+            if v["visual"]["visualType"] == "textbox":
+                for pr in v["visual"]["objects"]["general"][0]["properties"]["paragraphs"]:
+                    assert all("url" not in r and "textDecoration" not in r["textStyle"] for r in pr["textRuns"]), pid
+
+
+def test_kpi_titles_short_without_subtitle(pages):
+    for pid, vis in pages:
+        for v in vis:
+            if v["visual"]["visualType"] == "cardVisual":
+                c = v["visual"]["visualContainerObjects"]
+                assert len(lit(c["title"][0]["properties"]["text"])) <= 26, (pid, v["name"])
+                assert lit(c["subTitle"][0]["properties"]["show"]) == "false", (pid, v["name"])
+
+
+def test_disease_slicer_open(pages):
+    for pid, vis in pages:
+        for v in vis:
+            if v["visual"]["visualType"] == "slicer" and                     v["visual"]["query"]["queryState"]["Values"]["projections"][0]["queryRef"] == "dim_disease.disease_key":
+                o = v["visual"]["objects"]
+                assert v["position"]["width"] >= 880 and lit(o["data"][0]["properties"]["mode"]) == "'Basic'", pid
+                assert lit(o["general"][0]["properties"]["orientation"]) == "1D", pid
+                assert lit(o["selection"][0]["properties"]["selectAllCheckboxEnabled"]) == "false", pid
+
+
+def test_demographics_chart_types(pages):
+    pid, vis = pages[5]
+    kinds = {}
+    for v in vis:
+        refs = [pr["queryRef"] for r in v["visual"].get("query", {}).get("queryState", {}).values() for pr in r["projections"]]
+        for k in ("sex", "age_group", "race_group"):
+            if f"dim_demographic.{k}" in refs:
+                kinds[k] = v["visual"]["visualType"]
+    assert kinds == {"sex": "hundredPercentStackedBarChart", "age_group": "columnChart", "race_group": "barChart"}
+
+
+def test_sex_labels_one_decimal(pages):
+    pid, vis = pages[5]
+    sex = [v for v in vis if v["visual"]["visualType"] == "hundredPercentStackedBarChart"]
+    assert len(sex) == 1
+    assert lit(sex[0]["visual"]["objects"]["labels"][0]["properties"]["labelPrecision"]) == "1D"
+
+
+def test_sex_chart_only_female_male_with_note(pages):
+    pid, vis = pages[5]
+    sex = next(v for v in vis if v["visual"]["visualType"] == "hundredPercentStackedBarChart")
+    f = next(f for f in sex["filterConfig"]["filters"] if f["field"]["Column"]["Property"] == "sex")
+    vals = [x[0]["Literal"]["Value"] for x in f["filter"]["Where"][0]["Condition"]["In"]["Values"]]
+    assert vals == ["'Female'", "'Male'"]
+    assert any("Nonbinary" in r["value"] for v in vis if v["visual"]["visualType"] == "textbox"
+               for p in v["visual"]["objects"]["general"][0]["properties"]["paragraphs"] for r in p["textRuns"])
+
+
+def test_disease_slicer_lists_only_diseases_with_data(pages):
+    for i, (pid, vis) in enumerate(pages):
+        for v in vis:
+            if v["visual"]["visualType"] == "slicer" and "dim_disease.disease_key" in json.dumps(v["visual"]["query"]):
+                vals = [x[0]["Literal"]["Value"].strip("'") for x in
+                        v["filterConfig"]["filters"][0]["filter"]["Where"][0]["Condition"]["In"]["Values"]]
+                if i < 4:   # NNDSS
+                    assert vals == ["CHL", "GON", "SYP_PS", "SYP_CONG"], pid
+                elif i < 6:  # Oregon
+                    assert "SYP_PS" not in vals and {"HIV", "SYP_EARLY"} <= set(vals), pid
+
+
+def test_oregon_county_labels_without_suffix(pages):
+    pid, vis = pages[4]
+    for v in vis:
+        if v["visual"]["visualType"] in ("barChart", "tableEx"):
+            refs = [pr["queryRef"] for r in v["visual"]["query"]["queryState"].values() for pr in r["projections"]]
+            assert "dim_geography.county_label" in refs and "dim_geography.county_name" not in refs, v["name"]

@@ -4,9 +4,9 @@
   "position": {
     "x": 96,
     "y": 8,
-    "z": 1,
-    "width": 224,
+    "z": 0,
     "height": 56,
+    "width": 224,
     "tabOrder": 0
   },
   "visual": {
@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Vigilancia de ITS",
+                    "value": "STI Surveillance",
                     "textStyle": {
                       "fontSize": "16pt",
                       "color": "#E6EDF3",
@@ -32,7 +32,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "EE.UU. · datos públicos",
+                    "value": "US · public data",
                     "textStyle": {
                       "fontSize": "11pt",
                       "color": "#A9B7C6"
@@ -46,7 +46,6 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "general": [
         {
@@ -54,7 +53,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Nombre del proyecto.'"
+                  "Value": "'Project name.'"
                 }
               }
             }
@@ -74,6 +73,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

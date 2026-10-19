@@ -3,11 +3,11 @@
   "name": "3dca831b4dd0d7be0322",
   "position": {
     "x": 32,
-    "y": 152,
-    "z": 10,
+    "y": 192,
+    "z": 9000,
     "height": 128,
     "width": 296,
-    "tabOrder": 9
+    "tabOrder": 9000
   },
   "visual": {
     "visualType": "cardVisual",
@@ -51,7 +51,69 @@
         "isDefaultSort": true
       }
     },
-    "drillFilterOtherVisuals": true,
+    "objects": {
+      "outline": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ],
+      "fillCustom": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "label": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ],
+      "value": [
+        {
+          "properties": {
+            "horizontalAlignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'center'"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ]
+    },
     "visualContainerObjects": {
       "title": [
         {
@@ -66,7 +128,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Estado de revisiones'"
+                  "Value": "'Revisions status'"
                 }
               }
             }
@@ -79,7 +141,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Tarjeta: estado de revisiones registradas.'"
+                  "Value": "'Card: status of recorded revisions.'"
                 }
               }
             }
@@ -147,7 +209,21 @@
             }
           }
         }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

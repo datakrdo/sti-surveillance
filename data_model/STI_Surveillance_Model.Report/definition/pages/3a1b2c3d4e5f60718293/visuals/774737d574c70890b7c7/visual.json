@@ -4,10 +4,10 @@
   "position": {
     "x": 1072,
     "y": 16,
-    "z": 7,
-    "width": 176,
+    "z": 6000,
     "height": 40,
-    "tabOrder": 6
+    "width": 176,
+    "tabOrder": 6000
   },
   "visual": {
     "visualType": "actionButton",
@@ -37,7 +37,11 @@
                   "Value": "true"
                 }
               }
-            },
+            }
+          }
+        },
+        {
+          "properties": {
             "text": {
               "expr": {
                 "Literal": {
@@ -92,7 +96,11 @@
                   "Value": "true"
                 }
               }
-            },
+            }
+          }
+        },
+        {
+          "properties": {
             "fillColor": {
               "solid": {
                 "color": {
@@ -126,7 +134,11 @@
                   "Value": "true"
                 }
               }
-            },
+            }
+          }
+        },
+        {
+          "properties": {
             "lineColor": {
               "solid": {
                 "color": {
@@ -161,7 +173,6 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "general": [
         {
@@ -169,7 +180,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Botón de navegación a la página Oregon.'"
+                  "Value": "'Navigation button to the Oregon page.'"
                 }
               }
             }
@@ -203,6 +214,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

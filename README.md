@@ -121,7 +121,7 @@ Cadence seen on 2026-10-14: NNDSS weekly, Oregon declared monthly (it regenerate
 - CI debugging: traced a failing run to an unpinned dependency that resolved to a beta
 - Composite Power BI modelling (DirectQuery, Dual and an Import aggregation) with the aggregation hit proven three ways, and epidemiological DAX: person-year rates, MMWR-aligned year-over-year and endemic corridors
 - Row- and object-level security in TMDL, tested role by role, including how overlapping roles combine
-- Accessible report design generated from code: 8 px grid, synced slicers, fixed color per disease, WCAG contrast and layout tests
+- Accessible report design generated from code: 8 px grid, synced slicers, WCAG contrast and layout tests
 - Static data sites: one shared calculation module used by the page and the API, checked against SQL anchors in CI
 - A free, safe public API for an AI: a read-only remote MCP on Cloudflare Workers with validated parameters, no free SQL and no secrets
 - CI/CD with least-privilege GitHub Actions: weekly export, anchor check and Pages deploy

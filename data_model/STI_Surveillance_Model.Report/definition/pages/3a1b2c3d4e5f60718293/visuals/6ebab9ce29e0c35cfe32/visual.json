@@ -4,10 +4,10 @@
   "position": {
     "x": 848,
     "y": 1032,
-    "z": 21,
-    "width": 1040,
+    "z": 19000,
     "height": 32,
-    "tabOrder": 20
+    "width": 1040,
+    "tabOrder": 19000
   },
   "visual": {
     "visualType": "textbox",
@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Proyecto independiente, sin afiliación con CDC, Oregon Health Authority ni U.S. Census Bureau.",
+                    "value": "Independent project, not affiliated with the CDC, Oregon Health Authority or the U.S. Census Bureau.",
                     "textStyle": {
                       "fontSize": "11pt",
                       "color": "#A9B7C6"
@@ -33,7 +33,6 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "general": [
         {
@@ -41,7 +40,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Aviso de que el proyecto no tiene afiliación con las fuentes.'"
+                  "Value": "'Notice that the project is not affiliated with the sources.'"
                 }
               }
             }
@@ -61,6 +60,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

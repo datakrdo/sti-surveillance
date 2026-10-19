@@ -203,21 +203,6 @@ table _Measures
 		displayFolder: NNDSS
 		lineageTag: ac08a4f2-3a3b-408c-8c57-205787ece504
 
-	measure 'Disease Color' =
-
-			SWITCH (
-			    SELECTEDVALUE ( dim_disease[disease_key] ),
-			    "CHL", "#56B4E9",
-			    "GON", "#E69F00",
-			    "SYP_PS", "#009E73",
-			    "SYP_EARLY", "#F0E442",
-			    "SYP_CONG", "#EF7B3A",
-			    "HIV", "#CC79A7",
-			    "#9AA7B4"
-			)
-		displayFolder: NNDSS
-		lineageTag: d15e32cf-a682-4b95-83c0-663a27bbef52
-
 	measure 'Cases Oregon' =
 			
 			VAR t = SELECTEDVALUE ( dim_demographic[demographic_type], "Geography" )
@@ -320,6 +305,21 @@ table _Measures
 	measure 'QA Revision Rows' = COUNTROWS ( mart_revisions )
 		displayFolder: QA
 		lineageTag: 3f4f0750-9e85-4763-b9a2-706f5a398455
+
+	measure 'Disease Color' =
+			
+			SWITCH (
+			    SELECTEDVALUE ( dim_disease[disease_key] ),
+			    "CHL", "#56B4E9",
+			    "GON", "#E69F00",
+			    "SYP_PS", "#009E73",
+			    "SYP_EARLY", "#F0E442",
+			    "SYP_CONG", "#EF7B3A",
+			    "HIV", "#CC79A7",
+			    "#9AA7B4"
+			)
+		displayFolder: NNDSS
+		lineageTag: d15e32cf-a682-4b95-83c0-663a27bbef52
 
 	column x
 		dataType: string

@@ -3,11 +3,11 @@
   "name": "f3204e2b6f4e280fde3b",
   "position": {
     "x": 32,
-    "y": 296,
-    "z": 19,
-    "height": 712,
+    "y": 336,
+    "z": 17000,
+    "height": 672,
     "width": 1856,
-    "tabOrder": 18
+    "tabOrder": 17000
   },
   "visual": {
     "visualType": "lineChart",
@@ -112,6 +112,34 @@
         "isDefaultSort": true
       }
     },
+    "objects": {
+      "legend": [
+        {
+          "properties": {
+            "position": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Top'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "valueAxis": [
+        {
+          "properties": {
+            "gridlineStyle": {
+              "expr": {
+                "Literal": {
+                  "Value": "'dashed'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
     "visualContainerObjects": {
       "title": [
         {
@@ -140,7 +168,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Casos semanales vs. corredor histórico (P25, P50, P75)'"
+                  "Value": "'Weekly cases vs. historical corridor (P25, P50, P75)'"
                 }
               }
             }
@@ -153,7 +181,7 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "false"
                 }
               }
             },
@@ -379,7 +407,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Gráfico de líneas por semana MMWR: casos notificados del año seleccionado frente a los percentiles 25, 50 y 75 de los años anteriores.'"
+                  "Value": "'Line chart by MMWR week: reported cases for the selected year against the 25th, 50th and 75th percentiles of previous years.'"
                 }
               }
             }

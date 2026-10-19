@@ -3,11 +3,11 @@
   "name": "d88ed730e22b5261ebb5",
   "position": {
     "x": 32,
-    "y": 296,
-    "z": 12,
-    "height": 712,
+    "y": 336,
+    "z": 11000,
+    "height": 672,
     "width": 1856,
-    "tabOrder": 11
+    "tabOrder": 11000
   },
   "visual": {
     "visualType": "tableEx",
@@ -145,7 +145,6 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "title": [
         {
@@ -160,7 +159,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Calidad de datos por fuente'"
+                  "Value": "'Data quality by source'"
                 }
               }
             }
@@ -173,7 +172,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Tabla de calidad de datos por fuente: última ingesta, periodo máximo, filas, porcentaje suprimido y marcado, y estados que reportan en la última semana.'"
+                  "Value": "'Data quality table by source: latest ingest, maximum period, rows, percent masked and flagged, and states reporting in the latest week.'"
                 }
               }
             }
@@ -242,6 +241,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

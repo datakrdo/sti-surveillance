@@ -4,10 +4,10 @@
   "position": {
     "x": 336,
     "y": 16,
-    "z": 3,
-    "width": 176,
+    "z": 2000,
     "height": 40,
-    "tabOrder": 2
+    "width": 176,
+    "tabOrder": 2000
   },
   "visual": {
     "visualType": "actionButton",
@@ -37,11 +37,15 @@
                   "Value": "true"
                 }
               }
-            },
+            }
+          }
+        },
+        {
+          "properties": {
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Resumen'"
+                  "Value": "'Overview'"
                 }
               }
             },
@@ -92,7 +96,11 @@
                   "Value": "true"
                 }
               }
-            },
+            }
+          }
+        },
+        {
+          "properties": {
             "fillColor": {
               "solid": {
                 "color": {
@@ -126,7 +134,11 @@
                   "Value": "true"
                 }
               }
-            },
+            }
+          }
+        },
+        {
+          "properties": {
             "lineColor": {
               "solid": {
                 "color": {
@@ -161,7 +173,6 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "general": [
         {
@@ -169,7 +180,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Botón de navegación a la página Resumen.'"
+                  "Value": "'Navigation button to the Overview page.'"
                 }
               }
             }
@@ -203,6 +214,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

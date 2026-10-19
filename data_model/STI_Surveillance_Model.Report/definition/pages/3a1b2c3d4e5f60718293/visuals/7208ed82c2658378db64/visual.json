@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "7208ed82c2658378db64",
   "position": {
-    "x": 928,
+    "x": 1184,
     "y": 80,
-    "z": 12,
-    "height": 64,
-    "width": 224,
-    "tabOrder": 11
+    "z": 11000,
+    "height": 96,
+    "width": 320,
+    "tabOrder": 11000
   },
   "visual": {
     "visualType": "slicer",
@@ -135,9 +135,21 @@
             }
           }
         }
+      ],
+      "header": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "title": [
         {
@@ -152,7 +164,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Semana MMWR (para el exceso)'"
+                  "Value": "'MMWR week (excess)'"
                 }
               }
             }
@@ -165,14 +177,15 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Segmentador de semana MMWR; solo afecta al gráfico de exceso sobre P75.'"
+                  "Value": "'MMWR week slicer; it only affects the excess-over-P75 chart.'"
                 }
               }
             }
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   },
   "filterConfig": {
     "filters": [

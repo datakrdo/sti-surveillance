@@ -3,11 +3,11 @@
   "name": "2cd3681d0af809254b8e",
   "position": {
     "x": 32,
-    "y": 152,
-    "z": 13,
+    "y": 192,
+    "z": 11000,
     "height": 128,
     "width": 296,
-    "tabOrder": 12
+    "tabOrder": 11000
   },
   "visual": {
     "visualType": "cardVisual",
@@ -51,7 +51,69 @@
         "isDefaultSort": true
       }
     },
-    "drillFilterOtherVisuals": true,
+    "objects": {
+      "outline": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ],
+      "fillCustom": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "label": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ],
+      "value": [
+        {
+          "properties": {
+            "horizontalAlignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'center'"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ]
+    },
     "visualContainerObjects": {
       "title": [
         {
@@ -66,7 +128,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Celdas suprimidas (%)'"
+                  "Value": "'Suppressed cells'"
                 }
               }
             }
@@ -79,7 +141,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Tarjeta: porcentaje de celdas de Oregon suprimidas por tener menos de 6 casos.'"
+                  "Value": "'Card: percentage of Oregon cells suppressed for having fewer than 6 cases.'"
                 }
               }
             }
@@ -147,7 +209,21 @@
             }
           }
         }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

@@ -3,11 +3,11 @@
   "name": "45d1ffde61db0481a38b",
   "position": {
     "x": 32,
-    "y": 296,
-    "z": 15,
-    "height": 712,
+    "y": 336,
+    "z": 13000,
+    "height": 672,
     "width": 920,
-    "tabOrder": 14
+    "tabOrder": 13000
   },
   "visual": {
     "visualType": "barChart",
@@ -112,26 +112,11 @@
                   "Value": "11D"
                 }
               }
-            }
-          }
-        }
-      ],
-      "dataPoint": [
-        {
-          "properties": {
-            "fill": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Disease Color"
-                    }
-                  }
+            },
+            "gridlineShow": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -139,7 +124,6 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "title": [
         {
@@ -154,7 +138,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Tasa por 100.000 hab., anualizada, 15 estados con mayor tasa'"
+                  "Value": "'Rate per 100,000 population, annualized, top 15 states'"
                 }
               }
             }
@@ -167,7 +151,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Barras horizontales: 15 estados con mayor tasa de casos por 100.000 hab., anualizada.'"
+                  "Value": "'Horizontal bars: the 15 states with the highest case rate per 100,000 population, annualized.'"
                 }
               }
             }
@@ -235,8 +219,22 @@
             }
           }
         }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   },
   "filterConfig": {
     "filters": [

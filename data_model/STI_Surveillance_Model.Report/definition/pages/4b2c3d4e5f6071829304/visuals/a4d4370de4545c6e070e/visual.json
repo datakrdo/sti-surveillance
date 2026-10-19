@@ -3,11 +3,11 @@
   "name": "a4d4370de4545c6e070e",
   "position": {
     "x": 32,
-    "y": 152,
-    "z": 14,
-    "height": 752,
+    "y": 192,
+    "z": 12000,
+    "height": 712,
     "width": 1856,
-    "tabOrder": 13
+    "tabOrder": 12000
   },
   "visual": {
     "visualType": "lineChart",
@@ -112,6 +112,54 @@
         "isDefaultSort": true
       }
     },
+    "objects": {
+      "legend": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "position": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Top'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "lineStyles": [
+        {
+          "properties": {
+            "lineStyle": {
+              "expr": {
+                "Literal": {
+                  "Value": "'solid'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "valueAxis": [
+        {
+          "properties": {
+            "gridlineStyle": {
+              "expr": {
+                "Literal": {
+                  "Value": "'dashed'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
     "visualContainerObjects": {
       "title": [
         {
@@ -140,7 +188,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Casos semanales del año vs. corredor histórico (P25, P50, P75)'"
+                  "Value": "'Weekly cases for the year vs. historical corridor (P25, P50, P75)'"
                 }
               }
             }
@@ -153,7 +201,7 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "false"
                 }
               }
             },
@@ -379,7 +427,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Gráfico de líneas por semana MMWR: casos del año seleccionado frente a los percentiles 25, 50 y 75 de los años previos, para el estado elegido.'"
+                  "Value": "'Line chart by MMWR week: cases for the selected year against the 25th, 50th and 75th percentiles of previous years, for the chosen state.'"
                 }
               }
             }

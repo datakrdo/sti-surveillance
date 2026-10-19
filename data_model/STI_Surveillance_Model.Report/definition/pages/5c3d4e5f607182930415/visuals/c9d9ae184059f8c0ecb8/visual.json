@@ -3,11 +3,11 @@
   "name": "c9d9ae184059f8c0ecb8",
   "position": {
     "x": 968,
-    "y": 296,
-    "z": 16,
-    "height": 536,
+    "y": 336,
+    "z": 14000,
+    "height": 496,
     "width": 920,
-    "tabOrder": 15
+    "tabOrder": 14000
   },
   "visual": {
     "visualType": "tableEx",
@@ -23,11 +23,11 @@
                       "Entity": "dim_geography"
                     }
                   },
-                  "Property": "county_name"
+                  "Property": "county_label"
                 }
               },
-              "queryRef": "dim_geography.county_name",
-              "nativeQueryRef": "county_name"
+              "queryRef": "dim_geography.county_label",
+              "nativeQueryRef": "county_label"
             },
             {
               "field": {
@@ -106,7 +106,6 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "title": [
         {
@@ -121,7 +120,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Casos y tasa por 100.000 hab., anualizada por condado'"
+                  "Value": "'Cases and rate per 100,000 population, annualized, by county'"
                 }
               }
             }
@@ -134,7 +133,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Tabla por condado de Oregon con casos y tasa por 100.000 hab., anualizada.'"
+                  "Value": "'Table by Oregon county with cases and rate per 100,000 population, annualized.'"
                 }
               }
             }
@@ -203,7 +202,8 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   },
   "filterConfig": {
     "filters": [
@@ -258,7 +258,8 @@
               }
             }
           ]
-        }
+        },
+        "howCreated": "User"
       },
       {
         "name": "ca9b86ccf0e09b7536b1",

@@ -45,7 +45,7 @@ Vigilancia de ETS en EE.UU. con datos públicos: **NNDSS** (CDC, semanal por est
 10. `Person-Years Oregon` se reescribió iterando `dim_epi_month` (evita `RELATED`/`NOT`/`ISBLANK` dentro de `FILTER` en DirectQuery). Limitación: ya no excluye del denominador las 34 filas no suprimidas con `cases` vacío; puede diferir levemente en otros cortes.
 11. En DirectQuery no cambiar tipos con Power Query (error "can't be used for DirectQuery"): se cambian en el panel Data.
 12. Agregación (6.G): Prueba 2 en DAX Studio confirma `RewriteAttempted` con match y `Scan` sobre `agg_weekly_national`, sin SQL; con `dim_geography` falla el rewrite y va a Postgres.
-13. Informe: dos versiones sobre un solo modelo semántico: `STI_Surveillance_Model.pbip` (ES) y `STI_Surveillance_Model_EN.pbip` (EN, generado traduciendo títulos, alt text, notas y nombres de página). Las medidas conservan nombres en inglés en ambas. Los visuales se editaron como JSON PBIR con Desktop cerrado.
+13. Informe: dos versiones sobre un solo modelo semántico: `STI_Surveillance_Model.pbip` (EN, por defecto) y `STI_Surveillance_Model_ES.pbip` (ES, generado traduciendo títulos, alt text, notas y nombres de página). Las medidas conservan nombres en inglés en ambas. Los visuales se editaron como JSON PBIR con Desktop cerrado.
 14. Tarjetas `Reference Week` / `Latest Week With Data`: formato `0000"-W"00` aplicado desde Tabular Editor 2 (el menú de Desktop no ofrece *Custom*) y *Display units* = None.
 15. Filled map: el relleno por tasa se configura en *Fill colors → fx* (no hay *Color saturation*), con `nullColoringStrategy = noColor` para que los territorios sin población queden sin dato y no en 0.
 
@@ -608,7 +608,7 @@ DirectQuery a Postgres en el servicio requiere gateway: no se instala; se prueba
 
 ## Task 9.2 — Informe de 7 páginas
 - [ ] *View → Themes → Browse for themes* → `theme\dark_accessible.json`.
-- [ ] Colores fijos por enfermedad (*Format → Colors* en cada visual con leyenda): CHL `#56B4E9` · GON `#E69F00` · SYP_PS `#009E73` · SYP_EARLY `#F0E442` · SYP_CONG `#EF7B3A` · HIV `#CC79A7`. Mapas de tasa: rampa `#4F7CA3` → `#F0E442`.
+- [x] Color por enfermedad: **no se aplica** (decisión 2026-10-18). Barras y líneas usan el color del tema. Se probó pintar el mosaico seleccionado del segmentador con la medida `Disease Color`, pero el segmentador nativo no admite color por valor; la alternativa es el visual personalizado *Button Slicer* (AppSource), descartada por ahora (accesibilidad y dependencia de AppSource). Mapas de tasa: rampa `#4F7CA3` → `#F0E442`.
 - [ ] Cada visual: título, *Alt text* (*Format → General → Alt text*) con la lectura clave, y orden de tabulación (*View → Selection → Tab order*) izquierda→derecha, arriba→abajo.
 
 | Pág. | Contenido | Verificación |
@@ -668,13 +668,13 @@ feat(report): 7-page accessible report
 | A14 | Oregon CHL por edad | 20–29 41.900 · 10–19 16.587 · 30–39 15.456 · 40–49 5.457 · 50–59 1.991 · 60–69 485 · <5 10 |
 
 ## Rediseño del informe (2026-10-18) — validar en Desktop
-El layout de ambos informes (ES y EN) lo genera `scripts/build_report_layout.py` (grilla de 8 px, navegación superior, filtros sincronizados, leyenda de colores, pie con fuentes) y lo comprueba `tests/test_report_layout.py`. Para cambiar el diseño se edita el script y se vuelve a correr; no editar posiciones a mano.
+El layout de ambos informes (ES y EN) lo genera `scripts/build_report_layout.py` (grilla de 8 px, navegación superior, filtros sincronizados, pie con fuentes) y lo comprueba `tests/test_report_layout.py`. Para cambiar el diseño se edita el script y se vuelve a correr; no editar posiciones a mano.
 
 Pasos para validar (cerrar Desktop antes de `git pull`):
-- [ ] Abrir `STI_Surveillance_Model.pbip` y `STI_Surveillance_Model_EN.pbip`: sin errores de carga. Si Desktop rechaza algún botón de navegación o el formato de color, anotar el mensaje exacto.
+- [ ] Abrir `STI_Surveillance_Model.pbip` (EN) y `STI_Surveillance_Model_ES.pbip` (ES): sin errores de carga. Si Desktop rechaza algún botón de navegación o el formato de color, anotar el mensaje exacto.
 - [ ] Los 7 botones de la cabecera navegan a su página (Ctrl+clic en Desktop) y el de la página actual está resaltado.
 - [ ] Cambiar Enfermedad y Año en una página: se sincroniza en las demás (Oregon tiene su propio grupo de año).
-- [ ] Las barras toman el color de la enfermedad elegida (medida `Disease Color`); la línea de Resumen/Corredor queda en color neutro porque Power BI no admite color por medida en series de línea.
+- [ ] Los botones de la cabecera muestran el nombre de su página; el segmentador de enfermedad sigue el tema oscuro; los enlaces del pie abren la web de cada fuente; los estados sin dato del mapa quedan sin color.
 - [ ] Las cifras de las tarjetas no cambiaron (A3, A4, A9, A10). Tomar `page_1…7`.
 
 Paleta de enfermedades (validador del skill `dataviz`, modo oscuro): contraste y separación para daltónicos OK; falla el piso de visión normal entre `#CC79A7` y `#EF7B3A` (ΔE 14,9 frente a 15) y la banda de luminosidad. Se mantienen los colores del plan original porque la selección es única (nunca van juntos en un gráfico) y cada uno lleva etiqueta.

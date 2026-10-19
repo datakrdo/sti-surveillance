@@ -3,11 +3,11 @@
   "name": "bcf414b44cf8dfcb10e9",
   "position": {
     "x": 32,
-    "y": 296,
-    "z": 15,
-    "height": 712,
+    "y": 336,
+    "z": 13000,
+    "height": 672,
     "width": 920,
-    "tabOrder": 14
+    "tabOrder": 13000
   },
   "visual": {
     "visualType": "barChart",
@@ -23,11 +23,11 @@
                       "Entity": "dim_geography"
                     }
                   },
-                  "Property": "county_name"
+                  "Property": "county_label"
                 }
               },
-              "queryRef": "dim_geography.county_name",
-              "nativeQueryRef": "county_name",
+              "queryRef": "dim_geography.county_label",
+              "nativeQueryRef": "county_label",
               "active": true
             }
           ]
@@ -112,26 +112,11 @@
                   "Value": "11D"
                 }
               }
-            }
-          }
-        }
-      ],
-      "dataPoint": [
-        {
-          "properties": {
-            "fill": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Disease Color"
-                    }
-                  }
+            },
+            "gridlineShow": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -139,7 +124,6 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "title": [
         {
@@ -147,14 +131,14 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "false"
                 }
               }
             },
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Tasa por 100.000 hab., anualizada, por condado de Oregon'"
+                  "Value": "'Rate per 100,000 population, annualized, by Oregon county'"
                 }
               }
             }
@@ -167,7 +151,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Barras: tasa de casos por 100.000 hab., anualizada por condado de Oregon; no incluye celdas suprimidas.'"
+                  "Value": "'Bars: case rate per 100,000 population, annualized, by Oregon county; excludes suppressed cells.'"
                 }
               }
             }
@@ -236,7 +220,8 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   },
   "filterConfig": {
     "filters": [
@@ -291,7 +276,8 @@
               }
             }
           ]
-        }
+        },
+        "howCreated": "User"
       },
       {
         "name": "2106e2e3493e9065a779",

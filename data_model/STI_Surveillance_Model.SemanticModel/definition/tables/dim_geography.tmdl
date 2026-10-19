@@ -66,6 +66,13 @@ table dim_geography
 
 		annotation SummarizationSetBy = Automatic
 
+	column county_label = SUBSTITUTE ( dim_geography[county_name], " County", "" )
+		dataType: string
+		lineageTag: 15ce2e2c-06b0-472f-a2ee-7266c8b0ebe5
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
 	partition dim_geography = m
 		mode: import
 		source =

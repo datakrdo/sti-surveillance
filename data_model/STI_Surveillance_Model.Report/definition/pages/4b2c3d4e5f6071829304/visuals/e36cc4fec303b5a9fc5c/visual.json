@@ -4,10 +4,10 @@
   "position": {
     "x": 32,
     "y": 920,
-    "z": 15,
+    "z": 13000,
     "height": 88,
     "width": 1856,
-    "tabOrder": 14
+    "tabOrder": 13000
   },
   "visual": {
     "visualType": "textbox",
@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Corredor con 4 años (2022–2025) para el año en curso; para años anteriores usa los años previos disponibles (hasta 5). Semanas sin datos en un año no cuentan.",
+                    "value": "Corridor built with 4 years (2022–2025) for the current year; for earlier years it uses the available previous years (up to 5). Weeks without data in a year are not counted.",
                     "textStyle": {
                       "fontSize": "12pt"
                     }
@@ -31,7 +31,6 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "general": [
         {
@@ -39,7 +38,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Nota metodológica sobre los años usados en el corredor.'"
+                  "Value": "'Methodological note on the years used in the corridor.'"
                 }
               }
             }
@@ -59,6 +58,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

@@ -121,7 +121,7 @@ Cadencia vista el 2026-10-14: NNDSS semanal, Oregon declara mensual (se regener�
 - Depuración de CI: rastreé un run fallido hasta una dependencia sin fijar que resolvió a una beta
 - Modelado compuesto en Power BI (DirectQuery, Dual y una agregación Import) con el acierto de la agregación probado de tres formas, y DAX epidemiológico: tasas en persona-años, comparación interanual alineada por semana MMWR y corredores endémicos
 - Seguridad a nivel de fila y de objeto en TMDL, probada rol por rol, incluida la combinación de roles que se solapan
-- Diseño de informe accesible generado desde código: grilla de 8 px, segmentadores sincronizados, color fijo por enfermedad, tests de contraste WCAG y de layout
+- Diseño de informe accesible generado desde código: grilla de 8 px, segmentadores sincronizados, tests de contraste WCAG y de layout
 - Sitios de datos estáticos: un módulo de cálculo compartido por la página y la API, verificado contra anclas SQL en el CI
 - Una API pública, gratuita y segura para una IA: un MCP remoto de solo lectura en Cloudflare Workers con parámetros validados, sin SQL libre y sin secretos
 - CI/CD con GitHub Actions de mínimo privilegio: exportación semanal, verificación de anclas y despliegue en Pages

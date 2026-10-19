@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "5b7eaeb6c8556a28e86e",
   "position": {
-    "x": 928,
+    "x": 1184,
     "y": 80,
-    "z": 12,
-    "height": 64,
-    "width": 224,
-    "tabOrder": 11
+    "z": 11000,
+    "height": 96,
+    "width": 320,
+    "tabOrder": 11000
   },
   "visual": {
     "visualType": "slicer",
@@ -114,9 +114,21 @@
             }
           }
         }
+      ],
+      "header": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "title": [
         {
@@ -131,7 +143,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Estado'"
+                  "Value": "'State'"
                 }
               }
             }
@@ -144,14 +156,15 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Segmentador de estado; selección única.'"
+                  "Value": "'State slicer; single selection.'"
                 }
               }
             }
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   },
   "filterConfig": {
     "filters": [

@@ -3,11 +3,11 @@
   "name": "93d33a26b1505eebe748",
   "position": {
     "x": 1168,
-    "y": 152,
-    "z": 14,
-    "height": 856,
+    "y": 192,
+    "z": 12000,
+    "height": 816,
     "width": 720,
-    "tabOrder": 13
+    "tabOrder": 12000
   },
   "visual": {
     "visualType": "tableEx",
@@ -64,7 +64,6 @@
         ]
       }
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "title": [
         {
@@ -79,7 +78,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Top 10 estados: tasa por 100.000 hab., anualizada'"
+                  "Value": "'Top 10 states: rate per 100,000 population, annualized'"
                 }
               }
             }
@@ -92,7 +91,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Tabla de los 10 estados con mayor tasa de casos por 100.000 habitantes, anualizada, ordenada de mayor a menor.'"
+                  "Value": "'Table of the 10 states with the highest case rate per 100,000 population, annualized, sorted from highest to lowest.'"
                 }
               }
             }
@@ -161,7 +160,8 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   },
   "filterConfig": {
     "filters": [
@@ -265,20 +265,6 @@
             }
           ]
         }
-      },
-      {
-        "name": "8768c8d59874c1973e2c",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "_Measures"
-              }
-            },
-            "Property": "Rate per 100k NNDSS"
-          }
-        },
-        "type": "Advanced"
       }
     ]
   }

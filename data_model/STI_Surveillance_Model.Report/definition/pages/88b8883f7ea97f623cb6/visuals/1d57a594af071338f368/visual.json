@@ -3,11 +3,11 @@
   "name": "1d57a594af071338f368",
   "position": {
     "x": 32,
-    "y": 152,
-    "z": 13,
-    "height": 856,
+    "y": 192,
+    "z": 11000,
+    "height": 816,
     "width": 1120,
-    "tabOrder": 12
+    "tabOrder": 11000
   },
   "visual": {
     "visualType": "filledMap",
@@ -110,6 +110,41 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "properties": {
+            "fillRule": {
+              "linearGradient2": {
+                "min": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'minColor'"
+                      }
+                    }
+                  }
+                },
+                "max": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'maxColor'"
+                      }
+                    }
+                  }
+                },
+                "nullColoringStrategy": {
+                  "strategy": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'noColor'"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       ],
@@ -244,7 +279,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Tasa por 100.000 hab., anualizada, por estado'"
+                  "Value": "'Rate per 100,000 population, annualized, by state'"
                 }
               }
             }
@@ -257,7 +292,33 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Mapa de EE.UU. por estado: tasa de casos por 100.000 habitantes, anualizada. Los colores van del azul (menor tasa) al amarillo (mayor tasa); los territorios sin población no tienen dato.'"
+                  "Value": "'US map by state: case rate per 100,000 population, annualized. Colors range from blue (lower rate) to yellow (higher rate); territories without population have no data.'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }

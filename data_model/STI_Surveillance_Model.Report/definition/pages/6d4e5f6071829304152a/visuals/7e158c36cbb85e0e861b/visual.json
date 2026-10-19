@@ -3,11 +3,11 @@
   "name": "7e158c36cbb85e0e861b",
   "position": {
     "x": 32,
-    "y": 872,
-    "z": 15,
-    "height": 136,
+    "y": 888,
+    "z": 13000,
+    "height": 120,
     "width": 1856,
-    "tabOrder": 14
+    "tabOrder": 13000
   },
   "visual": {
     "visualType": "textbox",
@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Bloqueado para el rol restringido: los cortes por edad y raza no están disponibles para Restricted_Epidemiologist ni Restricted_State_Analyst (seguridad a nivel de objeto). Oregon suprime celdas con menos de 6 casos.",
+                    "value": "Blocked for the restricted role: age and race breakdowns are not available to Restricted_Epidemiologist or Restricted_State_Analyst (object-level security). Oregon suppresses cells with fewer than 6 cases. The sex chart shows only Female and Male: Nonbinary and Unknown are almost always suppressed.",
                     "textStyle": {
                       "fontSize": "12pt"
                     }
@@ -31,7 +31,6 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "general": [
         {
@@ -39,7 +38,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Aviso: edad y raza bloqueados para el rol restringido; supresión de celdas con menos de 6 casos.'"
+                  "Value": "'Notice: age and race are blocked for the restricted role; cells with fewer than 6 cases are suppressed.'"
                 }
               }
             }
@@ -59,6 +58,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "7e158c36cbb85e0e861b",
+  "position": {
+    "x": 32,
+    "y": 888,
+    "z": 14,
+    "height": 120,
+    "width": 1856,
+    "tabOrder": 13
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Bloqueado para el rol restringido: los cortes por edad y raza no están disponibles para Restricted_Epidemiologist ni Restricted_State_Analyst (seguridad a nivel de objeto). Oregon suprime celdas con menos de 6 casos. El gráfico de sexo muestra solo Female y Male: Nonbinary y Unknown casi siempre quedan suprimidos.",
+                    "textStyle": {
+                      "fontSize": "12pt"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Aviso: edad y raza bloqueados para el rol restringido; supresión de celdas con menos de 6 casos.'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

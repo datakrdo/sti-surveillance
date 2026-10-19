@@ -3,11 +3,11 @@
   "name": "e457856c982bb886eae6",
   "position": {
     "x": 32,
-    "y": 152,
-    "z": 13,
+    "y": 192,
+    "z": 11000,
     "height": 128,
     "width": 296,
-    "tabOrder": 12
+    "tabOrder": 11000
   },
   "visual": {
     "visualType": "cardVisual",
@@ -51,7 +51,69 @@
         "isDefaultSort": true
       }
     },
-    "drillFilterOtherVisuals": true,
+    "objects": {
+      "label": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ],
+      "outline": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ],
+      "fillCustom": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "value": [
+        {
+          "properties": {
+            "horizontalAlignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'center'"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ]
+    },
     "visualContainerObjects": {
       "title": [
         {
@@ -66,7 +128,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Casos notificados (NNDSS)'"
+                  "Value": "'Reported cases'"
                 }
               }
             }
@@ -79,7 +141,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Tarjeta: total de casos notificados al NNDSS para la enfermedad y el año seleccionados.'"
+                  "Value": "'Card: total cases reported to NNDSS for the selected disease and year.'"
                 }
               }
             }
@@ -147,7 +209,21 @@
             }
           }
         }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

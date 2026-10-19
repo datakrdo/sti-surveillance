@@ -4,10 +4,10 @@
   "position": {
     "x": 32,
     "y": 80,
-    "z": 10,
-    "height": 64,
-    "width": 640,
-    "tabOrder": 9
+    "z": 9000,
+    "height": 96,
+    "width": 896,
+    "tabOrder": 9000
   },
   "visual": {
     "visualType": "slicer",
@@ -108,7 +108,7 @@
             "selectAllCheckboxEnabled": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "false"
                 }
               }
             },
@@ -121,9 +121,57 @@
             }
           }
         }
+      ],
+      "header": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "items": [
+        {
+          "properties": {
+            "background": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "Disease Color"
+                    }
+                  }
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0F1720'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "selected"
+          }
+        }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "title": [
         {
@@ -138,7 +186,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Enfermedad'"
+                  "Value": "'Disease'"
                 }
               }
             }
@@ -151,7 +199,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Segmentador de enfermedad.'"
+                  "Value": "'Disease slicer.'"
                 }
               }
             }
@@ -163,12 +211,13 @@
       "groupName": "sync_disease",
       "fieldChanges": true,
       "filterChanges": true
-    }
+    },
+    "drillFilterOtherVisuals": true
   },
   "filterConfig": {
     "filters": [
       {
-        "name": "28f4afdde10e4257ddaf",
+        "name": "83d3be2f45e52145187f",
         "field": {
           "Column": {
             "Expression": {
@@ -179,7 +228,7 @@
             "Property": "disease_key"
           }
         },
-        "type": "Advanced",
+        "type": "Categorical",
         "filter": {
           "Version": 2,
           "From": [
@@ -192,27 +241,56 @@
           "Where": [
             {
               "Condition": {
-                "Not": {
-                  "Expression": {
-                    "Comparison": {
-                      "ComparisonKind": 0,
-                      "Left": {
-                        "Column": {
-                          "Expression": {
-                            "SourceRef": {
-                              "Source": "d"
-                            }
-                          },
-                          "Property": "disease_key"
-                        }
-                      },
-                      "Right": {
-                        "Literal": {
-                          "Value": "null"
-                        }
+                "In": {
+                  "Expressions": [
+                    {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "d"
+                          }
+                        },
+                        "Property": "disease_key"
                       }
                     }
-                  }
+                  ],
+                  "Values": [
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'CHL'"
+                        }
+                      }
+                    ],
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'GON'"
+                        }
+                      }
+                    ],
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'SYP_CONG'"
+                        }
+                      }
+                    ],
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'SYP_EARLY'"
+                        }
+                      }
+                    ],
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'HIV'"
+                        }
+                      }
+                    ]
+                  ]
                 }
               }
             }

@@ -4,10 +4,10 @@
   "position": {
     "x": 968,
     "y": 848,
-    "z": 17,
+    "z": 15000,
     "height": 160,
     "width": 920,
-    "tabOrder": 16
+    "tabOrder": 15000
   },
   "visual": {
     "visualType": "textbox",
@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Oregon suprime las celdas con menos de 6 casos: sus casos no se muestran y esas celdas se excluyen de la tasa. Las tasas son por 100.000 hab., anualizadas.",
+                    "value": "Oregon suppresses cells with fewer than 6 cases: their cases are not shown and those cells are excluded from the rate. Rates are per 100,000 population, annualized.",
                     "textStyle": {
                       "fontSize": "12pt"
                     }
@@ -31,7 +31,6 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "visualContainerObjects": {
       "general": [
         {
@@ -39,7 +38,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Aviso de supresión de celdas con menos de 6 casos y definición de la tasa.'"
+                  "Value": "'Notice on suppression of cells with fewer than 6 cases and rate definition.'"
                 }
               }
             }
@@ -59,6 +58,7 @@
           }
         }
       ]
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

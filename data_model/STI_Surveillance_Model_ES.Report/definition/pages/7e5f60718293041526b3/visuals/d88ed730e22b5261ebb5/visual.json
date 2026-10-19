@@ -1,0 +1,247 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "d88ed730e22b5261ebb5",
+  "position": {
+    "x": 32,
+    "y": 336,
+    "z": 12,
+    "height": 672,
+    "width": 1856,
+    "tabOrder": 11
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_data_quality"
+                    }
+                  },
+                  "Property": "source"
+                }
+              },
+              "queryRef": "mart_data_quality.source",
+              "nativeQueryRef": "source"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_data_quality"
+                    }
+                  },
+                  "Property": "last_ingested_at"
+                }
+              },
+              "queryRef": "mart_data_quality.last_ingested_at",
+              "nativeQueryRef": "last_ingested_at"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_data_quality"
+                    }
+                  },
+                  "Property": "max_period"
+                }
+              },
+              "queryRef": "mart_data_quality.max_period",
+              "nativeQueryRef": "max_period"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_data_quality"
+                    }
+                  },
+                  "Property": "n_rows"
+                }
+              },
+              "queryRef": "mart_data_quality.n_rows",
+              "nativeQueryRef": "n_rows"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_data_quality"
+                    }
+                  },
+                  "Property": "pct_masked"
+                }
+              },
+              "queryRef": "mart_data_quality.pct_masked",
+              "nativeQueryRef": "pct_masked"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_data_quality"
+                    }
+                  },
+                  "Property": "pct_flagged"
+                }
+              },
+              "queryRef": "mart_data_quality.pct_flagged",
+              "nativeQueryRef": "pct_flagged"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_data_quality"
+                    }
+                  },
+                  "Property": "n_states_reporting_last_week"
+                }
+              },
+              "queryRef": "mart_data_quality.n_states_reporting_last_week",
+              "nativeQueryRef": "n_states_reporting_last_week"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "columnHeaders": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "values": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Calidad de datos por fuente'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Tabla de calidad de datos por fuente: última ingesta, periodo máximo, filas, porcentaje suprimido y marcado, y estados que reportan en la última semana.'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#18232F'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#2A3A4A'"
+                    }
+                  }
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
