@@ -8,24 +8,23 @@ Un pipeline semanal para clamidia, gonorrea, sífilis y VIH en Estados Unidos. C
 
 Fuentes: [CDC NNDSS Weekly](https://data.cdc.gov/resource/x9gk-5huc), [Oregon Monthly Reportable Disease](https://data.oregon.gov/resource/rk77-sqhz) y [Census PEP 2025](https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/state/totals/NST-EST2025-ALLDATA.csv). Todas gratuitas y sin API key.
 
+## Informe en Power BI 📈
+
+El entregable principal: siete páginas (Resumen, Mapa, Ranking, Corredor, Oregon, Demografía, Calidad) en español e inglés sobre un solo modelo semántico, con un tema oscuro accesible.
+
+![Recorrido animado por las siete páginas del informe de Power BI](docs/img/report_es.gif)
+
+- **Modelo compuesto.** Los dos hechos (`fct_nndss_weekly`, `fct_oregon_monthly`) quedan en DirectQuery contra Neon, cinco dimensiones son Dual y una pequeña agregación Import (`agg_weekly_national`) responde las vistas nacionales semanales sin tocar la base.
+- **Seguridad por filas (RLS).** Cada usuario ve solo sus filas: `dim_access` asocia el inicio de sesión (`USERPRINCIPALNAME()`) con un estado o condado, y los roles `State_Analyst`, `County_Analyst` y `Admin` filtran `dim_geography` a partir de eso. Un usuario desconocido no ve nada.
+- **Seguridad por objetos (OLS).** `Restricted_State_Analyst` y `Restricted_Epidemiologist` no ven `race_group`, `age_group`, `demographic_level` ni la tabla `mart_revisions`; la página de Demografía lo avisa en lugar de fallar.
+- **MCP.** Los mismos datos se exponen también a un asistente de IA mediante un servidor MCP de solo lectura; ver [Demo en vivo](#demo-en-vivo-) y [Cómo funciona](#cómo-funciona-%EF%B8%8F).
+- **Honesto con los vacíos.** Las tasas son anualizadas por 100.000, las celdas suprimidas quedan vacías y las páginas de Oregon indican la regla de supresión (menos de 6 casos).
+
+## Demo en vivo 🌐
+
 **[Demo en vivo →](https://datakrdo.github.io/sti-surveillance/)** · [Español](https://datakrdo.github.io/sti-surveillance/?lang=es) · [English](https://datakrdo.github.io/sti-surveillance/?lang=en) · [MCP remoto](#demo-en-vivo-)
 
 [![Vista previa animada de la demo: Resumen, Mapa y Corredor](docs/img/cover_es.gif)](https://datakrdo.github.io/sti-surveillance/?lang=es)
-
-## Resultados 📊
-
-- `dbt build`: pasan 70 de 70 nodos.
-- Contraste con las APIs: gonorrea de California en la semana 2024-W52 = 499 casos y clamidia de Multnomah en 2026-M01 = 294, ambos iguales a la fuente.
-- La vista del MCP da los mismos totales que una consulta independiente para las cinco enfermedades.
-- La ingesta es idempotente: dos corridas seguidas dejan los mismos conteos.
-- El workflow semanal corre en verde de punta a punta (pytest, ingesta, seed, snapshot, build, frescura) en unos 1 min 17 s.
-- Modelo de Power BI contrastado con anclas en SQL: 12 conteos de tablas, totales de NNDSS y Oregon, tasas anualizadas (clamidia de CA 2024 = 259,434 por 100 mil), interanual en dos formas (alineada por MMWR y `SAMEPERIODLASTYEAR`, que difieren exactamente en los 2.833 casos de la semana 2025-W1), el corredor endémico y los cortes de Oregon (clamidia 80.587 por condado, 82.066 estatal).
-- Acierto de la agregación confirmado de tres maneras: Performance Analyzer, DAX Studio (`RewriteAttempted` con coincidencia y escaneo de `agg_weekly_national`, sin SQL) y revocando `SELECT` sobre el hecho a `pbi_reader`: el visual agregado siguió funcionando y el otro falló.
-- Seguridad por fila: la matriz de 10 casos en *View as* coincide y un usuario desconocido no ve nada. La seguridad por objeto bloquea `race_group`, `age_group`, `demographic_level` y `mart_revisions` en *View as*, mientras `sex` sigue funcionando.
-- Informe: 7 páginas en español e inglés sobre un solo modelo semántico, con el tema oscuro accesible (tests de contraste en `tests/test_theme_contrast.py`).
-- Protecciones del MCP verificadas desde Python: una consulta válida devuelve JSON, el DML y las columnas restringidas se bloquean, y la propia base rechaza escrituras y el esquema `raw`.
-
-## Demo en vivo 🌐
 
 Una versión pública y gratuita, sin base de datos ni claves en línea:
 
@@ -53,9 +52,9 @@ Necesitas una cuenta de Claude (cualquier plan; el gratuito permite un conector 
 
 1. Copia la dirección del servidor: `https://sti-surveillance-mcp.jcbatman.workers.dev/mcp`
 2. En Claude abre **Customize → Connectors** y elige **Add custom connector** (añadir conector personalizado). En los planes Team y Enterprise lo añade un propietario de la organización en **Organization settings → Connectors**.
-3. Ponle un nombre (por ejemplo "STI Surveillance"), pega la dirección y guarda. El servidor es público y de solo lectura, así que deja vacías las opciones de inicio de sesión o avanzadas.
+3. Ponle un nombre (por ejemplo "Vigilancia de ITS"), pega la dirección y guarda. El servidor es público y de solo lectura, así que deja vacías las opciones de inicio de sesión o avanzadas.
 4. Abre un chat nuevo, comprueba que el conector esté activado y pregunta en lenguaje natural. Si Claude pide permiso para usar una herramienta, permítelo. Prueba:
-   - "Con el conector STI Surveillance, ¿cuántos casos de gonorrea se notificaron en California en 2024?"
+   - "Con el conector Vigilancia de ITS, ¿cuántos casos de gonorrea se notificaron en California en 2024?"
    - "¿Cuál fue la tasa nacional de clamidia por 100.000 habitantes en 2025?"
    - "¿La gonorrea en Texas sube o baja respecto al mismo periodo del año anterior?"
    - "¿California está por encima de su rango habitual de gonorrea en la semana 38 de 2026?"
@@ -64,6 +63,20 @@ Necesitas una cuenta de Claude (cualquier plan; el gratuito permite un conector 
 5. Cualquier otro cliente que admita servidores MCP remotos funciona con la misma dirección.
 
 Lo que **no** puede hacer, a propósito: ejecutar SQL libre, modificar nada ni mostrar los datos de condados y demografía del Oregon Health Authority. Las cifras semanales son provisionales y los datos se actualizan cada semana. Si una respuesta parece rara, pide a Claude que liste las enfermedades, los estados y las semanas disponibles (`list_dimensions`).
+
+## Resultados 📊
+
+- `dbt build`: pasan 70 de 70 nodos.
+- Contraste con las APIs: gonorrea de California en la semana 2024-W52 = 499 casos y clamidia de Multnomah en 2026-M01 = 294, ambos iguales a la fuente.
+- La vista del MCP da los mismos totales que una consulta independiente para las cinco enfermedades.
+- La ingesta es idempotente: dos corridas seguidas dejan los mismos conteos.
+- El workflow semanal corre en verde de punta a punta (pytest, ingesta, seed, snapshot, build, frescura) en unos 1 min 17 s.
+- Modelo de Power BI contrastado con anclas en SQL: 12 conteos de tablas, totales de NNDSS y Oregon, tasas anualizadas (clamidia de CA 2024 = 259,434 por 100 mil), interanual en dos formas (alineada por MMWR y `SAMEPERIODLASTYEAR`, que difieren exactamente en los 2.833 casos de la semana 2025-W1), el corredor endémico y los cortes de Oregon (clamidia 80.587 por condado, 82.066 estatal).
+- Acierto de la agregación confirmado de tres maneras: Performance Analyzer, DAX Studio (`RewriteAttempted` con coincidencia y escaneo de `agg_weekly_national`, sin SQL) y revocando `SELECT` sobre el hecho a `pbi_reader`: el visual agregado siguió funcionando y el otro falló.
+- Seguridad por fila: la matriz de 10 casos en *View as* coincide y un usuario desconocido no ve nada. La seguridad por objeto bloquea `race_group`, `age_group`, `demographic_level` y `mart_revisions` en *View as*, mientras `sex` sigue funcionando.
+- Informe: 7 páginas en español e inglés sobre un solo modelo semántico, con el tema oscuro accesible (tests de contraste en `tests/test_theme_contrast.py`).
+- Protecciones del MCP verificadas desde Python: una consulta válida devuelve JSON, el DML y las columnas restringidas se bloquean, y la propia base rechaza escrituras y el esquema `raw`.
+
 
 ## Cómo funciona 🏗️
 
@@ -190,7 +203,7 @@ cd dbt && ../.venv/bin/dbt build --profiles-dir .
 - [x] MCP probado desde Claude Code (consulta válida, bloqueo de DML, bloqueo de columna restringida, recurso de esquema)
 - [x] Modelo semántico de Power BI: relaciones, medidas DAX, agregaciones
 - [x] Seguridad a nivel de fila por condado y de objeto sobre raza, edad y revisiones, probada con *View as*
-- [ ] Mismas pruebas de seguridad en el servicio de Power BI (requiere tenant)
+- [x] Mismas pruebas de seguridad en el servicio de Power BI
 - [x] Tema oscuro accesible y el informe de 7 páginas (falta la revisión manual de accesibilidad)
 - [x] Sitio estático bilingüe y MCP remoto (código y tests)
 - [ ] Desplegar Pages y el Worker, y probar el MCP público desde Claude
@@ -220,7 +233,7 @@ cd dbt && ../.venv/bin/dbt build --profiles-dir .
 - La población de 2026 usa la estimación Census de 2025.
 - `dim_access.csv` trae usuarios ficticios con el dominio `TENANT`; hay que reemplazarlo antes de probar la seguridad a nivel de fila.
 - `Asymptomatic_Ratio` del plan original se eliminó: ninguna fuente lo tiene.
-- La seguridad por fila y por objeto se probó solo en Power BI Desktop (*View as*). La prueba en el servicio (copia del modelo con Import, workspace privado) no se hizo: no hay tenant de Microsoft 365.
+- La prueba de seguridad por fila y por objeto en el servicio se hizo en un workspace privado de un tenant de trabajo, con cuentas de prueba reales. Requiere una conexión en la nube a PostgreSQL con el rol de solo lectura `pbi_reader`; el plan gratuito de Neon puede suspenderse y demorar la primera consulta.
 - Asignar a un usuario un rol con filtros de fila y otro que solo restringe objetos une los filtros de fila: `State_Analyst` + `Restricted_Epidemiologist` mostró 93 geografías en vez de 38, y la restricción de objetos se mantuvo.
 - `SAMEPERIODLASTYEAR` sobre una sola semana devuelve vacío porque los datos son semanales; el informe usa la comparación alineada por MMWR.
 - El corredor endémico usa los años con datos (desde 2022) y la última semana de gonorrea de CA (2026-W40) parece un reporte parcial (hipótesis).

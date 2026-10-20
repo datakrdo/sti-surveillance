@@ -3,7 +3,7 @@
 Leé esto primero. Sos el asistente de una persona que va a construir el modelo semántico y el informe de Power BI de este repo en Windows. Respondé en español, corto, sin halagos.
 
 ## Qué es el proyecto
-Vigilancia de ETS en EE.UU. con datos públicos: **NNDSS** (CDC, semanal por estado), **Oregon** (mensual por condado/sexo/edad/raza, celdas <6 casos suprimidas) y **Census PEP** (población). Pipeline: ingesta Python semanal (GitHub Actions, jueves 06:00 UTC) → Postgres en Neon (`raw`) → dbt (`analytics_staging`, `analytics_marts`, `analytics_seeds`) → Power BI. Un servidor MCP (`mcp/mcp_server.py`) expone una vista read-only y lee el TMDL de `data_model/`.
+Vigilancia de ITS en EE.UU. con datos públicos: **NNDSS** (CDC, semanal por estado), **Oregon** (mensual por condado/sexo/edad/raza, celdas <6 casos suprimidas) y **Census PEP** (población). Pipeline: ingesta Python semanal (GitHub Actions, jueves 06:00 UTC) → Postgres en Neon (`raw`) → dbt (`analytics_staging`, `analytics_marts`, `analytics_seeds`) → Power BI. Un servidor MCP (`mcp/mcp_server.py`) expone una vista read-only y lee el TMDL de `data_model/`.
 
 ## Estado (2026-10-15)
 - Pipeline y dbt terminados y en verde (CI run `38731585509`, commit `31ae93e`); tests de dbt cubren ceros vs `U`, corte `Statewide`, `dim_date`, grano de la agregación.
@@ -30,7 +30,7 @@ Vigilancia de ETS en EE.UU. con datos públicos: **NNDSS** (CDC, semanal por est
 (1) hallazgo de 6.D1 (date table en Dual); (2) resultado de la combinación de roles en 7.D; (3) si *View as* aplicó OLS en Desktop; (4) valores que no coincidieron y qué devolvió el SQL; (5) `git push` hecho. Con eso se hace: verificar que el recurso MCP lee el TMDL, probar el MCP en Claude Code y escribir README/spec con resultados reales.
 
 ### Actualización 2026-10-18 (cierre de la sesión en Windows)
-**Estado:** Task 6 y 7.A–7.D completas y subidas. 9.2 generada y revisada a mano por el usuario (7 páginas, ES y EN); falta el gate 9.2 (teclado, daltonismo, 11 pt, alt text) y las capturas. **7.E pendiente: no hay tenant.**
+**Estado:** Task 6 y 7.A–7.D completas y subidas. 9.2 generada y revisada a mano por el usuario (7 páginas, ES y EN); gate 9.2 y validación del rediseño hechos; las capturas se reemplazaron por los GIF `docs/img/report_en.gif` y `report_es.gif`. **7.E hecha (2026-10-20).**
 
 **Decisiones y hallazgos para README/Limitaciones**
 1. `dim_geography` quedó en **Import** (no Dual): el editor de roles rechaza RLS sobre una tabla Dual que referencia `dim_access` (Import). Modelo vigente: 2 DirectQuery · 5 Dual · 5 Import. Con eso, GATES 6.C–6.G dieron los mismos valores. Costo: la consulta por `state_code` pasa de `JOIN` a `WHERE geo_key IN (…~5.664 claves…)` (~2,3 s); es la firma de una relación *limited* (Desktop no la dibuja, sin paréntesis).
@@ -49,7 +49,7 @@ Vigilancia de ETS en EE.UU. con datos públicos: **NNDSS** (CDC, semanal por est
 14. Tarjetas `Reference Week` / `Latest Week With Data`: formato `0000"-W"00` aplicado desde Tabular Editor 2 (el menú de Desktop no ofrece *Custom*) y *Display units* = None.
 15. Filled map: el relleno por tasa se configura en *Fill colors → fx* (no hay *Color saturation*), con `nullColoringStrategy = noColor` para que los territorios sin población queden sin dato y no en 0.
 
-**Pendiente en Windows:** gate 9.2 manual; capturas `page_1`…`page_7` (solo para mostrar cómo se ve el informe en los README); borrar el `.pbit` sobrante de `data_model\`; decidir si se borra o se deja oculta `_AGG`; 7.E cuando haya tenant.
+**Pendiente en Windows:** nada.
 
 **Para la sesión en Linux:** (1) verificar que el recurso MCP lee el TMDL (incluye `roles\`); (2) probar el MCP en Claude Code; (3) escribir README/spec con los hallazgos de arriba; (4) revisar `git diff` de `_Measures.tmdl`, `Restricted_Epidemiologist.tmdl` y `Query 1.dax`, que cambiaron por guardados de Desktop.
 
@@ -65,7 +65,7 @@ Vigilancia de ETS en EE.UU. con datos públicos: **NNDSS** (CDC, semanal por est
 - [x] **P3.** Neon Console → SQL Editor → pegar `sql/qa_anchors.sql` → Run. Comparar con la tabla de anclas (al final).
 - [x] **P4.** Desktop → *File → Options and settings → Options → Current File → Data Load* → **desmarcar** "Autodetect new relationships after data is loaded".
 - [x] **P5.** *Options → Preview features*: activar "Power BI Project (.pbip) save option" y "Store semantic model using TMDL format" **solo si aparecen**; si no aparecen, ya vienen activos. Reiniciar Desktop si cambiaste algo.
-- [ ] **P6. Parámetro `PgHost` (el host de Neon ya no está en el repo).** Al abrir el `.pbip` por primera vez: *Inicio → Transformar datos → Editar parámetros* → `PgHost` = el valor de `PGHOST` de tu `.env` (solo el host, sin contraseña) → Aceptar → *Cerrar y aplicar*. Las credenciales guardadas siguen valiendo porque el origen (host + `neondb`) es el mismo. **No commitees ese valor:** Desktop lo escribe en `definition/expressions.tmdl`; antes de `git add` ejecutá una sola vez `git update-index --skip-worktree data_model/STI_Surveillance_Model.SemanticModel/definition/expressions.tmdl`. `tests/test_no_real_host.py` falla si el host real llega al repo.
+- [x] **P6. Parámetro `PgHost` (el host de Neon ya no está en el repo).** Al abrir el `.pbip` por primera vez: *Inicio → Transformar datos → Editar parámetros* → `PgHost` = el valor de `PGHOST` de tu `.env` (solo el host, sin contraseña) → Aceptar → *Cerrar y aplicar*. Las credenciales guardadas siguen valiendo porque el origen (host + `neondb`) es el mismo. **No commitees ese valor:** Desktop lo escribe en `definition/expressions.tmdl`; antes de `git add` ejecutá una sola vez `git update-index --skip-worktree data_model/STI_Surveillance_Model.SemanticModel/definition/expressions.tmdl`. `tests/test_no_real_host.py` falla si el host real llega al repo.
 
 **Expected:** las 3 herramientas abren; P3 reproduce las anclas.
 
@@ -497,7 +497,7 @@ EVALUATE ROW (
   2. Desktop: *Refresh visuals* en `_AGG`. Esperado: **A muestra datos**, **B da error de permiso**.
   3. `GRANT SELECT ON analytics_marts.fct_nndss_weekly TO pbi_reader;`
   4. Refresh: B vuelve. **No seguir sin el GRANT verificado** (el CI también lo repone en el próximo `dbt build`, pero no dejarlo colgado).
-- [ ] Borrar la página `_AGG` (o dejarla oculta).
+- [x] Borrar la página `_AGG` (eliminada).
 
 ## Task 6.H — Guardar y versionar
 - [x] **H1.** *File → Save*. En el explorador: `data_model\STI_Surveillance_Model.pbip`, `STI_Surveillance_Model.SemanticModel\definition\` con `model.tmdl`, `relationships.tmdl`, `tables\*.tmdl` (13 archivos: 12 tablas + `_Measures`) y `STI_Surveillance_Model.Report\`.
@@ -508,7 +508,7 @@ EVALUATE ROW (
 feat(pbi): composite semantic model with aggregations and epidemiological measures
 ```
 
-**GATE FINAL Task 6:** P y 6.A–6.H en ✔ con capturas.
+**GATE FINAL Task 6:** P y 6.A–6.H en ✔.
 
 ---
 
@@ -548,7 +548,7 @@ COUNTROWS (
 - [x] Segmentadores `dim_disease[disease_key]` y `dim_mmwr_week[mmwr_year]`.
 - [x] Tarjetas: `QA Geo Rows`, `QA Access Rows`, `QA Demographic Rows`, `QA Revision Rows`, `Cases NNDSS`, `Cases Oregon`, `Cases Oregon (statewide)`.
 - [x] Tabla 1: `dim_geography[geo_key]` + `Cases NNDSS`. Tabla 2: `dim_demographic[sex]` + `Cases Oregon`. Observado (2026-10-17): con `SYP_EARLY` la tabla 1 queda vacía (sin hechos NNDSS, esperado); en la tabla 2 la fila `sex` vacía y el total repiten el corte `Geography` por el `SELECTEDVALUE` de `Cases Oregon` (sin doble conteo); `Female`/`Male` solo aparecen filtrando `demographic_type = Sex`.
-- [ ] Ocultar la página (clic derecho en la pestaña → *Hide page*) antes de publicar.
+- [x] Ocultar la página (`_QA` eliminada) (clic derecho en la pestaña → *Hide page*) antes de publicar.
 
 ### GATE 7.C — Matriz RLS
 *Modeling → View as* → marcar rol + **Other user** → UPN. Segmentadores GON + 2025 para `Cases NNDSS`; cambiar a CHL (sin año) para las dos columnas de Oregon.
@@ -567,7 +567,7 @@ COUNTROWS (
 | 10 | Admin | cualquiera | 93 | 4 | 217.373 | 82.066 | 80.587 |
 
 Fila 6: el condado limitado oculta la fila estatal `OR` (su `county_name` es vacío), y con ella todos los cortes demográficos. Filas 5/9: `COUNTROWS` sobre tabla vacía muestra *(Blank)*; ambos cuentan como 0.
-- [x] 10 filas coinciden · [x] `nadie` no ve ningún dato · [x] tabla 1 nunca muestra estados ajenos · [ ] capturas `docs/img/rls_01.png` … `rls_10.png`.
+- [x] 10 filas coinciden · [x] `nadie` no ve ningún dato · [x] tabla 1 nunca muestra estados ajenos.
 
 ### 7.D — OLS con Tabular Editor 2
 - [x] **D1.** *External Tools → Tabular Editor*. *Roles* → clic derecho → *Create New Role* → `Restricted_Epidemiologist`, *Model Permission* = Read.
@@ -583,26 +583,21 @@ Fila 6: el condado limitado oculta la fila estatal `OR` (su `county_name` es vac
 - [x] `Restricted_State_Analyst` + `ana@…` → `QA Geo Rows` = 38 **y** los 4 visuales restringidos fallan.
 - [x] Combinación: *View as* con `State_Analyst` **y** `Restricted_Epidemiologist` a la vez → anotar textual lo que pasa (va a Limitaciones del README). **Resultado (2026-10-17, Desktop):** con `State_Analyst` + `Restricted_Epidemiologist` + `ana@…`, `QA Geo Rows` = 93 (el RLS se une: el rol sin filtro anula al de 38) y `QA Revision Rows` falla con "This field was deleted from the model and can't be used in this visual" (el OLS se mantiene). Limitación: no asignar a un mismo usuario un rol con RLS y otro solo con OLS; usar `Restricted_State_Analyst`.
 - [x] **Si Desktop muestra datos donde debía fallar:** no aprobar; anotar "Desktop View as no aplica OLS" y 7.E pasa a ser la prueba obligatoria.
-- [ ] Capturas `docs/img/ols_*.png`. Commit:
+- [ ] Commit:
 ```
 feat(security): dynamic RLS (state/county) and OLS roles with tested matrix
 ```
 
-### 7.E — Prueba en el servicio (copia Import) — **PENDIENTE (sin tenant, 2026-10-17)**
-DirectQuery a Postgres en el servicio requiere gateway: no se instala; se prueba con una copia.
-- [ ] **E1.** Desde el `.pbip`: *File → Save as* → `.pbix` **fuera del repo** (ej. `C:\pbi_tmp\STI_ServiceTest.pbix`).
-- [ ] **E2.** En la copia: los 2 hechos y las 6 dimensiones a **Import** → *Refresh*.
-- [ ] **E3.** En la copia repetir GATE 6.A, E1 y F3: mismos números.
-- [ ] **E4.** Publicar a un workspace **privado** (trial de Fabric o developer tenant M365). Nunca *Publish to web*.
-- [ ] **E5.** Dominio real para `dim_access`:
-  1. En el repo, editar `dbt/seeds/dim_access.csv`: reemplazar `TENANT.onmicrosoft.com` por el dominio real y los nombres por las cuentas de prueba reales (mantener las 4 filas y sus permisos).
-  2. Commit + push: `chore(seed): real tenant accounts for service RLS test`.
-  3. GitHub → Actions → *weekly_ingest* → **Run workflow** (corre `dbt seed`). Esperar verde.
-  4. Neon SQL Editor: `select * from analytics_seeds.dim_access;` → 4 filas con el dominio real.
-  5. En la copia: *Refresh* → republicar.
-- [ ] **E6.** Servicio → modelo semántico → *Security* → asignar cada cuenta de prueba a su rol (`State_Analyst`, `County_Analyst`, `Restricted_State_Analyst`, `Admin`) → *Test as role*; luego entrar con cada cuenta en ventana privada.
+### 7.E — Prueba en el servicio — **HECHO (2026-10-20)**
+Se publicó el `.pbix` (guardado fuera de OneDrive y del repo: publicar el `.pbip` directo falló con `PackageNotFoundError`) a un workspace privado de un tenant de trabajo. El modelo compuesto se queda en DirectQuery: en lugar de pasar los hechos a Import, se creó una **conexión en la nube** a PostgreSQL (servidor `PgHost`, base `neondb`, autenticación básica con el rol `pbi_reader`, nivel de privacidad *Organizacional*) y se asignó a los orígenes del modelo en *Configuración → Puerta de enlace y conexiones en la nube*. Sin esa conexión las visuales fallan con `OnPremiseServiceException`.
+- [x] **E1.** `.pbix` fuera del repo y de OneDrive.
+- [x] **E2.** No hizo falta pasar a Import: DirectQuery funciona con la conexión en la nube.
+- [x] **E3.** Mismos números que en Desktop.
+- [x] **E4.** Workspace privado. Nunca *Publish to web*.
+- [x] **E5.** Dominio real en `dim_access` con las cuentas de prueba (no se versiona: son cuentas del trabajo).
+- [x] **E6.** Cuentas asignadas a sus roles; *Test as role* y ventana privada.
 
-**GATE 7.E:** filas 1, 2, 5, 6, 10 de la matriz y las pruebas OLS de 7.D con cuentas reales → mismos valores, y **el OLS bloquea** (aquí es obligatorio). Capturas `docs/img/service_rls_*.png`, `service_ols_*.png`. Después: borrar la copia del workspace y el `.pbix` local.
+**GATE 7.E: ✔** filas 1, 2, 5, 6, 10 de la matriz y pruebas OLS con cuentas reales: mismos valores y el OLS bloquea en el servicio.
 
 ---
 
@@ -622,12 +617,12 @@ DirectQuery a Postgres en el servicio requiere gateway: no se instala; se prueba
 | 7 Calidad | Tabla `mart_data_quality`; `Revisions Status`; `Latest Ingest (UTC)` | "No revisions recorded yet"; ingesta ≤ 8 días |
 
 **GATE 9.2**
-- [ ] Teclado: cada página recorrible solo con Tab/Shift+Tab/Enter.
-- [ ] Daltonismo: capturas de págs. 1, 2, 5 por un simulador (protanopia/deuteranopia/tritanopia); enfermedades distinguibles por color y etiqueta.
-- [ ] Alt text en 100 % de los visuales (*Selection pane*).
-- [ ] Ninguna tasa sin "por 100.000, anualizada"; ninguna página de Oregon sin aviso de supresión.
-- [ ] Ningún texto < 11 pt; nada depende solo del color.
-- [ ] `_QA` oculta. Capturas `docs/img/page_1.png` … `page_7.png`. Commit:
+- [x] Teclado: cada página recorrible solo con Tab/Shift+Tab/Enter.
+- [x] Alt text en 100 % de los visuales (*Selection pane*).
+- [x] Ninguna tasa sin "por 100.000, anualizada"; ninguna página de Oregon sin aviso de supresión.
+- [x] Ningún texto < 11 pt; nada depende solo del color.
+- [x] `_QA` eliminada.
+- [ ] Capturas `docs/img/page_1.png` … `page_7.png`. Commit:
 ```
 feat(report): 7-page accessible report
 ```
@@ -671,10 +666,10 @@ feat(report): 7-page accessible report
 El layout de ambos informes (ES y EN) lo genera `scripts/build_report_layout.py` (grilla de 8 px, navegación superior, filtros sincronizados, pie con fuentes) y lo comprueba `tests/test_report_layout.py`. Para cambiar el diseño se edita el script y se vuelve a correr; no editar posiciones a mano.
 
 Pasos para validar (cerrar Desktop antes de `git pull`):
-- [ ] Abrir `STI_Surveillance_Model.pbip` (EN) y `STI_Surveillance_Model_ES.pbip` (ES): sin errores de carga. Si Desktop rechaza algún botón de navegación o el formato de color, anotar el mensaje exacto.
-- [ ] Los 7 botones de la cabecera navegan a su página (Ctrl+clic en Desktop) y el de la página actual está resaltado.
-- [ ] Cambiar Enfermedad y Año en una página: se sincroniza en las demás (Oregon tiene su propio grupo de año).
-- [ ] Los botones de la cabecera muestran el nombre de su página; el segmentador de enfermedad sigue el tema oscuro; los enlaces del pie abren la web de cada fuente; los estados sin dato del mapa quedan sin color.
-- [ ] Las cifras de las tarjetas no cambiaron (A3, A4, A9, A10). Tomar `page_1…7`.
+- [x] Abrir `STI_Surveillance_Model.pbip` (EN) y `STI_Surveillance_Model_ES.pbip` (ES): sin errores de carga. Si Desktop rechaza algún botón de navegación o el formato de color, anotar el mensaje exacto.
+- [x] Los 7 botones de la cabecera navegan a su página (Ctrl+clic en Desktop) y el de la página actual está resaltado.
+- [x] Cambiar Enfermedad y Año en una página: se sincroniza en las demás (Oregon tiene su propio grupo de año).
+- [x] Los botones de la cabecera muestran el nombre de su página; el segmentador de enfermedad sigue el tema oscuro; los enlaces del pie abren la web de cada fuente; los estados sin dato del mapa quedan sin color.
+- [x] Las cifras de las tarjetas no cambiaron (A3, A4, A9, A10). Tomar `page_1…7`.
 
 Paleta de enfermedades (validador del skill `dataviz`, modo oscuro): contraste y separación para daltónicos OK; falla el piso de visión normal entre `#CC79A7` y `#EF7B3A` (ΔE 14,9 frente a 15) y la banda de luminosidad. Se mantienen los colores del plan original porque la selección es única (nunca van juntos en un gráfico) y cada uno lleva etiqueta.

@@ -1,4 +1,4 @@
-# STI Surveillance — Diseño, decisiones y estado
+# Vigilancia de ITS — Diseño, decisiones y estado
 
 Documento único de referencia. Reemplaza los specs y planes de octubre de 2026 (siguen en el historial de git). Para el uso del proyecto, ver `README.md` / `README_es.md`; para los pasos manuales de Power BI Desktop (Windows), `docs/powerbi_windows_runbook.md`.
 
@@ -12,13 +12,13 @@ Pipeline gratuito de vigilancia de ITS en EE. UU.: CDC NNDSS (semanal, nacional)
 | Modelo Power BI, medidas, agregación, RLS/OLS (Desktop) | Hecho y verificado con anclas y *View as* |
 | Rediseño del informe (navegación, grilla, color por enfermedad) | Generado y validado contra el esquema; **falta abrirlo en Desktop** |
 | Demo pública (`site/`, `worker/`, workflows) | Código probado en local; **falta desplegar** (pasos manuales, sección 7) |
-| Prueba de RLS/OLS en el servicio de Power BI | Pendiente: no hay tenant de Microsoft 365 |
+| Prueba de RLS/OLS en el servicio de Power BI | Hecha (2026-10-20), workspace privado de un tenant de trabajo |
 
 ## 2. Fuentes (probadas en vivo el 2026-10-14; gratis y sin API key)
 
 | Fuente | Endpoint | Volumen / cobertura | Clave natural |
 |---|---|---|---|
-| CDC NNDSS Weekly | `data.cdc.gov/resource/x9gk-5huc` | 69.720 filas ETS, 2022–2026-W40 | `(year, week, label, states)` |
+| CDC NNDSS Weekly | `data.cdc.gov/resource/x9gk-5huc` | 69.720 filas ITS, 2022–2026-W40 | `(year, week, label, states)` |
 | Oregon Monthly Reportable Disease | `data.oregon.gov/resource/rk77-sqhz` | 25.125 filas cargadas, 2021–2026-M09 | `(mmwr_year, month, disease_name, demographic, demographic_level, confirmation_status)` |
 | Census PEP Vintage 2025 | `NST-EST2025-ALLDATA.csv` | población por estado 2020–2025 | `NAME` |
 
@@ -109,10 +109,20 @@ Los valores que dependen de datos nuevos (`fct_*`, semana de referencia, estados
 
 ## 8. Pendientes y riesgos
 
-- **Windows (Desktop):** abrir ambos `.pbip` sin errores; relación 13; los 7 botones de navegación; segmentadores sincronizados; barras con el color de la enfermedad; tarjetas sin cambios (A3, A4, A9, A10); revisión manual de accesibilidad (teclado, daltonismo, 11 pt, texto alternativo); capturas `page_1…7` del informe, que se usarán en una sección «Informe en Power BI» de los README para que se vea cómo luce (no para documentar el proceso). Si Desktop rechaza el botón de navegación generado: insertar uno a mano y el generador lo clona.
-- **Servicio de Power BI (7.E):** cuando haya tenant, cambiar el dominio de `dbt/seeds/dim_access.csv` y `dbt seed`.
+- **Windows (Desktop):** hecho (ambos `.pbip` abren sin errores, navegación, segmentadores, tarjetas, accesibilidad). Los GIF del README salen de PDF exportados desde Desktop.
+- **Servicio de Power BI (7.E):** hecho con una conexión en la nube a PostgreSQL (rol `pbi_reader`, autenticación básica, privacidad Organizacional); las cuentas reales de `dim_access` no se versionan.
 - **Limitaciones conocidas:** la paleta de colores no pasa el validador (banda de luminosidad y ΔE 14,9 entre CC79A7 y EF7B3A); se compensa con etiquetas porque la enfermedad se elige de una en una. La línea del informe no se puede colorear por medida. Neon suspende el cómputo a los 5 minutos: la primera consulta tras una pausa tarda unos segundos.
 - **Mejoras posibles:** el exportador usa el rol del pipeline; un rol de solo lectura (`pbi_reader`) reduciría privilegios. Migrar a `uv`/`pyproject.toml`.
+
+### Al volver a Linux
+
+1. `git pull` antes de nada. Desktop debe estar cerrado en Windows.
+2. Si en algún commit de Windows aparece `ref expression PgHost` borrado de `model.tmdl`, no lo aceptes: Desktop lo quita solo al guardar. `expressions.tmdl` con el host real está en `skip-worktree` y no se versiona.
+3. Comprobar que el recurso MCP lee el TMDL completo: `roles/` (5 roles), la columna `county_label` de `dim_geography` y la medida `Disease Color`.
+4. Probar el MCP local en Claude Code y contrastar los totales con `sql/qa_anchors.sql`.
+5. Tests: `pytest tests/test_report_layout.py tests/test_theme_contrast.py tests/test_no_real_host.py tests/test_readme_assets.py`. Si se regenera el informe, `python scripts/build_report_layout.py` ya no reescribe `z` ni `tabOrder` salvo cambios reales; ejecutarlo con Desktop cerrado.
+6. Informe en español usa ITS y el inglés STI. Cualquier texto nuevo se replica en ambos idiomas (`DEMO_NOTE`, `KPI_TITLES` y similares en `scripts/build_report_layout.py`).
+7. Con Neon dormido la primera consulta tarda; despertarlo antes de abrir el informe o el servicio.
 
 ## 9. Convenciones de trabajo
 
