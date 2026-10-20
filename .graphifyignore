@@ -1,7 +1,0 @@
-# JSON generado del informe PBIR y archivos locales: ruido para el grafo
-data_model/*.Report/
-data_model/**/.pbi/
-.serena/
-dbt/.user.yml
-dbt/profiles.yml
-graphify-out/

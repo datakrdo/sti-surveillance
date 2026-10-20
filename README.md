@@ -163,8 +163,7 @@ sti-surveillance/
 ├── worker/                               # remote read-only MCP (Cloudflare Workers)
 ├── tests/                                # ingest, theme contrast, report layout, exporter, no real DB host
 └── docs/
-    ├── PROJECT.md                        # design, decisions, anchors, demo, pending work
-    └── powerbi_windows_runbook.md        # manual Power BI Desktop steps
+    └── PROJECT.md                        # design, decisions, anchors, demo, pending work
 ```
 
 ## Quick start 🚀
@@ -190,7 +189,7 @@ CI needs the repo secrets `NEON_DATABASE_URL`, `PGHOST`, `PGUSER`, `PGPASSWORD` 
 ## Tests
 
 ```bash
-.venv/bin/pytest -q                       # 45 tests: ingest, theme contrast, report layout, exporter, no real DB host
+.venv/bin/pytest -q                       # 62 tests: ingest, theme contrast, report layout, exporter, no real DB host
 node --test "site/js/*.test.mjs"          # 17 tests: metrics against the SQL anchors, site
 (cd worker && npm test)                   # 11 tests: remote MCP tools
 cd dbt && ../.venv/bin/dbt build --profiles-dir .

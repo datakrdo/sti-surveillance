@@ -163,8 +163,7 @@ sti-surveillance/
 ├── worker/                               # MCP remoto de solo lectura (Cloudflare Workers)
 ├── tests/                                # ingesta, contraste del tema, layout del informe, exportador, sin host real de la base
 └── docs/
-    ├── PROJECT.md                        # diseño, decisiones, anclas, demo, pendientes
-    └── powerbi_windows_runbook.md        # pasos manuales en Power BI Desktop
+    └── PROJECT.md                        # diseño, decisiones, anclas, demo, pendientes
 ```
 
 ## Inicio rápido 🚀
@@ -190,7 +189,7 @@ El CI necesita los secrets del repo `NEON_DATABASE_URL`, `PGHOST`, `PGUSER`, `PG
 ## Tests
 
 ```bash
-.venv/bin/pytest -q                       # 45 tests: ingesta, contraste del tema, layout del informe, exportador, sin host real de la base
+.venv/bin/pytest -q                       # 62 tests: ingesta, contraste del tema, layout del informe, exportador, sin host real de la base
 node --test "site/js/*.test.mjs"          # 17 tests: cálculos contra las anclas SQL, sitio
 (cd worker && npm test)                   # 11 tests: herramientas del MCP remoto
 cd dbt && ../.venv/bin/dbt build --profiles-dir .

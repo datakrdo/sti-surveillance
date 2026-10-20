@@ -11,7 +11,6 @@ __pycache__/
 *.pbit
 site/data/
 .superpowers/
-graphify-out/
 .serena/
 dbt/.user.yml
 worker/node_modules/

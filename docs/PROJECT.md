@@ -1,6 +1,6 @@
 # Vigilancia de ITS — Diseño, decisiones y estado
 
-Documento único de referencia. Reemplaza los specs y planes de octubre de 2026 (siguen en el historial de git). Para el uso del proyecto, ver `README.md` / `README_es.md`; para los pasos manuales de Power BI Desktop (Windows), `docs/powerbi_windows_runbook.md`.
+Documento único de referencia. Reemplaza los specs y planes de octubre de 2026 (siguen en el historial de git). Para el uso del proyecto, ver `README.md` / `README_es.md`.
 
 ## 1. Qué es y en qué estado está
 
@@ -93,7 +93,7 @@ Los valores que dependen de datos nuevos (`fct_*`, semana de referencia, estados
 
 - **Metas:** sitio estático en GitHub Pages con 3 vistas (Resumen, Mapa, Corredor), ES/EN, filtros de enfermedad/año/estado, 5 preguntas de ejemplo calculadas en el navegador, bloque "Conecta tu propio Claude", modo recorrido `?tour=1`; MCP remoto de solo lectura en Cloudflare Workers; repo listo para hacerse público.
 - **No metas:** no embeber Power BI (exige licencia y no admite DirectQuery/RLS); no chat libre dentro de la página (requeriría un LLM de pago); no consultas en vivo a Postgres; no el dataset del Oregon Health Authority (condados y demografía) ni las revisiones en lo público; las filas del estado de Oregon de NNDSS sí se publican; no logos de terceros.
-- **Portada:** el README abre con `docs/img/report_{en,es}.gif` (recorrido del informe, exportado desde Desktop); `scripts/make_cover_gif.sh` regenera `cover_{en,es}.gif` (Resumen → Mapa → Corredor, con capturas reales del sitio) para «Demo en vivo»; `tests/test_readme_assets.py` impide imágenes rotas en los README.
+- **Portada:** el README abre con `docs/img/report_{en,es}.gif` (recorrido del informe, exportado desde Desktop); `scripts/make_cover_gif.sh` regenera `cover_{en,es}.gif` (Resumen → Mapa → Corredor, con capturas reales del sitio) para «Demo en vivo».
 - **Anti-metas:** filtrar credenciales o datos restringidos; cualquier cargo o tarjeta; SQL libre o escritura en el MCP público; que las cifras difieran de las anclas.
 - **Datos:** solo NNDSS (CHL, GON, SYP_PS, SYP_CONG) por estado y semana. VIH no está porque solo existe en Oregon.
 - **Flujo:** `scripts/export_public.py` → `site/data/nndss.json` (1,8 MB) y `anchors.json`. `site/js/metrics.js` concentra los cálculos y lo usan el sitio y el Worker, así coinciden. `pages.yml` exporta, corre `node --test` (compara con las anclas SQL) y publica; `weekly_ingest.yml` lo invoca cada semana. El Worker lee el JSON desde Pages (caché 10 min): no hace falta redesplegarlo ni un token de Cloudflare en GitHub.
@@ -110,32 +110,15 @@ Los valores que dependen de datos nuevos (`fct_*`, semana de referencia, estados
 ## 8. Pendientes y riesgos
 
 - **Windows (Desktop):** hecho (ambos `.pbip` abren sin errores, navegación, segmentadores, tarjetas, accesibilidad). Los GIF del README salen de PDF exportados desde Desktop.
-- **MCP de Microsoft contra el modelo publicado:** pendiente; paso a paso en `docs/windows_next_steps.md`. Si funciona, entra al README como el caso fuerte del MCP sobre el modelo.
+- **MCP de Microsoft contra el modelo publicado:** pendiente de probar. Si funciona, entra al README como el caso fuerte del MCP sobre el modelo.
 - **Servicio de Power BI (7.E):** hecho con una conexión en la nube a PostgreSQL (rol `pbi_reader`, autenticación básica, privacidad Organizacional); las cuentas reales de `dim_access` no se versionan.
 - **Limitaciones conocidas:** la paleta de colores no pasa el validador (banda de luminosidad y ΔE 14,9 entre CC79A7 y EF7B3A); se compensa con etiquetas porque la enfermedad se elige de una en una. La línea del informe no se puede colorear por medida. Neon suspende el cómputo a los 5 minutos: la primera consulta tras una pausa tarda unos segundos.
 - **Mejoras posibles:** el exportador usa el rol del pipeline; un rol de solo lectura (`pbi_reader`) reduciría privilegios. Migrar a `uv`/`pyproject.toml`.
 
-### Al volver a Linux
-
-1. `git pull` antes de nada. Desktop debe estar cerrado en Windows.
-2. Si en algún commit de Windows aparece `ref expression PgHost` borrado de `model.tmdl`, no lo aceptes: Desktop lo quita solo al guardar. `expressions.tmdl` con el host real está en `skip-worktree` y no se versiona.
-3. Comprobar que el recurso MCP lee el TMDL completo: `roles/` (5 roles), la columna `county_label` de `dim_geography` y la medida `Disease Color`.
-4. Probar el MCP local en Claude Code y contrastar los totales con `sql/qa_anchors.sql`.
-5. Tests: `pytest tests/test_report_layout.py tests/test_theme_contrast.py tests/test_no_real_host.py tests/test_readme_assets.py`. Si se regenera el informe, `python scripts/build_report_layout.py` ya no reescribe `z` ni `tabOrder` salvo cambios reales; ejecutarlo con Desktop cerrado.
-6. Informe en español usa ITS y el inglés STI. Cualquier texto nuevo se replica en ambos idiomas (`DEMO_NOTE`, `KPI_TITLES` y similares en `scripts/build_report_layout.py`).
-7. Con Neon dormido la primera consulta tarda; despertarlo antes de abrir el informe o el servicio.
-
-## 9. Convenciones de trabajo
-
-- El agente nunca hace `git commit`/`push` ni crea repos: entrega el mensaje de commit, sin líneas de atribución.
-- Nunca se versiona un `.pbix` (contiene datos) ni credenciales; secretos solo en `.env` (local) y GitHub Secrets. Power BI usa `pbi_reader`, no el dueño de la base.
-- Los `.pbip`/TMDL los commitea quien trabaja en Windows. Cerrar Desktop antes de `git pull`.
-- Cada cambio de un README se replica en el otro idioma.
-
-## 10. Verificación
+## 9. Verificación
 
 ```bash
-.venv/bin/pytest -q                                   # 45 tests (ingesta, tema, layout, exportador, README)
+.venv/bin/pytest -q                                   # 62 tests (ingesta, tema, layout, exportador, sin host real)
 node --test "site/js/*.test.mjs"                      # 17 (cálculos contra anclas SQL + sitio)
 (cd worker && npm test)                               # 11 (herramientas del MCP remoto)
 cd dbt && ../.venv/bin/dbt build --profiles-dir .     # 70/70
