@@ -10,8 +10,8 @@ Pipeline gratuito de vigilancia de ITS en EE. UU.: CDC NNDSS (semanal, nacional)
 |---|---|
 | Ingesta, dbt, CI semanal, MCP local (`mcp_reader`) | Hecho y verificado (`dbt build` 70/70, MCP probado desde Claude Code) |
 | Modelo Power BI, medidas, agregación, RLS/OLS (Desktop) | Hecho y verificado con anclas y *View as* |
-| Rediseño del informe (navegación, grilla, color por enfermedad) | Generado y validado contra el esquema; **falta abrirlo en Desktop** |
-| Demo pública (`site/`, `worker/`, workflows) | Código probado en local; **falta desplegar** (pasos manuales, sección 7) |
+| Rediseño del informe (navegación, grilla, tema oscuro) | Hecho y validado en Desktop (EN por defecto, `_ES`) |
+| Demo pública (`site/`, `worker/`, workflows) | Desplegada: sitio en GitHub Pages y MCP remoto en Cloudflare Workers |
 | Prueba de RLS/OLS en el servicio de Power BI | Hecha (2026-10-20), workspace privado de un tenant de trabajo |
 
 ## 2. Fuentes (probadas en vivo el 2026-10-14; gratis y sin API key)
@@ -93,7 +93,7 @@ Los valores que dependen de datos nuevos (`fct_*`, semana de referencia, estados
 
 - **Metas:** sitio estático en GitHub Pages con 3 vistas (Resumen, Mapa, Corredor), ES/EN, filtros de enfermedad/año/estado, 5 preguntas de ejemplo calculadas en el navegador, bloque "Conecta tu propio Claude", modo recorrido `?tour=1`; MCP remoto de solo lectura en Cloudflare Workers; repo listo para hacerse público.
 - **No metas:** no embeber Power BI (exige licencia y no admite DirectQuery/RLS); no chat libre dentro de la página (requeriría un LLM de pago); no consultas en vivo a Postgres; no el dataset del Oregon Health Authority (condados y demografía) ni las revisiones en lo público; las filas del estado de Oregon de NNDSS sí se publican; no logos de terceros.
-- **Portada:** `scripts/make_cover_gif.sh` regenera `docs/img/cover_en.gif` y `cover_es.gif` (Resumen → Mapa → Corredor) con capturas reales del sitio; `tests/test_readme_assets.py` impide imágenes rotas en los README.
+- **Portada:** el README abre con `docs/img/report_{en,es}.gif` (recorrido del informe, exportado desde Desktop); `scripts/make_cover_gif.sh` regenera `cover_{en,es}.gif` (Resumen → Mapa → Corredor, con capturas reales del sitio) para «Demo en vivo»; `tests/test_readme_assets.py` impide imágenes rotas en los README.
 - **Anti-metas:** filtrar credenciales o datos restringidos; cualquier cargo o tarjeta; SQL libre o escritura en el MCP público; que las cifras difieran de las anclas.
 - **Datos:** solo NNDSS (CHL, GON, SYP_PS, SYP_CONG) por estado y semana. VIH no está porque solo existe en Oregon.
 - **Flujo:** `scripts/export_public.py` → `site/data/nndss.json` (1,8 MB) y `anchors.json`. `site/js/metrics.js` concentra los cálculos y lo usan el sitio y el Worker, así coinciden. `pages.yml` exporta, corre `node --test` (compara con las anclas SQL) y publica; `weekly_ingest.yml` lo invoca cada semana. El Worker lee el JSON desde Pages (caché 10 min): no hace falta redesplegarlo ni un token de Cloudflare en GitHub.
@@ -110,6 +110,7 @@ Los valores que dependen de datos nuevos (`fct_*`, semana de referencia, estados
 ## 8. Pendientes y riesgos
 
 - **Windows (Desktop):** hecho (ambos `.pbip` abren sin errores, navegación, segmentadores, tarjetas, accesibilidad). Los GIF del README salen de PDF exportados desde Desktop.
+- **MCP de Microsoft contra el modelo publicado:** pendiente; paso a paso en `docs/windows_next_steps.md`. Si funciona, entra al README como el caso fuerte del MCP sobre el modelo.
 - **Servicio de Power BI (7.E):** hecho con una conexión en la nube a PostgreSQL (rol `pbi_reader`, autenticación básica, privacidad Organizacional); las cuentas reales de `dim_access` no se versionan.
 - **Limitaciones conocidas:** la paleta de colores no pasa el validador (banda de luminosidad y ΔE 14,9 entre CC79A7 y EF7B3A); se compensa con etiquetas porque la enfermedad se elige de una en una. La línea del informe no se puede colorear por medida. Neon suspende el cómputo a los 5 minutos: la primera consulta tras una pausa tarda unos segundos.
 - **Mejoras posibles:** el exportador usa el rol del pipeline; un rol de solo lectura (`pbi_reader`) reduciría privilegios. Migrar a `uv`/`pyproject.toml`.

@@ -15,9 +15,9 @@ def test_images_exist(name):
     assert not missing, f"imágenes inexistentes en {name}: {missing}"
 
 
-def test_both_readmes_show_the_cover_gif():
+def test_both_readmes_show_the_report_gif():
     for name in READMES:
-        assert "docs/img/cover" in (ROOT / name).read_text(), name
+        assert "docs/img/report_" in (ROOT / name).read_text(), name
 
 
 def test_phases_checklist_has_no_screenshot_item():

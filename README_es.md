@@ -2,23 +2,40 @@
 
 # sti-surveillance 🧬
 
-**¿Puede un stack gratuito mantener al día los datos de vigilancia de infecciones de transmisión sexual (ITS), ser honesto sobre sus vacíos y ser seguro para dárselo a un asistente de IA?**
+**¿Puede un asistente de IA responder preguntas sobre datos de vigilancia de ITS usando el mismo modelo gobernado que alimenta un informe de Power BI?**
 
-Un pipeline semanal para clamidia, gonorrea, sífilis y VIH en Estados Unidos. Combina dos fuentes abiertas: las notificaciones semanales nacionales del CDC (NNDSS) y los datos de enfermedades de notificación obligatoria de Oregon, que añaden condado, sexo, edad y raza. Los datos llegan a Postgres (Neon), dbt los modela en un esquema en estrella y un servidor MCP de solo lectura permite que una IA los consulte sin poder modificarlos ni leer columnas restringidas. Encima hay un modelo compuesto de Power BI con seguridad a nivel de fila y de objeto y un informe bilingüe de 7 páginas, y una demo estática gratuita más un MCP remoto de solo lectura permiten explorarlo (ver [Demo en vivo](#demo-en-vivo-)).
+Este proyecto construye ambas cosas. Un pipeline semanal lleva las notificaciones nacionales del CDC (NNDSS) y los datos de enfermedades de notificación obligatoria de Oregon (condado, sexo, edad, raza) a Postgres (Neon); dbt los modela en un esquema en estrella; y sobre ese único modelo hay un **informe de 7 páginas en Power BI** con seguridad a nivel de fila y de objeto, y un **servidor MCP de solo lectura** para que una IA consulte las mismas tablas y definiciones sin poder modificarlas ni leer columnas restringidas. La demo web pública es solo un ejemplo de cómo funcionaría (ver [Demo en vivo](#demo-en-vivo-)).
 
 Fuentes: [CDC NNDSS Weekly](https://data.cdc.gov/resource/x9gk-5huc), [Oregon Monthly Reportable Disease](https://data.oregon.gov/resource/rk77-sqhz) y [Census PEP 2025](https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/state/totals/NST-EST2025-ALLDATA.csv). Todas gratuitas y sin API key.
 
 ## Informe en Power BI 📈
 
-El entregable principal: siete páginas (Resumen, Mapa, Ranking, Corredor, Oregon, Demografía, Calidad) en español e inglés sobre un solo modelo semántico, con un tema oscuro accesible.
+El entregable principal: siete páginas (Resumen, Mapa, Ranking, Corredor, Oregon, Demografía, Calidad) sobre un solo modelo semántico, con un tema oscuro accesible.
 
 ![Recorrido animado por las siete páginas del informe de Power BI](docs/img/report_es.gif)
 
 - **Modelo compuesto.** Los dos hechos (`fct_nndss_weekly`, `fct_oregon_monthly`) quedan en DirectQuery contra Neon, cinco dimensiones son Dual y una pequeña agregación Import (`agg_weekly_national`) responde las vistas nacionales semanales sin tocar la base.
 - **Seguridad por filas (RLS).** Cada usuario ve solo sus filas: `dim_access` asocia el inicio de sesión (`USERPRINCIPALNAME()`) con un estado o condado, y los roles `State_Analyst`, `County_Analyst` y `Admin` filtran `dim_geography` a partir de eso. Un usuario desconocido no ve nada.
 - **Seguridad por objetos (OLS).** `Restricted_State_Analyst` y `Restricted_Epidemiologist` no ven `race_group`, `age_group`, `demographic_level` ni la tabla `mart_revisions`; la página de Demografía lo avisa en lugar de fallar.
-- **MCP.** Los mismos datos se exponen también a un asistente de IA mediante un servidor MCP de solo lectura; ver [Demo en vivo](#demo-en-vivo-) y [Cómo funciona](#cómo-funciona-%EF%B8%8F).
+- **MCP.** El mismo modelo está abierto también a un asistente de IA; ver [MCP sobre el modelo](#mcp-sobre-el-modelo-).
 - **Honesto con los vacíos.** Las tasas son anualizadas por 100.000, las celdas suprimidas quedan vacías y las páginas de Oregon indican la regla de supresión (menos de 6 casos).
+
+## MCP sobre el modelo 🤖
+
+El informe responde las preguntas para las que alguien armó un visual; el MCP deja que una IA conteste el resto en lenguaje natural. Lee la definición del modelo (el TMDL, expuesto como resource) y consulta el mismo esquema en estrella, así que sus cifras usan las definiciones del informe y coinciden con él (sus totales igualan una consulta independiente para las cinco enfermedades). Es de solo lectura, tiene un timeout de 10 s y su rol de base no puede leer las columnas restringidas ni el historial de revisiones. Ejemplos: «¿Cuáles son los cinco estados con más casos de sífilis primaria y secundaria en 2025?», «¿California está por encima de su rango habitual de gonorrea esta semana?». Detalles en [Cómo funciona](#cómo-funciona-%EF%B8%8F); para probar una versión pública, ver [Demo en vivo](#demo-en-vivo-).
+
+## Resultados 📊
+
+- `dbt build`: pasan 70 de 70 nodos.
+- Contraste con las APIs: gonorrea de California en la semana 2024-W52 = 499 casos y clamidia de Multnomah en 2026-M01 = 294, ambos iguales a la fuente.
+- La vista del MCP da los mismos totales que una consulta independiente para las cinco enfermedades.
+- La ingesta es idempotente: dos corridas seguidas dejan los mismos conteos.
+- El workflow semanal corre en verde de punta a punta (pytest, ingesta, seed, snapshot, build, frescura) en unos 1 min 17 s.
+- Modelo de Power BI contrastado con anclas en SQL: 12 conteos de tablas, totales de NNDSS y Oregon, tasas anualizadas (clamidia de CA 2024 = 259,434 por 100 mil), interanual en dos formas (alineada por MMWR y `SAMEPERIODLASTYEAR`, que difieren exactamente en los 2.833 casos de la semana 2025-W1), el corredor endémico y los cortes de Oregon (clamidia 80.587 por condado, 82.066 estatal).
+- Acierto de la agregación confirmado de tres maneras: Performance Analyzer, DAX Studio (`RewriteAttempted` con coincidencia y escaneo de `agg_weekly_national`, sin SQL) y revocando `SELECT` sobre el hecho a `pbi_reader`: el visual agregado siguió funcionando y el otro falló.
+- Seguridad por fila: la matriz de 10 casos en *View as* coincide y un usuario desconocido no ve nada. La seguridad por objeto bloquea `race_group`, `age_group`, `demographic_level` y `mart_revisions` en *View as*, mientras `sex` sigue funcionando.
+- Informe: 7 páginas sobre un solo modelo semántico, con el tema oscuro accesible (tests de contraste en `tests/test_theme_contrast.py`).
+- Protecciones del MCP verificadas desde Python: una consulta válida devuelve JSON, el DML y las columnas restringidas se bloquean, y la propia base rechaza escrituras y el esquema `raw`.
 
 ## Demo en vivo 🌐
 
@@ -26,9 +43,9 @@ El entregable principal: siete páginas (Resumen, Mapa, Ranking, Corredor, Orego
 
 [![Vista previa animada de la demo: Resumen, Mapa y Corredor](docs/img/cover_es.gif)](https://datakrdo.github.io/sti-surveillance/?lang=es)
 
-Una versión pública y gratuita, sin base de datos ni claves en línea:
+Un ejemplo de cómo funcionaría, público y gratuito, sin base de datos ni claves en línea:
 
-- **Sitio estático** (GitHub Pages, `site/`): réplica de 3 vistas del informe (Resumen, Mapa, Corredor) en español e inglés, con 5 preguntas de ejemplo calculadas en el navegador. `?tour=1` rota las vistas solo.
+- **Sitio estático** (GitHub Pages, `site/`): réplica de 3 vistas del informe (Resumen, Mapa, Corredor), con 5 preguntas de ejemplo calculadas en el navegador. `?tour=1` rota las vistas solo.
 - **MCP remoto de solo lectura** (Cloudflare Workers, `worker/`): 6 herramientas con parámetros validados y sin SQL libre. Lee el mismo JSON agregado que el sitio. Se conecta como conector personalizado en Claude (disponible en todos los planes; el gratuito permite uno) o en cualquier cliente con soporte de MCP remoto: `https://sti-surveillance-mcp.jcbatman.workers.dev/mcp`.
 - **Qué contiene:** solo NNDSS (clamidia, gonorrea, sífilis primaria/secundaria y congénita) por estado y semana, con las mismas definiciones del modelo. El dataset del Oregon Health Authority (condados, demografía) y las revisiones no se publican (las filas del estado de Oregon de NNDSS sí); siguen en el informe de Power BI y en el MCP local de laboratorio (`mcp/`, rol `mcp_reader`).
 - **Cómo se actualiza:** el workflow semanal exporta `site/data/*.json` desde Neon y vuelve a publicar Pages; el Worker lee ese JSON, así que no hay que redesplegarlo. Las pruebas comparan las cifras del sitio con las anclas SQL antes de publicar.
@@ -63,20 +80,6 @@ Necesitas una cuenta de Claude (cualquier plan; el gratuito permite un conector 
 5. Cualquier otro cliente que admita servidores MCP remotos funciona con la misma dirección.
 
 Lo que **no** puede hacer, a propósito: ejecutar SQL libre, modificar nada ni mostrar los datos de condados y demografía del Oregon Health Authority. Las cifras semanales son provisionales y los datos se actualizan cada semana. Si una respuesta parece rara, pide a Claude que liste las enfermedades, los estados y las semanas disponibles (`list_dimensions`).
-
-## Resultados 📊
-
-- `dbt build`: pasan 70 de 70 nodos.
-- Contraste con las APIs: gonorrea de California en la semana 2024-W52 = 499 casos y clamidia de Multnomah en 2026-M01 = 294, ambos iguales a la fuente.
-- La vista del MCP da los mismos totales que una consulta independiente para las cinco enfermedades.
-- La ingesta es idempotente: dos corridas seguidas dejan los mismos conteos.
-- El workflow semanal corre en verde de punta a punta (pytest, ingesta, seed, snapshot, build, frescura) en unos 1 min 17 s.
-- Modelo de Power BI contrastado con anclas en SQL: 12 conteos de tablas, totales de NNDSS y Oregon, tasas anualizadas (clamidia de CA 2024 = 259,434 por 100 mil), interanual en dos formas (alineada por MMWR y `SAMEPERIODLASTYEAR`, que difieren exactamente en los 2.833 casos de la semana 2025-W1), el corredor endémico y los cortes de Oregon (clamidia 80.587 por condado, 82.066 estatal).
-- Acierto de la agregación confirmado de tres maneras: Performance Analyzer, DAX Studio (`RewriteAttempted` con coincidencia y escaneo de `agg_weekly_national`, sin SQL) y revocando `SELECT` sobre el hecho a `pbi_reader`: el visual agregado siguió funcionando y el otro falló.
-- Seguridad por fila: la matriz de 10 casos en *View as* coincide y un usuario desconocido no ve nada. La seguridad por objeto bloquea `race_group`, `age_group`, `demographic_level` y `mart_revisions` en *View as*, mientras `sex` sigue funcionando.
-- Informe: 7 páginas en español e inglés sobre un solo modelo semántico, con el tema oscuro accesible (tests de contraste en `tests/test_theme_contrast.py`).
-- Protecciones del MCP verificadas desde Python: una consulta válida devuelve JSON, el DML y las columnas restringidas se bloquean, y la propia base rechaza escrituras y el esquema `raw`.
-
 
 ## Cómo funciona 🏗️
 
@@ -153,10 +156,10 @@ sti-surveillance/
 │   ├── snapshots/snap_nndss_weekly.sql
 │   └── tests/                            # tests singulares de grano
 ├── mcp/mcp_server.py
-├── data_model/                           # proyecto Power BI (PBIP/TMDL), informes ES y EN
+├── data_model/                           # Power BI: un solo modelo semántico (TMDL), un informe por idioma
 ├── theme/dark_accessible.json            # tema oscuro accesible
 ├── scripts/export_public.py              # agregados públicos para la demo
-├── site/                                 # dashboard estático bilingüe (GitHub Pages)
+├── site/                                 # dashboard estático (GitHub Pages)
 ├── worker/                               # MCP remoto de solo lectura (Cloudflare Workers)
 ├── tests/                                # ingesta, contraste del tema, layout del informe, exportador, sin host real de la base
 └── docs/
@@ -192,22 +195,6 @@ node --test "site/js/*.test.mjs"          # 17 tests: cálculos contra las ancla
 (cd worker && npm test)                   # 11 tests: herramientas del MCP remoto
 cd dbt && ../.venv/bin/dbt build --profiles-dir .
 ```
-
-## Fases ✅
-
-- [x] Búsqueda de fuentes y prueba en vivo de las APIs
-- [x] Ingesta idempotente con tests unitarios
-- [x] dbt: staging, esquema en estrella, snapshot, tests y exposure
-- [x] Workflow semanal de GitHub Actions
-- [x] Servidor MCP de solo lectura con vista de un solo corte
-- [x] MCP probado desde Claude Code (consulta válida, bloqueo de DML, bloqueo de columna restringida, recurso de esquema)
-- [x] Modelo semántico de Power BI: relaciones, medidas DAX, agregaciones
-- [x] Seguridad a nivel de fila por condado y de objeto sobre raza, edad y revisiones, probada con *View as*
-- [x] Mismas pruebas de seguridad en el servicio de Power BI
-- [x] Tema oscuro accesible y el informe de 7 páginas (falta la revisión manual de accesibilidad)
-- [x] Sitio estático bilingüe y MCP remoto (código y tests)
-- [ ] Desplegar Pages y el Worker, y probar el MCP público desde Claude
-- [ ] Abrir ambos `.pbip` en Desktop tras el rediseño del informe
 
 ## Fuera de alcance (a propósito)
 
