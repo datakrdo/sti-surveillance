@@ -15,7 +15,7 @@ INK, MUTED, ACCENT = "#E6EDF3", "#A9B7C6", "#56B4E9"
 TEXT = {
     "es": {
         "nav": ["Resumen", "Mapa", "Ranking", "Corredor", "Oregon", "Demografía", "Calidad"],
-        "brand": "Vigilancia de ITS", "tag": "EE.UU. · datos públicos",
+        "brand": "Vigilancia de ITS", "logo": "ITS", "tag": "EE.UU. · datos públicos",
         "sources": "Fuentes de datos",
         "disclaimer": "Proyecto independiente, sin afiliación con CDC, Oregon Health Authority ni U.S. Census Bureau.",
         "alt_logo": "Logotipo del proyecto Vigilancia de ITS.", "alt_brand": "Nombre del proyecto.",
@@ -25,7 +25,7 @@ TEXT = {
     },
     "en": {
         "nav": ["Overview", "Map", "Ranking", "Corridor", "Oregon", "Demographics", "Quality"],
-        "brand": "STI Surveillance", "tag": "US · public data",
+        "brand": "STI Surveillance", "logo": "STI", "tag": "US · public data",
         "sources": "Data sources",
         "disclaimer": "Independent project, not affiliated with the CDC, Oregon Health Authority or the U.S. Census Bureau.",
         "alt_logo": "STI Surveillance project logo.", "alt_brand": "Project name.",
@@ -174,7 +174,7 @@ def generated(pid, idx, lang):
     t = TEXT[lang]
     out = {}
     out["logo"] = textbox(stable_name(pid, "logo"), (32, 16, 56, 40),
-                          [([("STI", 16, BG, True)], "center")], t["alt_logo"], bg=ACCENT)
+                          [([(t["logo"], 16, BG, True)], "center")], t["alt_logo"], bg=ACCENT)
     out["brand"] = textbox(stable_name(pid, "brand"), (96, 8, 224, 56),
                            [([(t["brand"], 16, INK, True)], "left"), ([(t["tag"], 11, MUTED, False)], "left")], t["alt_brand"])
     for i, label in enumerate(t["nav"]):
@@ -250,6 +250,18 @@ def convert_demo(v, role):
             "Expression": {"SourceRef": {"Entity": "dim_demographic"}}, "Property": "age_group"}}, "direction": "Ascending"}]}
 
 
+def save(f, v, force=False):
+    """Escribe solo si cambia algo real: Desktop reescribe z/tabOrder y el orden de claves."""
+    if f.exists() and not force:
+        old = json.loads(f.read_text(encoding="utf-8-sig"))
+
+        def strip(d):
+            return {**d, "position": {k: x for k, x in d["position"].items() if k not in ("z", "tabOrder")}}
+        if strip(old) == strip(v):
+            return
+    f.write_text(json.dumps(v, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
 def build(lang):
     global PAGE_IDS
     pages_dir = ROOT / REPORTS[lang] / "definition" / "pages"
@@ -262,8 +274,11 @@ def build(lang):
             for f in (vdir / old_legend).iterdir():
                 f.unlink()
             (vdir / old_legend).rmdir()
+        prev = {}
         for f in vdir.glob("*/visual.json"):          # idempotente: quitar lo generado antes
-            if json.loads(f.read_text(encoding="utf-8-sig"))["name"] in {g["name"] for g in gen.values()}:
+            j = json.loads(f.read_text(encoding="utf-8-sig"))
+            if j["name"] in {g["name"] for g in gen.values()}:
+                prev[f] = j
                 f.unlink()
                 f.parent.rmdir()
         existing = []
@@ -334,14 +349,22 @@ def build(lang):
                 vals.append({"properties": {"horizontalAlignment": lit("'center'")}, "selector": {"id": "default"}})
             if vt == "barChart":
                 v["visual"].get("objects", {}).pop("dataPoint", None)
-            f.write_text(json.dumps(v, indent=2, ensure_ascii=False), encoding="utf-8")
+            save(f, v)
         missing = set(LAYOUT[idx]) - used
         assert not missing, (lang, idx, missing)
         # nuevos visuales
+        fresh = set()
         for role, g in gen.items():
             d = vdir / g["name"]
             d.mkdir(exist_ok=True)
-            (d / "visual.json").write_text(json.dumps(g, indent=2, ensure_ascii=False), encoding="utf-8")
+            f = d / "visual.json"
+            if f in prev:                              # conservar lo que Desktop guardó si no hay cambio real
+                strip = lambda x: {**x, "position": {k: y for k, y in x["position"].items() if k not in ("z", "tabOrder")}}
+                if strip(prev[f]) == strip(g):
+                    g = prev[f]
+            else:
+                fresh.add(f)
+            save(f, g, force=True)
         # z y tabOrder: cabecera, filtros, contenido (por lectura), pie
         allv = []
         for f in vdir.glob("*/visual.json"):
@@ -355,7 +378,7 @@ def build(lang):
         for i, (f, v) in enumerate(sorted(allv, key=key)):
             v["position"]["z"] = i + 1
             v["position"]["tabOrder"] = i
-            f.write_text(json.dumps(v, indent=2, ensure_ascii=False), encoding="utf-8")
+            save(f, v, force=f in fresh)
 
 
 if __name__ == "__main__":

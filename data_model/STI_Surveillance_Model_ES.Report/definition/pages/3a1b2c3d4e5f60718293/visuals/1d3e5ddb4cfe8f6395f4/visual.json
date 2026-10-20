@@ -4,10 +4,10 @@
   "position": {
     "x": 32,
     "y": 16,
-    "z": 2,
+    "z": 0,
     "width": 56,
     "height": 40,
-    "tabOrder": 1
+    "tabOrder": 0
   },
   "visual": {
     "visualType": "textbox",
@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "STI",
+                    "value": "ITS",
                     "textStyle": {
                       "fontSize": "16pt",
                       "color": "#0F1720",

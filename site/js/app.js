@@ -20,6 +20,7 @@ const latestYear = () => Math.floor(ix.data.latest_week / 100);
 
 function fillStatic() {
   document.documentElement.lang = S.lang;
+  $("logo").textContent = L("logo");
   $("title").textContent = L("title"); $("subtitle").textContent = L("subtitle");
   $("lbl-disease").textContent = L("disease"); $("lbl-year").textContent = L("year"); $("lbl-state").textContent = L("state");
   $("lang-group").setAttribute("aria-label", L("langLabel")); $("filters").setAttribute("aria-label", L("filtersLabel"));

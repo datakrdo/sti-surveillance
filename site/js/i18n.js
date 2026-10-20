@@ -1,6 +1,6 @@
 export const STRINGS = {
   es: {
-    title: "Vigilancia de ITS en EE. UU.",
+    logo: "ITS", title: "Vigilancia de ITS en EE. UU.",
     subtitle: "Notificaciones semanales NNDSS · demo estática del informe de Power BI",
     tabOverview: "Resumen", tabMap: "Mapa", tabCorridor: "Corredor",
     disease: "Enfermedad", year: "Año", state: "Estado", language: "Idioma",
@@ -27,7 +27,7 @@ export const STRINGS = {
     tourOn: "Modo recorrido", mapTable: "Tabla de la tasa por estado", loading: "Cargando datos…", loadError: "No se pudieron cargar los datos.",
   },
   en: {
-    title: "STI Surveillance in the U.S.",
+    logo: "STI", title: "STI Surveillance in the U.S.",
     subtitle: "NNDSS weekly notifications · static demo of the Power BI report",
     tabOverview: "Overview", tabMap: "Map", tabCorridor: "Corridor",
     disease: "Disease", year: "Year", state: "State", language: "Language",
