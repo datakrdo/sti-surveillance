@@ -195,6 +195,15 @@ node --test "site/js/*.test.mjs"          # 17 tests: cálculos contra las ancla
 cd dbt && ../.venv/bin/dbt build --profiles-dir .
 ```
 
+## Validar los servidores MCP
+
+Los valores esperados salen de las anclas SQL de `docs/PROJECT.md` §6 (solo cambian si el CDC revisa datos).
+
+1. **MCP remoto (público), cualquier cliente o conector de Claude.** Pide la tasa nacional de gonorrea en 2025 (`get_rate_per_100k`, `disease=GON`, `year=2025`): debe dar **62,04** por 100.000. Clamidia en California 2024 (`disease=CHL`, `state=CA`, `year=2024`): debe dar **259,43**. Con el MCP Inspector (`npx @modelcontextprotocol/inspector`, transporte *Streamable HTTP*, la dirección `/mcp` de arriba) verás 6 herramientas y el recurso `sti://definitions`.
+2. **Guardrails del remoto.** `state=XX` devuelve `Unknown state`; un argumento extra devuelve `Invalid arguments`; los datos de condados y demografía de Oregon no están disponibles.
+3. **MCP local (requiere tu propia base).** `pip install -r mcp/requirements.txt` y, desde la raíz del repo: `claude mcp add sti-epidemiology --env MCP_DATABASE_URL=<URL de mcp_reader> -- python mcp/mcp_server.py`.
+4. **Guardrails del local.** Un `SELECT` sobre `analytics_marts` devuelve filas. `DELETE FROM analytics_marts.dim_disease ...` devuelve `ERROR: base de datos de solo lectura.` Una consulta que mencione `race_group` devuelve `ERROR [OLS-HIPAA]: acceso denegado a objeto restringido.` Leer el recurso `powerbi://metadata/schema` devuelve el TMDL.
+
 ## Fuera de alcance (a propósito)
 
 - Una serie nacional de VIH: la única fuente gratuita con API y datos recientes es Oregon.

@@ -1,4 +1,5 @@
 import csv, io, os, re
+from operator import itemgetter
 import requests, psycopg2
 from psycopg2.extras import execute_values
 from requests.adapters import HTTPAdapter
@@ -71,7 +72,7 @@ def dedupe(rows, key):
     return list({key(t): t for t in rows}.values())  # último gana
 
 
-OREGON_PK = lambda t: t[:2] + t[4:7] + t[10:11]
+OREGON_PK = itemgetter(0, 1, 4, 5, 6, 10)
 
 
 def upsert(cur, table, cols, pk, rows):
