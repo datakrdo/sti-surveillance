@@ -9,19 +9,36 @@ def ratio(a, b):
     hi, lo = sorted((lum(a), lum(b)), reverse=True)
     return (hi + 0.05) / (lo + 0.05)
 
-THEME = json.loads((pathlib.Path(__file__).parent.parent / "theme" / "dark_accessible.json").read_text())
-BG, CARD = "#0F1720", "#18232F"
+import pytest
 
-def test_text_meets_wcag_aa():
+T = pathlib.Path(__file__).parent.parent / "theme"
+# nombre -> (fondo de página, tarjeta, extremos del mapa secuencial)
+THEMES = {"dark_accessible": ("#0F1720", "#18232F", ("#4F7CA3", "#F0E442")),
+          "light_accessible": ("#F5F7FA", "#FFFFFF", ("#4F7CA3", "#7D6E00"))}
+
+
+@pytest.fixture(params=THEMES)
+def th(request):
+    bg, card, ends = THEMES[request.param]
+    return json.loads((T / f"{request.param}.json").read_text()), (bg, card), ends
+
+
+def test_text_meets_wcag_aa(th):
+    theme, bgs, _ = th
     for key in ("foreground", "hyperlink", "visitedHyperlink"):
-        for bg in (BG, CARD):
-            assert ratio(THEME[key], bg) >= 4.5, (key, bg)
+        for bg in bgs:
+            assert ratio(theme[key], bg) >= 4.5, (key, bg)
 
-def test_data_colors_meet_non_text_contrast():
-    assert len(THEME["dataColors"]) >= 8
-    for c in THEME["dataColors"]:
-        for bg in (BG, CARD):
+
+def test_data_colors_meet_non_text_contrast(th):
+    theme, bgs, _ = th
+    assert len(theme["dataColors"]) >= 8
+    for c in theme["dataColors"]:
+        for bg in bgs:
             assert ratio(c, bg) >= 3.0, (c, bg)
 
-def test_sequential_map_endpoints_visible():
-    assert ratio("#4F7CA3", BG) >= 3.0 and ratio("#F0E442", BG) >= 3.0
+
+def test_sequential_map_endpoints_visible(th):
+    _, bgs, ends = th
+    for c in ends:
+        assert ratio(c, bgs[0]) >= 3.0, c

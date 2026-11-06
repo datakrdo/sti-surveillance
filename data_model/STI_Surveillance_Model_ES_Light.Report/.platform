@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "STI_Surveillance_Model_ES_Light"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "dd101762-5491-57eb-bf98-ae1d52b326c6"
+  }
+}

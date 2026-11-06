@@ -10,7 +10,7 @@ Fuentes: [CDC NNDSS Weekly](https://data.cdc.gov/resource/x9gk-5huc), [Oregon Mo
 
 ## Informe en Power BI 📈
 
-El entregable principal: siete páginas (Resumen, Mapa, Ranking, Corredor, Oregon, Demografía, Calidad) sobre un solo modelo semántico, con un tema oscuro accesible.
+El entregable principal: siete páginas (Resumen, Mapa, Ranking, Corredor, Oregon, Demografía, Calidad) sobre un solo modelo semántico, con un tema oscuro accesible. Cada informe tiene su gemelo en tema claro (`*_Light.pbip`), generado con `python scripts/build_light_reports.py`.
 
 ![Recorrido animado por las siete páginas del informe de Power BI](docs/img/report_es.gif)
 
@@ -158,6 +158,7 @@ sti-surveillance/
 ├── mcp/mcp_server.py
 ├── data_model/                           # Power BI: un solo modelo semántico (TMDL), un informe por idioma
 ├── theme/dark_accessible.json            # tema oscuro accesible
+├── theme/light_accessible.json           # tema claro accesible (informes *_Light.pbip)
 ├── scripts/export_public.py              # agregados públicos para la demo
 ├── site/                                 # dashboard estático (GitHub Pages)
 ├── worker/                               # MCP remoto de solo lectura (Cloudflare Workers)

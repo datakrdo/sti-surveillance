@@ -3,7 +3,8 @@ import json, pathlib, itertools
 import pytest
 
 ROOT = pathlib.Path(__file__).parent.parent / "data_model"
-REPORTS = {"es": "STI_Surveillance_Model_ES.Report", "en": "STI_Surveillance_Model.Report"}
+REPORTS = {"es": "STI_Surveillance_Model_ES.Report", "en": "STI_Surveillance_Model.Report",
+           "es_light": "STI_Surveillance_Model_ES_Light.Report", "en_light": "STI_Surveillance_Model_Light.Report"}
 W, H = 1920, 1080
 NAV = 7
 CARD = (296, 128)
@@ -29,7 +30,7 @@ def lit(obj, *path):
     return obj["expr"]["Literal"]["Value"] if "expr" in obj else obj
 
 
-@pytest.fixture(params=["es", "en"])
+@pytest.fixture(params=list(REPORTS))
 def pages(request):
     return load(request.param)
 
@@ -274,3 +275,10 @@ def test_oregon_county_labels_without_suffix(pages):
         if v["visual"]["visualType"] in ("barChart", "tableEx"):
             refs = [pr["queryRef"] for r in v["visual"]["query"]["queryState"].values() for pr in r["projections"]]
             assert "dim_geography.county_label" in refs and "dim_geography.county_name" not in refs, v["name"]
+
+
+@pytest.mark.parametrize("lang", ["es_light", "en_light"])
+def test_light_reports_have_no_dark_colors(lang):
+    for f in (ROOT / REPORTS[lang]).rglob("*.json"):
+        t = f.read_text().upper()
+        assert not any(h in t for h in ("#0F1720", "#18232F", "#2A3A4A", "DARK_ACCESSIBLE")), f

@@ -321,6 +321,21 @@ table _Measures
 		displayFolder: NNDSS
 		lineageTag: d15e32cf-a682-4b95-83c0-663a27bbef52
 
+	measure 'Disease Color Light' =
+			
+			SWITCH (
+			    SELECTEDVALUE ( dim_disease[disease_key] ),
+			    "CHL", "#0072B2",
+			    "GON", "#A35F00",
+			    "SYP_PS", "#008060",
+			    "SYP_EARLY", "#7D6E00",
+			    "SYP_CONG", "#C2410C",
+			    "HIV", "#A8457F",
+			    "#6B7785"
+			)
+		displayFolder: NNDSS
+		lineageTag: e253ca69-447a-4158-84db-03913107e588
+
 	column x
 		dataType: string
 		isHidden

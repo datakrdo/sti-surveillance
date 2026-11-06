@@ -1,0 +1,64 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "7e158c36cbb85e0e861b",
+  "position": {
+    "x": 32,
+    "y": 888,
+    "z": 13000,
+    "height": 120,
+    "width": 1856,
+    "tabOrder": 13000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Blocked for the restricted role: age and race breakdowns are not available to Restricted_Epidemiologist or Restricted_State_Analyst (object-level security). Oregon suppresses cells with fewer than 6 cases. The sex chart shows only Female and Male: Nonbinary and Unknown are almost always suppressed.",
+                    "textStyle": {
+                      "fontSize": "12pt"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Notice: age and race are blocked for the restricted role; cells with fewer than 6 cases are suppressed.'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
