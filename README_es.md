@@ -14,6 +14,8 @@ El entregable principal: siete páginas (Resumen, Mapa, Ranking, Corredor, Orego
 
 ![Recorrido animado por las siete páginas del informe de Power BI](docs/img/report_es.gif)
 
+![Recorrido del informe en tema claro](docs/img/report_es_light.gif)
+
 - **Modelo compuesto.** Los dos hechos (`fct_nndss_weekly`, `fct_oregon_monthly`) quedan en DirectQuery contra Neon, cinco dimensiones son Dual y una pequeña agregación Import (`agg_weekly_national`) responde las vistas nacionales semanales sin tocar la base.
 - **Seguridad por filas (RLS).** Cada usuario ve solo sus filas: `dim_access` asocia el inicio de sesión (`USERPRINCIPALNAME()`) con un estado o condado, y los roles `State_Analyst`, `County_Analyst` y `Admin` filtran `dim_geography` a partir de eso. Un usuario desconocido no ve nada.
 - **Seguridad por objetos (OLS).** `Restricted_State_Analyst` y `Restricted_Epidemiologist` no ven `race_group`, `age_group`, `demographic_level` ni la tabla `mart_revisions`; la página de Demografía lo avisa en lugar de fallar.

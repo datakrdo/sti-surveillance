@@ -14,6 +14,8 @@ The main deliverable: seven pages (Overview, Map, Ranking, Corridor, Oregon, Dem
 
 ![Animated tour of the seven Power BI report pages](docs/img/report_en.gif)
 
+![Light-theme tour of the report](docs/img/report_en_light.gif)
+
 - **Composite model.** The two facts (`fct_nndss_weekly`, `fct_oregon_monthly`) stay in DirectQuery against Neon, five dimensions are Dual, and a small Import aggregation (`agg_weekly_national`) answers the national weekly views without touching the database.
 - **Row-level security (RLS).** Each user sees only their rows: `dim_access` maps the sign-in (`USERPRINCIPALNAME()`) to a state or county, and the roles `State_Analyst`, `County_Analyst` and `Admin` filter `dim_geography` from it. An unknown user sees nothing.
 - **Object-level security (OLS).** `Restricted_State_Analyst` and `Restricted_Epidemiologist` cannot see `race_group`, `age_group`, `demographic_level` or the `mart_revisions` table; the Demographics page says so instead of failing.
